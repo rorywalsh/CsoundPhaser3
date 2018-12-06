@@ -283,6 +283,7 @@ update()
     }
 }
 ```
+<a href="update.html" target="_blank">Example</a>
 
 [Example](update.html)
 

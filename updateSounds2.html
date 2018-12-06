@@ -112,7 +112,7 @@ class GameScene extends Phaser.Scene {
 
         if (this.keys.W.isDown && this.player.body.touching.down){
             if (this.keys.W.isDown && this.player.body.touching.down){
-            csound.inputMessage("i1 0 .1 1000 " + this.player.x.toString());
+            csound.inputMessage("i1 0 .1 1000 " + (this.player.x*2).toString());
             this.player.setVelocityY(-540);
             this.player.setGravityY(1040);
         }
