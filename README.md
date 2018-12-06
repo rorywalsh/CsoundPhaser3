@@ -640,9 +640,13 @@ create()
 
 <img src="gifs/movingPlatformSounds.gif" style="width:60%" />
 
-## Where to now?
+## The demo
 
-The demo game is there to be hacked, as too are each of the examples presented in the text above. If any of you wish to contribute a level for the game, I'm more than happy to host it on my github page. Note that the web assembly version of Csound runs a little slower than native Csound. Therefore is important to make your instruments and game run as efficient as possible. The demo game follows standard Phaser3 protocols but is not optimised for performance. More details on how best to optimise graphics can be found at the Html5GameDevs forums. 
+<a href="game.html" target="_blank">The demo</a>
+
+The demo game is in pretty raw state but it does import Csound so it's ready to be hacked; as too are each of the examples presented in the text above. The demo adds a few extra features such collectable stars that came straight out of a phaser tutorial!. The bombs can be used blow up platforms. The goal is to get to the yellow door, which Spike must go through to get to the next level. The code for these things can be found in the githug page. If anyone wishes to contribute a level for the game, I'm more than happy to host it on my github page. 
+
+Note that the web assembly version of Csound runs a little slower than native Csound. Therefore it is important to make your instruments and game run as efficient as possible. The demo game follows standard Phaser3 protocols but is not optimised for performance. More details on how best to optimise graphics can be found at the Html5GameDevs forums. 
 
 
 ## Acknowledgments
