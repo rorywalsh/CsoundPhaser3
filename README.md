@@ -283,7 +283,9 @@ update()
     }
 }
 ```
+
 [Example](update.html)
+
 <img src="gifs/walking.gif" style="width:60%" />
 
 #### Adding some sounds: Score events
@@ -342,7 +344,7 @@ update()
         }
     (...)
 ```
-[Update demo with sounds 2](updateSounds2.html)
+[Example](updateSounds2.html)
 
 
 ## A bad night
@@ -398,6 +400,8 @@ addRain()
     });
 }
 ```
+
+[Example](rain.html)
 
 <img src="gifs/rain.gif" style="width:60%" />
 
@@ -593,8 +597,8 @@ A collision detector needs to be created to test if Spike hits the platform. Wit
 
 ## Where to now?
 
-The demo game is there to be hacked, as too are each of the examples presented in the text above. Feel free to change up stuff, or use your own sprites. If any of you wish to create a level for the game, I'm more than happy to host it on my github page. 
+The demo game is there to be hacked, as too are each of the examples presented in the text above. If any of you wish to contribute a level for the game, I'm more than happy to host it on my github page. 
 
 ## Acknowledgments
 
-Victor, Steven, John, and Hlolli for all the help with the Javascript stuff. To the developers of Phaser3 and their vault of examples. And thanks to those on who took the time to answer my questions on the HTML5GameDev forums.   
+Victor, Steven, John, and Hlolli for all the help with the Javascript stuff. To the developers of Phaser3 and their enormous vault of online examples. And thanks to those on who took the time to answer my questions on the HTML5GameDev forums.   

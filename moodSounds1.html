@@ -32,13 +32,29 @@ class GameScene extends Phaser.Scene {
     {
         this.load.spritesheet('spike', 'assets/spike.png', { frameWidth: 39, frameHeight: 48 });
         this.load.image('platform', 'assets/platform.png'); 
+        this.load.image('raindrop', 'assets/rainDrop.png'); 
     }
     
+    addRain()
+    {
+        this.rain = this.add.particles('raindrop');
+        this.rain.createEmitter({
+            x: { min: 1, max: 1800 },
+            y: 0,
+            lifespan: 1200,
+            speedY: { min: 200, max: 400 },
+            gravityY: 100,
+            gravityX: Phaser.Math.Between(100, 200),
+            scale: { start: 0.1, end: 0.2 },
+            quantity: 4,
+            blendMode: 'ADD'
+        });
+    }
      
     create()
     {
+        this.addRain(); 
         csound.inputMessage("i2 0 -1");
-        csound.inputMessage("i3 0 -1");
         this.player = this.physics.add.sprite(100, 10, 'spike');
         this.player.displayHeight = 45;
         this.player.setBounce(.1);  
