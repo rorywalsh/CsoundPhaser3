@@ -418,7 +418,6 @@ class GameScene extends Phaser.Scene {
     //non-callback events, triggered during game play
     dropBomb()
     {
-        var platformChildren = this.platforms.getChildren();
         var bomb = this.activeBombs.getChildren()[this.activeBombs.getTotalUsed()-1];
         bomb.setBounce(1);
         bomb.setCollideWorldBounds(true);

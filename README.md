@@ -603,6 +603,41 @@ The targets field of the tween object sets the sprite to attach the tween to. Th
 
 A collision detector needs to be created to test if Spike hits the platform. Without this Spike will just fall through the object as shown in the previous gif. The demo game features some logic to help the player move while standing on a platform. And it also features a falling platform that drops as soon as the player lands on it. Check out the source code for further details. 
 
+## More fun with sounds
+
+The is unlimited scope for interaction with between game events and sound using Phaser3 and Csound. For example, it's not that difficult to build a simple instrument in Csound that can be used to move platforms in the game. The following example is based on the simple update function code previously. 
+
+In this example, we use the amplitudes of 8 oscillators, which is set randomly, to move platforms up and down in the scene. In our k-rate callback function we grab each of the oscillator's current amplitude, and use that to move the platforms up and down. 
+
+The following code will move each platform based on some channel data from Csound. 
+
+```javascript
+create()
+{
+    for (var x = 0; x < 12; x++)
+                this.soundPlatforms.create(90*x, 400, 'platform').refreshBody();
+
+    csound.on("perform", async () => {
+        if(this.shouldUpdate>32)
+        {
+            for( var i = 0 ; i < 12 ; i++)
+            {
+                const yPos = await csound.getControlChannel('platform' + i.toString());
+                var platform = this.soundPlatforms.getChildren()[i];
+                platform.y = 200+(yPos*200);
+                platform.refreshBody();
+            }
+        }
+
+        this.shouldUpdate++;
+    });
+}
+
+
+<a href="updateSounds3.html" target="_blank">Example</a>
+
+<img src="gifs/movingPlatformSounds.gif" style="width:60%" />
+
 
 ## Where to now?
 
@@ -610,4 +645,4 @@ The demo game is there to be hacked, as too are each of the examples presented i
 
 ## Acknowledgments
 
-Victor, Steven, John, and Hlolli for all the help with the Javascript stuff. To the developers of Phaser3 and their enormous vault of online examples. And thanks to those on who took the time to answer my questions on the HTML5GameDev forums.   
+Victor, Steven, John, and Hlolli for all the help with the Javascript stuff. To the developers of Phaser3 and their enormous vault of online examples. And a special thanks to those on who took the time to answer my questions on the HTML5GameDev forums.   
