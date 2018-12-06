@@ -2,7 +2,7 @@
 
 This repo contains an example of a basic game created using the Phaser3 framework and Csound. Provided below is an overview of different aspects of the game development, from simple sprite movements to object collision. The code uses ES6-based techniques (i.e., classes), but works just as well in traditional JS code. 
 
-# Getting started: Loading Phaser3 and WebCsound
+## Getting started: Loading Phaser3 and WebCsound
  
 Phaser3 is a framework for generating Javascript based games. Csound-WASM is a web assembly version of the now well established audio programming language Csound. The two libraries need to be loaded before calling any game scripts. The loading of the library scripts happens in the game.html file, before any other scripts are called:
 
@@ -25,7 +25,7 @@ Phaser3 is a framework for generating Javascript based games. Csound-WASM is a w
 ```
 * Note that the demos presented here use a forked version of WebCsound available through [this](https://github.com/hlolli/csound-wasm) repo. It works just the same as the official Csound-WASM, but is provided as a single JS file rather a collection of different scripts.  
 
-# Creating a scene. 
+## Creating a scene. 
 
 Scenes are created in Phaser3 by creating a new `Phaser.Scene` object. Below is code for a barebones scene.
 
@@ -73,7 +73,7 @@ var game = new Phaser.Game(config);
 
 The first line of code declares a new class called `GameScene` which extends the `Phaser.Scene` namespace. The constructor is passed a JSON configuration var that sets various game properties. It sets the physics engine to arcade, and gravity to 300. The type field sets which system is used for displaying the graphics. It defaults to WebGL, but you can also set it to use the HTML5 Canvas.
 
-# The preload function
+## The preload function
 
 The preload function will load all assets needed for the game, including audio. The `load.image()` method can be used to load any sprites needed by the scene.  
 
@@ -118,12 +118,12 @@ f0 z
 </CsScore>
 </CsoundSynthesizer>
 ```
-The game will load this csd as soon as the game starts. Events can be sent to Csound from the game. The simplest way to do this is to trigger a score event. However, if realtime control of game sounds is required, it's best to use channels to send game data to Csound while it's running. 
+The game will load this csd as soon as the game starts. Events can be sent to Csound from the game. The simplest way to do this is to trigger a score event. However, if realtime control of game sounds is required, it's best to use channels to send game data to Csound while it's running.
+sdfdsf
+```To create your own character simply right click the spike.png file above and download it. Then open it in an image editor and replace the frames with your own character.```
 
-> To create your own character simply right click the spike.png file above and download it. Then open it in an image editor and replace the frames with your own character.
 
-
-## The create() function. 
+### The create() function. 
 
 The create function is used to create all of our gameobjects. For example, spike will be created here by creating a new physics sprite. 
 
@@ -240,7 +240,7 @@ create()
 }
 ```
 
-# The update function
+## The update function
 
 The update function is where the game is brought to life. This function runs repeatedly to constantly update our game world. It is here that one handles text input from the keyboard.   
 
@@ -275,10 +275,10 @@ update()
     }
 }
 ```
-
+(Update demo)[]
 <img src="gifs/walking.gif" style="width:60%" />
 
-# A bad night
+## A bad night
 
 The main character of this game is stuck in a maze of blocks that he needs to clear in order to find the yellow door. In order to add to the bleakness of Spike's challenge, some bad weather is added to the scene. Lightning is created via a callback function that randomly triggers itself. Each time it is called it momentarily starts to repeatedly redraw the scene's background colour. Once it has updating the background colour 20 times, it will return to the original background colour. 
 
@@ -325,7 +325,7 @@ addRain()
 
 <img src="gifs/rain.gif" style="width:60%" />
 
-# Bad things happen
+## Bad things happen
 
 In the demo game, collisions between certain sprites and the main player result in Spike being cosmically teleported back in time to the start of the level. This is done my marking certain platforms in the level string array with a 'g' instead of an 'x'. 
 
@@ -375,7 +375,7 @@ The first two parameters passed to `Physics.add.collider()` set the two objects 
 
 The same type of collision detection is used to collect tokens and bombs, and test for fatal missile attacks in the demo game. 
 
-# Canon fodder
+## Canon fodder
 
 The collision detection shown in the previous section is used to detect when cannon balls hit the player. The cannon balls themselves are creating in a timed callback which creates a sequence of game objects. The cannon balls hits are detected whenever a child cannon ball hits the player.  
 
@@ -404,7 +404,7 @@ triggercannonBalls()
 
 A second collision detector is set up between the cannon ball and the platforms to disable any cannonball that hits a platform.  
 
-# Platforms that move
+## Platforms that move
 
 Tweens provide a simple way of moving game objects around the screen. The demo game features moving platforms which constantly loop between two points. The platforms themselves form part of a physics group. As each object is added to the group, a tween is added to it. 
 
@@ -436,7 +436,7 @@ The targets field of the tween object sets the sprite to attach the tween to. Th
 
 A collision detector needs to be created to test if Spike hits the platform. Without this Spike will just fall through the object as shown in the previous gif. The demo game features some logic to help the player move while standing on a platform. And it also features a falling platform that drops as soon as the player lands on it. Check out the source code for further details. 
 
-## Adding sounds
+### Adding sounds
 
 Csound can by started by calling the `playCSD()` function. In the demo game, this happens in a file called csd.js which contains the csd code that is passed to Csound. It also compiles the code. 
 
@@ -532,10 +532,10 @@ endin
 ```
 
 
-# Where to now?
+## Where to now?
 
 The demo game is there to be hacked, as too are each of the examples presented in the text above. Feel free to change up stuff, or use your own sprites. If any of you wish to create a level for the game, I'm more than happy to host it on my github page. 
 
-# Acknowledgments
+## Acknowledgments
 
 Victor, Steven, John, and Hlolli for all the help with the Javascript stuff. To the developers of Phaser3 and their vault of examples. And thanks to those on who took the time to answer my questions on the HTML5GameDev forums.   
