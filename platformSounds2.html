@@ -63,6 +63,15 @@ class GameScene extends Phaser.Scene {
      
     create()
     {
+        this.controls = new Phaser.Cameras.Controls.SmoothedKeyControl(config);
+
+
+        this.input.on('pointermove', function (pointer) {
+        
+        //console.log(pointer.x);
+
+        }, this);
+
         this.addRain(); 
         csound.inputMessage("i2 0 -1");
         csound.inputMessage("i3 0 -1");
@@ -100,7 +109,7 @@ class GameScene extends Phaser.Scene {
         csound.on("perform", async () => {
             if(this.shouldUpdate>32)
             {
-                for( var i = 0 ; i < 12 ; i++)
+                for( var i = 0 ; i < 7 ; i++)
                 {
                     const yPos = await csound.getControlChannel('platform' + i.toString());
                     var platform = this.soundPlatforms.getChildren()[i];
@@ -155,8 +164,10 @@ class GameScene extends Phaser.Scene {
             this.cameras.main.setBackgroundColor(this.normalColour);
     }
 
-    update ()
+    update (time, delta)
     {
+        this.controls.update(delta);
+
         if (this.keys.A.isDown){
             this.player.setVelocityX(-160);    
             this.player.anims.play('left', true);
