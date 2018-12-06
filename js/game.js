@@ -35,8 +35,7 @@ class GameScene extends Phaser.Scene {
         this.load.image('razorGrass', 'assets/badGrass.png');
         this.load.spritesheet('spike', 'assets/spike.png', { frameWidth: 39, frameHeight: 48 });
         this.load.image('flame', 'assets/flame.png');
-        
-        csound.playCSD(csdText);
+
     }
 
     create() 
@@ -458,7 +457,7 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 300 },
-            debug: true
+            debug: false
         }
     },
     scene: GameScene,

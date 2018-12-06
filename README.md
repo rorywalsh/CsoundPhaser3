@@ -411,7 +411,7 @@ There may be times when you want to have a single instrument running all the tim
 
 In order for Csound to pick up this data it needs to call the `chnget` opcode. In the following instrument some noise is filter by Spike's position on the y axis. 
 
-```html
+```csound
 (...)
 instr 2
     a1 rand 1
@@ -439,7 +439,7 @@ The noise will change whenever Spike moves up or down the screen.
 
 Channels can be bi-directional. Csound can just as easily send data to the game as receive it. In this example we time a drum beat to the lightning. We use an always running instrument (`instr 3`) to trigger a drum sounds every second. At the same time it triggers the drum sound it also sends channel data to the 'triggerLights' named channel. 
 
-```html
+```javascript
 instr 3
     kRand randh 1000, 4000, 2
     if metro(1) == 1 then
@@ -476,16 +476,16 @@ preload()
 }
 ```
 
-Where `this.triggerLights` is variable used to hold the current value of the `triggerLights` channel. Each time it changes the `this.triggerLightning()` function is called. 
+Where `this.triggerLights` is a variable used to hold the current value of the `triggerLights` Csound channel. Each time it changes the `this.triggerLightning()` function is called and strikes of lightning will appear in the scene. 
 
 [Example](moodSounds2.html)
 
-Note that the timed function used the drive the strikes of lightning in the prevous example have been disabled in this case. 
+Note that the timed function used the drive the strikes of lightning in the previous example have been disabled in this case. 
 
 
 ## Bad things happen
 
-In the demo game, collisions between certain sprites and the main player result in Spike being cosmically teleported back in time to the start of the level. The bad platforms, or grass in this case is created in the same way as other platform, but different colliders are used with them. In the simpe level designer, we use 'g' to denote This is done my marking certain sprites in the level string array with a 'h' instead of an 'x'. 
+In the demo game, collisions between certain sprites and the main player result in Spike being cosmically teleported back in time to the start of the level. The bad platforms, or razor grass in this case, is created in the same way as any other platform, but different colliders are used with them. In the simple level designer, we use 'g' to denote the bad grass we wish to use in the scene. This is done my marking certain sprites in the level string array with a 'h' instead of an 'x'. 
 
 The demo game also features good grass that can be added as a prop anywhere in the scene. Again they are added in the same way as the other game objects. 
 
@@ -532,6 +532,11 @@ badGrassHit()
 The first two parameters passed to `Physics.add.collider()` set the two objects that will be tested for collisions. The next is a callback function that will be called each time a collision takes place. The next parameter gives you a more detailed callback function to testing different types of collisions. It is not needed here so `null` is passed instead. The last parameter is the 'callbackContext'. 
 
 The same type of collision detection is used to collect tokens and bombs, and test for fatal missile attacks in the demo game. 
+
+Sounds can easily be added to an event like this by sending a simple score event. In this, a low explosion is heard each time Spikes hits razor grass.
+
+[Example](razorGrass.html)
+
 
 ## Cannon fodder
 
