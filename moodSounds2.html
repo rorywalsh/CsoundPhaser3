@@ -31,13 +31,23 @@ class GameScene extends Phaser.Scene {
     preload()
     {
         this.load.spritesheet('spike', 'assets/spike.png', { frameWidth: 39, frameHeight: 48 });
-        this.load.image('platform', 'assets/platform.png');        
+        this.load.image('platform', 'assets/platform.png'); 
+        
+        csound.on("perform", async () => {
+            const val = await csound.getControlChannel("triggerLights");
+            if (this.triggerLights!=val)
+            {
+                this.triggerLights = val;
+                this.triggerLightning();
+            }
+        });
     }
     
      
     create()
     {
-        csound.inputMessage("i3 0 36000");
+        csound.inputMessage("i2 0 -1");
+        csound.inputMessage("i3 0 -1");
         this.player = this.physics.add.sprite(100, 10, 'spike');
         this.player.displayHeight = 45;
         this.player.setBounce(.1);  
@@ -99,14 +109,12 @@ class GameScene extends Phaser.Scene {
             repeat: -1
         });
 
-        this.timedEvent1 = this.time.addEvent({ delay: 300, callback: this.triggerLightning, callbackScope: this});
+        //this.timedEvent1 = this.time.addEvent({ delay: 300, callback: this.triggerLightning, callbackScope: this});
         csound.inputMessage("i3 0 -1");
     }
 
     triggerLightning ()
     {
-       // this.timedEvent1.reset({ delay: Phaser.Math.Between(500,1500), callback: this.triggerLightning, callbackScope: this, repeat: 1});
-       console.log("Triggering"); 
        this.lightningTime = 0;
     }
 
@@ -141,17 +149,9 @@ class GameScene extends Phaser.Scene {
             this.player.setVelocityY(-540);
             this.player.setGravityY(1040);
         }
-
+        
+        csound.setControlChannel("cutoff", this.player.y*2);
         this.showLightning();
-
-        csound.on("perform", async () => {
-            const val = await csound.getControlChannel("triggerLights");
-            if (this.triggerLights!=val)
-            {
-                this.triggerLights = val;
-                this.triggerLightning();
-            }
-        });
 
     }
 };

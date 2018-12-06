@@ -283,10 +283,10 @@ update()
     }
 }
 ```
-[Update demo](update.html)
+[Example](update.html)
 <img src="gifs/walking.gif" style="width:60%" />
 
-#### Adding some sounds 
+#### Adding some sounds: Score events
 
 Now that Spike has some moves, it might be good to test out some game sound. Sending events to Csound is trivial and can be done in 2 ways. The first mechanism is a score event, which can be sent using the `csound.inputMessage()` function. In the following example, a score message is sent to Csound each time the users jumps.
 
@@ -326,7 +326,7 @@ f0 z
 csound.playCSD(csd);
 ```
 
-[Update demo](updateSounds1.html)
+[Example](updateSounds1.html)
 
 `instr 1` 1 takes two p-field parameters which are sent via the `csound.inputMessage("i1 0 .1 1000 500")` function. These number can be changed on the javascript side at any point in the game to change to parameters of the sounds. In the following code Spike's x position within the world determines the pitch of the tone played. 
 
@@ -342,14 +342,23 @@ update()
         }
     (...)
 ```
-[Update demo](updateSounds2.html)
+[Update demo with sounds 2](updateSounds2.html)
 
 
 ## A bad night
 
-The main character of this game is stuck in a maze of blocks that he needs to clear in order to find the yellow door. In order to add to the bleakness of Spike's challenge, some bad weather is added to the scene. Lightning is created via a callback function that randomly triggers itself. Each time it is called it momentarily starts to repeatedly redraw the scene's background colour. Once it has updating the background colour 20 times, it will return to the original background colour. 
+The main character of this game is stuck in a maze of blocks that he needs to clear in order to find the yellow door. Some bad weather should help add to the bleakness of Spike's challenge. Lightning is created via a callback function that randomly triggers itself. Each time it is called it instructs the scene to repeatedly redraw its background colour. Once it has updating the background colour 20 times it will return to the original background colour. 
 
 ```javascript
+constructor (config)
+{
+    (...)
+    this.normalColour = new Phaser.Display.Color(60, 60, 60);
+    this.colour1 = new Phaser.Display.Color(155, 155, 155);
+    this.colour2 = new Phaser.Display.Color(0, 0, 0);
+    (...)
+}
+
 triggerLightning ()
 {
     this.timedEvent1.reset({ delay: Phaser.Math.Between(2000,15000), callback: this.triggerLightning, callbackScope: this, repeat: 1});
@@ -370,7 +379,7 @@ showLightning()
 
 <img src="gifs/mood.gif" style="width:60%" />
 
-Some rain will now be added to the scene. Rain can easily be created using the particle emitter. It has many different parameters for setting all aspects of how the particle are emitted. In this case we set an x range to vary between 0 and 1800. Gravity is set to 100 to pull the rain down the screen. The rain drops will also get a little larger as the fall from the sky.  
+Some rain can also be added to the scene. Rain can be created using the particle emitter, which comes with many different parameters for setting all aspects of how the particle are emitted. In this case we set an x range to vary between 0 and 1800. Gravity is set to 100 to pull the rain down the screen, while the raindrops themselves will get a little larger in scale as they fall from the sky.  
 
 ```javascript
 addRain()
@@ -392,11 +401,89 @@ addRain()
 
 <img src="gifs/rain.gif" style="width:60%" />
 
+#### Adding some sounds: Real-time channels 
+
+There may be times when you want to have a single instrument running all the time. In these cases it is important to able to send data to Csound while it is running. This can be achieved using so-called software channels. String and numeric data can be sent to any running instrument in Csound. The `csound.setControlChannel()` function can be called to send data to Csound from the game engine. 
+
+In order for Csound to pick up this data it needs to call the `chnget` opcode. In the following instrument some noise is filter by Spike's position on the y axis. 
+
+```html
+(...)
+instr 2
+    a1 rand 1
+    a2 lpf18 a1, chnget:k("cutoff"), .5, 0
+    printk 1, chnget:k("cutoff")
+    outs a2, a2 
+endin
+
+(...)
+```
+
+The above instrument is triggered to play in the Csound score section just as the game opens. It then waits for data to be sent from the game. The game data is sent using the `csound.setControlChannel()` function. This funtion takes two parameters, a string naming the channel, and the value to send to that channel. In the simple example presented here, Spike's y position will control how much of the noise is filtered. 
+
+The following code is added to the `update()` function:
+
+```javascript
+csound.setControlChannel("cutoff", this.player.y*2);
+```
+
+The noise will change whenever Spike moves up or down the screen.
+
+[Example](moodSounds1.html)
+
+#### Getting information from Csound
+
+Channels can be bi-directional. Csound can just as easily send data to the game as receive it. In this example we time a drum beat to the lightning. We use an always running instrument (`instr 3`) to trigger a drum sounds every second. At the same time it triggers the drum sound it also sends channel data to the 'triggerLights' named channel. 
+
+```html
+instr 3
+    kRand randh 1000, 4000, 2
+    if metro(1) == 1 then
+        event "i", 4, 0, 10
+        chnset kRand, "triggerLights"
+    endif
+endin
+
+instr 4
+    prints "Istrument 4"
+    a1 expon .1, p3, 0.001
+    a2 expon 150, p3, 50
+    a3 oscili a1, a2
+    outs a3, a3
+endin
+```
+
+The best way to pick up these message is by using a k-rate callback function. This function, which can be called from the game's `preload()` function will check for channel data on every k-rate cycle. It can be declared as follows.
+
+```javascript
+preload()
+{
+    this.load.spritesheet('spike', 'assets/spike.png', { frameWidth: 39, frameHeight: 48 });
+    this.load.image('platform', 'assets/platform.png'); 
+    
+    csound.on("perform", async () => {
+        const val = await csound.getControlChannel("triggerLights");
+        if (this.triggerLights!=val)
+        {
+            this.triggerLights = val;
+            this.triggerLightning();
+        }
+    });
+}
+```
+
+Where `this.triggerLights` is variable used to hold the current value of the `triggerLights` channel. Each time it changes the `this.triggerLightning()` function is called. 
+
+[Example](moodSounds2.html)
+
+Note that the timed function used the drive the strikes of lightning in the prevous example have been disabled in this case. 
+
+
 ## Bad things happen
 
-In the demo game, collisions between certain sprites and the main player result in Spike being cosmically teleported back in time to the start of the level. This is done my marking certain platforms in the level string array with a 'g' instead of an 'x'. 
+In the demo game, collisions between certain sprites and the main player result in Spike being cosmically teleported back in time to the start of the level. The bad platforms, or grass in this case is created in the same way as other platform, but different colliders are used with them. In the simpe level designer, we use 'g' to denote This is done my marking certain sprites in the level string array with a 'h' instead of an 'x'. 
 
-The demo game also features good grass that can be added as a prop anywhere in the scene. They are added in the same way as the other game objects. 
+The demo game also features good grass that can be added as a prop anywhere in the scene. Again they are added in the same way as the other game objects. 
 
 ```javascript
 create()
@@ -502,49 +589,6 @@ The targets field of the tween object sets the sprite to attach the tween to. Th
 <img src="gifs/platforms.gif" style="width:60%" />
 
 A collision detector needs to be created to test if Spike hits the platform. Without this Spike will just fall through the object as shown in the previous gif. The demo game features some logic to help the player move while standing on a platform. And it also features a falling platform that drops as soon as the player lands on it. Check out the source code for further details. 
-
-### Adding sounds
-
-Csound can by started by calling the `playCSD()` function. In the demo game, this happens in a file called csd.js which contains the csd code that is passed to Csound. It also compiles the code. 
-
-
-
-Instruments can be started any time, to match any game event. You can set how they play for, and pass lots of game data for tem to use. 
-
-There may be times when you want to have a single instrument running all the time. In these cases it is important to able to send data to Csound during the performance time of an instrument. This can be achieved using channels. String and numeric data can be sent to any running instrument in Csound. The `csound.setControlChannel()` function can be called to send data to Csound. 
-
-In order for Csound to pick up this data it needs to call the `chnget` opcode. In the following instrument some noise is filter by Spike's position on the y axis. 
-
-```html
-(...)
-instr 2
-    a1 rand 1
-    a2 lpf18 a1, chnget:k("cutoff"), .5, 0
-    printk 1, chnget:k("cutoff")
-    outs a2, a2 
-endin
-
-(...)
-```
-
-The above instrument is triggered to play in the Csound score section just as the game opens. It then waits for data to be sent from the game. The game data is sent using the `csound.setControlChannel()` function. This funtion takes two parameters, a string naming the channel, and the value to send to that channel. In the simple example presented here, Spike's y position will control how much of the noise is filtered. 
-
-The following code is added to the `update()` function:
-
-```javascript
-csound.setControlChannel("cutoff", this.player.y*2);
-```
-
-The noise will change whenever Spike moves up or down the screen. Channels can be bi-driectional. Csound can just as easily send data to the game. In this example we time a drum beat to the lightning. First we create a simple kick drum.
-
-```html
-instr 3
-a1 expon 1, p3, 0.001
-a2 expon 150, p3, 50
-a3 oscili a1, a2
-outs a3, a3
-endin
-```
 
 
 ## Where to now?
