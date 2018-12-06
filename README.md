@@ -325,6 +325,7 @@ f0 z
 `
 csound.playCSD(csd);
 ```
+
 <a href="updateSounds1.html" target="_blank">Example</a>
 
 
@@ -342,7 +343,6 @@ update()
         }
     (...)
 ```
-
 <a href="updateSounds2.html" target="_blank">Example</a>
 
 
@@ -399,6 +399,7 @@ addRain()
     });
 }
 ```
+
 <a href="rain.html" target="_blank">Example</a>
 
 
@@ -477,6 +478,7 @@ preload()
 ```
 
 Where `this.triggerLights` is a variable used to hold the current value of the `triggerLights` Csound channel. The Csound instrument is going to send a new random number every second. Each time it changes, the `this.triggerLightning()` function is called, and strikes of lightning appear on the scene. 
+
 
 <a href="moodSounds2.html" target="_blank">Example</a>
 
@@ -570,7 +572,6 @@ triggercannonBalls()
 
 A second collision detector is set up between the cannon ball and the platforms to disable any cannonball that hits a platform.  
 
-
 <a href="canonSounds.html" target="_blank">Example</a>
 
 ## Platforms that move
@@ -636,7 +637,7 @@ create()
 }
 ```
 
-<a href="updateSounds3.html" target="_blank">Example</a>
+<a href="platformSounds.html" target="_blank">Example</a>
 
 <img src="gifs/movingPlatformSounds.gif" style="width:60%" />
 
