@@ -349,7 +349,7 @@ update()
 
 ## A bad night
 
-The main character of this game is stuck in a maze of blocks that he needs to clear in order to find the yellow door. Some bad weather should help add to the bleakness of Spike's challenge. Lightning is created via a callback function that randomly triggers itself. Each time it is called it instructs the scene to repeatedly redraw its background colour. Once it has updating the background colour 20 times it will return to the original background colour. 
+The main character of this game is stuck in a maze of blocks that he needs to clear in order to find the yellow door. Some bad weather should help add to the bleakness of Spike's challenge. Lightning is created via a callback function that randomly triggers itself. Each time it is called it instructs the scene to repeatedly redraw its background colour. Once it has updated the background colour 20 times it will return to the original background colour. 
 
 ```javascript
 constructor (config)
