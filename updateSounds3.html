@@ -22,6 +22,9 @@ class GameScene extends Phaser.Scene {
     {
         super(config);
         this.shouldUpdate = 0;
+        this.normalColour = new Phaser.Display.Color(60, 60, 60);
+        this.colour1 = new Phaser.Display.Color(155, 155, 155);
+        this.colour2 = new Phaser.Display.Color(0, 0, 0);
     }
 
     preload()
