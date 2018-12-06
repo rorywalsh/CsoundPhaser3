@@ -21,10 +21,6 @@ class GameScene extends Phaser.Scene {
     constructor (config)
     {
         super(config);
-        this.normalColour = new Phaser.Display.Color(60, 60, 60);
-        this.colour1 = new Phaser.Display.Color(155, 155, 155);
-        this.colour2 = new Phaser.Display.Color(0, 0, 0);
-        this.triggerLights = -99;
     }
 
 
@@ -37,7 +33,6 @@ class GameScene extends Phaser.Scene {
      
     create()
     {
-        csound.inputMessage("i3 0 36000");
         this.player = this.physics.add.sprite(100, 10, 'spike');
         this.player.displayHeight = 45;
         this.player.setBounce(.1);  
@@ -50,19 +45,17 @@ class GameScene extends Phaser.Scene {
         this.cameras.main.setBounds(0, 0, width, height); 
 
         var mainLevel = [
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                '                                  ',
-                '                                  ',
-                'xx                                ',
-                '                                  ',
-                '                  xxxxxxx         ',
-                '            xxxxxxx               ',
-                '        xxxxxxxxxxxxxxxxxx        ',
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+                '                 ',
+                '                 ',
+                '                 ',
+                '             xxxx',
+                'xx               ',
+                '                 ',
+                '          xxxxxxx',
+                '                 ',
+                '        xxxxxxxxx',
+                '                 ',
+                'xxxxxxxxxxxxxxxxx'
         ];
         
         var width = mainLevel[0].length*48;
@@ -99,27 +92,8 @@ class GameScene extends Phaser.Scene {
             repeat: -1
         });
 
-        this.timedEvent1 = this.time.addEvent({ delay: 300, callback: this.triggerLightning, callbackScope: this});
-        csound.inputMessage("i3 0 -1");
     }
 
-    triggerLightning ()
-    {
-       // this.timedEvent1.reset({ delay: Phaser.Math.Between(500,1500), callback: this.triggerLightning, callbackScope: this, repeat: 1});
-       console.log("Triggering"); 
-       this.lightningTime = 0;
-    }
-
-    showLightning()
-    {
-        if(this.lightningTime<20){
-            var hexColour = Phaser.Display.Color.Interpolate.ColorWithColor(this.colour1, this.colour2, Phaser.Math.FloatBetween(0, 10), Phaser.Math.FloatBetween(0, 10));
-            this.cameras.main.setBackgroundColor(hexColour);
-            this.lightningTime++;
-        }
-        else
-            this.cameras.main.setBackgroundColor(this.normalColour);
-    }
 
     update ()
     {
@@ -137,21 +111,10 @@ class GameScene extends Phaser.Scene {
         }
 
         if (this.keys.W.isDown && this.player.body.touching.down){
-            //csound.inputMessage("i1 0 .1 1000 500");
+            csound.inputMessage("i1 0 .1 1000 500");
             this.player.setVelocityY(-540);
             this.player.setGravityY(1040);
         }
-
-        this.showLightning();
-
-        csound.on("perform", async () => {
-            const val = await csound.getControlChannel("triggerLights");
-            if (this.triggerLights!=val)
-            {
-                this.triggerLights = val;
-                this.triggerLightning();
-            }
-        });
 
     }
 };

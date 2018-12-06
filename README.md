@@ -159,7 +159,7 @@ create()
 
 #### Collisions 
 
-Although there is now a platform in the game, the main character will continue to fall through it until a collision callback is created. This is done through the `Physics.add.collider()` method. In this case a collider is created that will check for collisions between the player and the platforms.
+Although there are now platforms in the scene, the main character will continue to fall through them until a collision callback is created. This is done through the `Physics.add.collider()` function. In this case a collider is created that will check for collisions between the player and the platforms.
 
 ```javascript
 create()
@@ -177,6 +177,8 @@ create()
 ```
 
 <img src="gifs/collision.gif" style="width:60%" />
+
+#### Building a level
 
 The create function for the demo game includes a simple level editor that is based on ideas presented in [this](http://www.lessmilk.com/tutorial/2d-platformer-phaser) tutorial. A main level is built using a simple string array. Each string in the array represents a row in the scene. Each character within that string creates a particular type of platform. A simple loop in the create function can read through the array and create all the platforms one needs. The following level string be used to create an array of platforms across the screen.
 
@@ -215,7 +217,10 @@ The create function for the demo game includes a simple level editor that is bas
 ```
 You might notice an extra line of code at the bottom. This is use to set the keyboard mappings. Here the characters W,S,A,D are added. They can be queried later in the `update()` function.
 
+#### Animations
+
 Finally, it's time to add the animations for the main character. `this.anims.create()` will create animations, based on a range of frames from an asset. In this case 'turning' uses just a single frame, while walking 'left' and 'right' use a range of frames. 
+
 
 ```javascript
 create()
@@ -278,8 +283,67 @@ update()
     }
 }
 ```
-(Update demo)[]
+[Update demo](update.html)
 <img src="gifs/walking.gif" style="width:60%" />
+
+#### Adding some sounds 
+
+Now that Spike has some moves, it might be good to test out some game sound. Sending events to Csound is trivial and can be done in 2 ways. The first mechanism is a score event, which can be sent using the `csound.inputMessage()` function. In the following example, a score message is sent to Csound each time the users jumps.
+
+```javascript
+update()
+{
+    (...)
+        if (this.keys.W.isDown && this.player.body.touching.down){
+            csound.inputMessage("i1 0 .1 1000 500");
+            this.player.setVelocityY(-540);
+            this.player.setGravityY(1040);
+            this.stickToPlatform = false;
+        }
+    (...)
+```
+
+The Csound instrument being called is defined in the `csd.js` file, which looks like this.
+
+```html
+const csd = `
+<CsoundSynthesizer>
+<CsInstruments>
+
+;jumping sound
+instr 1
+    a1 expon 1, p3, 0.001
+    a2 oscili a1, (1-a1)*p4+p5
+    outs a2, a2 
+endin
+
+</CsInstruments>
+<CsScore>
+f0 z
+</CsScore>
+</CsoundSynthesizer>
+`
+csound.playCSD(csd);
+```
+
+[Update demo](updateSounds1.html)
+
+`instr 1` 1 takes two p-field parameters which are sent via the `csound.inputMessage("i1 0 .1 1000 500")` function. These number can be changed on the javascript side at any point in the game to change to parameters of the sounds. In the following code Spike's x position within the world determines the pitch of the tone played. 
+
+```javascript
+update()
+{
+    (...)
+        if (this.keys.W.isDown && this.player.body.touching.down){
+            csound.inputMessage("i1 0 .1 1000 " + this.player.x.toString());
+            this.player.setVelocityY(-540);
+            this.player.setGravityY(1040);
+            this.stickToPlatform = false;
+        }
+    (...)
+```
+[Update demo](updateSounds2.html)
+
 
 ## A bad night
 
@@ -378,7 +442,7 @@ The first two parameters passed to `Physics.add.collider()` set the two objects 
 
 The same type of collision detection is used to collect tokens and bombs, and test for fatal missile attacks in the demo game. 
 
-## Canon fodder
+## Cannon fodder
 
 The collision detection shown in the previous section is used to detect when cannon balls hit the player. The cannon balls themselves are creating in a timed callback which creates a sequence of game objects. The cannon balls hits are detected whenever a child cannon ball hits the player.  
 
@@ -443,59 +507,7 @@ A collision detector needs to be created to test if Spike hits the platform. Wit
 
 Csound can by started by calling the `playCSD()` function. In the demo game, this happens in a file called csd.js which contains the csd code that is passed to Csound. It also compiles the code. 
 
-Send events to Csound is trivial. The first mechanism is a score event, which can be sent using the `csound.inputMessage()` function. In the following example, a score message is sent to Csound each time the users jumps.
 
-```javascript
-update()
-{
-    (...)
-        if (this.keys.W.isDown && this.player.body.touching.down){
-            csound.inputMessage("i1 0 .1 1000 500");
-            this.player.setVelocityY(-540);
-            this.player.setGravityY(1040);
-            this.stickToPlatform = false;
-        }
-    (...)
-```
-
-The Csound instrument being called is defined in the csd.js file, which looks like this.
-
-```html
-const csd = `
-<CsoundSynthesizer>
-<CsInstruments>
-
-;jumping sound
-instr 1
-    a1 expon 1, p3, 0.001
-    a2 oscili a1, (1-a1)*p4+p5
-    outs a2, a2 
-endin
-
-</CsInstruments>
-<CsScore>
-f0 z
-</CsScore>
-</CsoundSynthesizer>
-`
-csound.playCSD(csd);
- 
-```
-
-Instrument 1 takes two p-field parameters which are pass via the score event "i1 0 .1 1000 500". These number can be changed on the javascript side at any point in the game to change to parameters of the sounds. In the following code Spike's x position within the world determines the pitch of the tone played. 
-
-```javascript
-update()
-{
-    (...)
-        if (this.keys.W.isDown && this.player.body.touching.down){
-            csound.inputMessage("i1 0 .1 1000 " + this.player.x.toString());
-            this.player.setVelocityY(-540);
-            this.player.setGravityY(1040);
-            this.stickToPlatform = false;
-        }
-    (...)
-```
 
 Instruments can be started any time, to match any game event. You can set how they play for, and pass lots of game data for tem to use. 
 
