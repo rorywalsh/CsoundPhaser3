@@ -381,7 +381,7 @@ showLightning()
 
 <img src="gifs/mood.gif" style="width:60%" />
 
-Some rain can also be added to the scene. Rain can be created using the particle emitter, which comes with many different parameters for setting all aspects of how the particle are emitted. In this case we set an x range to vary between 0 and 1800. Gravity is set to 100 to pull the rain down the screen, while the raindrops themselves will get a little larger in scale as they fall from the sky.  
+Rain can be created using the particle emitter, which comes with many different parameters for setting all aspects of how the particle are emitted. In this case we set an x range to vary between 0 and 1800. Gravity is set to 100 to pull the rain down the screen, while the raindrops themselves will get a little larger in scale as they fall from the sky.  
 
 ```javascript
 addRain()
@@ -438,7 +438,7 @@ The noise will change whenever Spike moves up or down the screen.
 
 #### Getting information from Csound
 
-Channels can be bi-directional. Csound can just as easily send data to the game as receive it. In this example we time a drum beat to the lightning. We use an always running instrument (`instr 3`) to trigger a drum sounds every second. At the same time it triggers the drum sound it also sends channel data to the 'triggerLights' named channel. 
+Channels can be bi-directional. Csound can just as easily send data to the game as receive it. In this example we time a drum beat to the lightning. We use an always running instrument (`instr 3`) to trigger a drum sounds every second. At the same time it triggers the drum sound it also sends channel data to the 'triggerLights' channel. 
 
 ```javascript
 instr 3
@@ -458,7 +458,7 @@ instr 4
 endin
 ```
 
-The best way to pick up these message is by using a k-rate callback function. This function, which can be called from the game's `preload()` function will check for channel data on every k-rate cycle. It can be declared as follows.
+The best way to pick up these message in the game is by using a callback function which is started from the game's `preload()` function. It will be called on each k-rate cycle. It can be declared as follows.
 
 ```javascript
 preload()
@@ -512,6 +512,8 @@ create()
 
 ```
 
+<a href="razor.html" target="_blank">Example</a>
+
 <img src="gifs/grass.gif" style="width:60%" />
 
 To reset the game each time Spike wonders into long grass, a collider is set up to observe collisions between Spike and the bad grass. This time a callback function is passed to the collider. This callback function will be called whenever a collision takes place.
@@ -537,7 +539,7 @@ The same type of collision detection is used to collect tokens and bombs, and te
 
 Sounds can easily be added to an event like this by sending a simple score event. In this, a low explosion is heard each time Spikes hits razor grass.
 
-<a href="razorGrass.html" target="_blank">Example</a>
+<a href="razorGrassSound.html" target="_blank">Example</a>
 
 
 ## Cannon fodder
