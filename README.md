@@ -344,7 +344,7 @@ update()
     (...)
 ```
 
-<a href="updateSound2.html" target="_blank">Example</a>
+<a href="updateSounds2.html" target="_blank">Example</a>
 
 
 ## A bad night
