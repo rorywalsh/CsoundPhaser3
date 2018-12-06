@@ -1,0 +1,207 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Csound and Phaser 3</title>
+    <script src="js/phaser.js"></script>
+    <script src="js/csound-wasm-browser.js"></script>
+    <script src="js/csd.js"></script>
+
+    <style type="text/css">
+        body {
+            margin: 0;
+        }  
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+class GameScene extends Phaser.Scene {
+
+    constructor (config)
+    {
+        super(config);
+        this.normalColour = new Phaser.Display.Color(60, 60, 60);
+        this.colour1 = new Phaser.Display.Color(155, 155, 155);
+        this.colour2 = new Phaser.Display.Color(0, 0, 0);
+        this.triggerLights = -99;
+        this.shouldUpdate = 0;
+    }
+
+
+    preload()
+    {
+        this.load.spritesheet('spike', 'assets/spike.png', { frameWidth: 39, frameHeight: 48 });
+        this.load.image('platform', 'assets/platform.png'); 
+        
+        csound.on("perform", async () => {
+            const val = await csound.getControlChannel("triggerLights");
+            if (this.triggerLights!=val)
+            {
+                this.triggerLights = val;
+                this.triggerLightning();
+            }
+        });
+    }
+    
+    addRain()
+    {
+        this.rain = this.add.particles('raindrop');
+        this.rain.createEmitter({
+            x: { min: 1, max: 1800 },
+            y: 0,
+            lifespan: 1200,
+            speedY: { min: 200, max: 400 },
+            gravityY: 100,
+            gravityX: Phaser.Math.Between(100, 200),
+            scale: { start: 0.1, end: 0.2 },
+            quantity: 4,
+            blendMode: 'ADD'
+        });
+    }
+     
+    create()
+    {
+        this.addRain(); 
+        csound.inputMessage("i2 0 -1");
+        csound.inputMessage("i3 0 -1");
+        csound.inputMessage("i6 0 -1");
+        this.player = this.physics.add.sprite(100, 10, 'spike');
+        this.player.displayHeight = 45;
+        this.player.setBounce(.1);  
+        this.soundPlatforms = this.physics.add.staticGroup();
+        this.physics.add.collider(this.player, this.soundPlatforms);
+        
+        this.physics.world.bounds.width = width;
+        this.physics.world.bounds.height = height
+        this.cameras.main.setBounds(0, 0, width, height); 
+
+        var mainLevel = [
+                '                 ',
+                '                 ',
+                '                 ',
+                '                 ',
+                '                ',
+                '                 ',
+                '                 ',
+                'xxxxxxxxxxxxxxxxx',
+                '                 ',
+                '                 ',
+                '                 '
+        ];
+        
+        var width = mainLevel[0].length*48;
+        var height = (mainLevel.length)*48;
+
+        for (var x = 0; x < 7; x++)
+            this.soundPlatforms.create(100+(90*x), 400, 'platform').refreshBody();
+
+        csound.on("perform", async () => {
+            if(this.shouldUpdate>32)
+            {
+                for( var i = 0 ; i < 12 ; i++)
+                {
+                    const yPos = await csound.getControlChannel('platform' + i.toString());
+                    var platform = this.soundPlatforms.getChildren()[i];
+                    platform.y = 200+(yPos*200);
+                    platform.refreshBody();
+                }
+            }
+
+            this.shouldUpdate++;
+        });
+
+        this.keys = this.input.keyboard.addKeys('W,S,A,D,B');
+
+        //  Our player animations, turning, walking left and walking right
+        this.anims.create({
+            key: 'left',
+            frames: this.anims.generateFrameNumbers('spike', { start: 0, end: 3 }),
+            frameRate: 10,
+            repeat: -1
+        });
+    
+        this.anims.create({
+            key: 'turn',
+            frames: [ { key: 'spike', frame: 4 } ],
+            frameRate: 20
+        });
+    
+        this.anims.create({
+            key: 'right',
+            frames: this.anims.generateFrameNumbers('spike', { start: 5, end: 8 }),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        //this.timedEvent1 = this.time.addEvent({ delay: 300, callback: this.triggerLightning, callbackScope: this});
+        csound.inputMessage("i3 0 -1");
+    }
+
+    triggerLightning ()
+    {
+       this.lightningTime = 0;
+    }
+
+    showLightning()
+    {
+        if(this.lightningTime<20){
+            var hexColour = Phaser.Display.Color.Interpolate.ColorWithColor(this.colour1, this.colour2, Phaser.Math.FloatBetween(0, 10), Phaser.Math.FloatBetween(0, 10));
+            this.cameras.main.setBackgroundColor(hexColour);
+            this.lightningTime++;
+        }
+        else
+            this.cameras.main.setBackgroundColor(this.normalColour);
+    }
+
+    update ()
+    {
+        if (this.keys.A.isDown){
+            this.player.setVelocityX(-160);    
+            this.player.anims.play('left', true);
+        }
+        else if (this.keys.D.isDown){
+            this.player.setVelocityX(160);    
+            this.player.anims.play('right', true);
+        }
+        else{
+            this.player.setVelocityX(0);    
+            this.player.anims.play('turn');
+        }
+
+        if (this.keys.W.isDown && this.player.body.touching.down){
+            //csound.inputMessage("i1 0 .1 1000 500");
+            this.player.setVelocityY(-540);
+            this.player.setGravityY(1040);
+        }
+        
+        csound.setControlChannel("cutoff", this.player.y*2);
+        this.showLightning();
+
+    }
+};
+
+//basic config for game
+var config = {
+    type: Phaser.CANVAS,
+    width: 960,
+    height: 600,
+    backgroundColor: 'rgb(255, 255, 255)',
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 300 },
+            debug: false
+        }
+    },
+    scene: GameScene
+};
+
+
+var game = new Phaser.Game(config);
+
+</script>
+
+</body>
+</html>
