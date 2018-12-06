@@ -137,7 +137,7 @@ create ()
 ```
 A physics sprite can have different properties set to control how it behaves. X and Y coordinates are passed to the `physics.add.sprite()` function, along with the sprite name. `setBounce(.1)` gives Spike a little pep in his step. Running the game now will show Spike fall from the sky and continue falling until he disappears. 
 
-<img src="falling.gif" style="width:60%" />
+<img src="gifs/falling.gif" style="width:60%" />
 
 Each platform is a static object which get added to a `staticGroup`. A simple `for` loop is used to place platforms across the entire scene.
 
@@ -154,7 +154,7 @@ create()
 }
 ```
 
-<img src="falling2.gif" style="width:60%" />
+<img src="gifs/falling2.gif" style="width:60%" />
 
 Although there is now a platform in the game, the main character will continue to fall through it until a collision callback is created. This is done through the `Physics.add.collider()` method. In this case a collider is created that will check for collisions between the player and the platforms.
 
@@ -173,7 +173,7 @@ create()
 }
 ```
 
-<img src="collision.gif" style="width:60%" />
+<img src="gifs/collision.gif" style="width:60%" />
 
 The create function for the demo game includes a simple level editor that is based on ideas presented in [this](http://www.lessmilk.com/tutorial/2d-platformer-phaser) tutorial. A main level is built using a simple string array. Each string in the array represents a row in the scene. Each character within that string creates a particular type of platform. A simple loop in the create function can read through the array and create all the platforms one needs. The following level string be used to create an array of platforms across the screen.
 
@@ -276,7 +276,7 @@ update()
 }
 ```
 
-<img src="walking.gif" style="width:60%" />
+<img src="gifs/walking.gif" style="width:60%" />
 
 # A bad night
 
@@ -301,7 +301,7 @@ showLightning()
 }
 ```
 
-<img src="mood.gif" style="width:60%" />
+<img src="gifs/mood.gif" style="width:60%" />
 
 Some rain will now be added to the scene. Rain can easily be created using the particle emitter. It has many different parameters for setting all aspects of how the particle are emitted. In this case we set an x range to vary between 0 and 1800. Gravity is set to 100 to pull the rain down the screen. The rain drops will also get a little larger as the fall from the sky.  
 
@@ -323,7 +323,7 @@ addRain()
 }
 ```
 
-<img src="rain.gif" style="width:60%" />
+<img src="gifs/rain.gif" style="width:60%" />
 
 # Bad things happen
 
@@ -352,7 +352,7 @@ create()
 
 ```
 
-<img src="grass.gif" style="width:60%" />
+<img src="gifs/grass.gif" style="width:60%" />
 
 To reset the game each time Spike wonders into long grass, a collider is set up to observe collisions between Spike and the bad grass. This time a callback function is passed to the collider. This callback function will be called whenever a collision takes place.
 
@@ -400,7 +400,7 @@ triggercannonBalls()
 
 }
 ```
-<img src="cannons.gif" style="width:60%" />
+<img src="gifs/cannons.gif" style="width:60%" />
 
 A second collision detector is set up between the cannon ball and the platforms to disable any cannonball that hits a platform.  
 
@@ -432,7 +432,7 @@ create()
 
 The targets field of the tween object sets the sprite to attach the tween to. The `x:'+=96` means the object will move 96 pixel along the x axis before returning at the same speed. The `yoyo` field is set to true to keep the object moving over and back.
 
-<img src="platforms.gif" style="width:60%" />
+<img src="gifs/platforms.gif" style="width:60%" />
 
 A collision detector needs to be created to test if Spike hits the platform. Without this Spike will just fall through the object as shown in the previous gif. The demo game features some logic to help the player move while standing on a platform. And it also features a falling platform that drops as soon as the player lands on it. Check out the source code for further details. 
 
