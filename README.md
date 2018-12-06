@@ -1,6 +1,6 @@
 
 
-This repo contains a demo game, and examples of simple scenes created using the Phaser3 framework and Csound. Provided below is an overview of different aspects of the game development, from simple sprite movements to object collision. The code uses ES6-based techniques (i.e., classes), but works just as well in traditional JS code. 
+This repo contains a demo game and examples of simple scenes created using the Phaser3 framework and Csound. Provided below is an overview of different aspects of the game development, from simple sprite movements to object collision. 
 
 ## Getting started: Loading Phaser3 and Csound
  
@@ -48,7 +48,7 @@ f0 z
 csound.playCSD(csd);
 ```
 
-Csound will star running as soon as the game loads. It will then wait for events from the game engine before it does anything. 
+Csound will start running as soon as the game loads. It will then wait for events from the game engine before it does anything. 
 
 
 ## Creating a scene. 
@@ -101,7 +101,7 @@ The first line of code declares a new class called `GameScene` which extends the
 
 ## The preload function
 
-The preload function will load all assets needed for the game, including audio. The `load.image()` method can be used to load any sprites needed by the scene.  
+The preload function will load all assets needed for the game, including audio. The `load.image()` method can be used to load any sprites needed by the scene, while `load.spritesheet()` loads multiple frames from an sprite sheet.  
 
 ```html
 (...)
@@ -113,16 +113,16 @@ preload ()
 (...)
 ```
 
-The assets folder in this case is located in the same directory as the game itself. spike.png is a sprite-sheet that contains 9 frames of Spikes in various walking positions and directions. platformBrick.png is a plain black cube that is used as a platform for the player to walk on. As this only contains one image, it can be loaded as an image rather than a sprite sheet.  
+The assets folder in this case is located in the same directory as the game itself. `spike.png` is a sprite-sheet that contains 9 frames of Spike in various walking positions and directions. `platformBrick.png` is a plain black cube that is used as a platform for the player to walk on. As this only contains one image, it can be loaded as an image rather than a sprite sheet.  
 
 <img src="assets/spike.png" style="width:50%" />
 
-'spike' is the name of the sprite, and is used later when we need to access the sprite. When loading sprite-sheets you can should specify the frame dimensions. How to animate these sprite will be covered later in this text.
+`spike` is the name of the sprite, and is used later when we need to access it. When loading sprite sheets you can should specify the frame dimensions. How to animate these sprite will be covered later in this text.
 
 
 ## The create() function. 
 
-The create function is used to create all of our game objects. For example, spike will be created here by creating a new physics sprite. 
+The create function is used to create all of our game objects. For example, Spike will be created here by creating a new physics sprite. 
 
 ```javascript
 create ()
@@ -140,7 +140,7 @@ Running the game now will show Spike fall from the sky and continue falling unti
 
 #### Platforms
 
-Spike needs somewhere to land when he falls from the sky. Each platforms will form part of a static group of objects. The `physcis.add.staticGroup()` function will add game objects to a static group. A simple `for` loop is then used to place platforms across the entire scene.
+Spike needs somewhere to land when he falls from the sky. Each platform will form part of a static group of objects. The `physcis.add.staticGroup()` function will add game objects to a static group. A simple `for` loop is then used to place platforms across the entire scene.
 
 ```javascript
 create()
@@ -159,7 +159,7 @@ create()
 
 #### Collisions 
 
-Although there are now platforms in the scene, the main character will continue to fall through them until a collision callback is created. This is done through the `Physics.add.collider()` function. In this case a collider is created that will check for collisions between the player and the platforms.
+Although there are now platforms in the scene, Spike will continue to fall through them until a collision callback is created. This is done through the `Physics.add.collider()` function. In this case a collider is created that will check for collisions between the player and the platforms.
 
 ```javascript
 create()
@@ -270,14 +270,13 @@ update ()
 }
 ```
 
-The `setVelocity()` function sets the velocity that the player will move on each key press. In order to make the Spike jump one must push him upwards by setting his y gravity to a lager number. The y velocity is also increased in order to bring Spike down to earth quickly. 
+The `setVelocity()` function sets the velocity that the player will move on each key press. In order to make Spike jump, one must push him upwards by setting his y gravity to a large number. The y velocity is also increased in order to bring Spike down to earth quickly. 
 
 ```javascript
 update()
 {
     (...)
     if (this.keys.W.isDown && this.player.body.touching.down){
-        //csound.inputMessage("i1 0 .1 1000 500");
         this.player.setVelocityY(-540);
         this.player.setGravityY(1040);
     }
@@ -289,7 +288,7 @@ update()
 
 #### Adding some sounds: Score events
 
-Now that Spike has some moves, it might be good to test out some game sound. Sending events to Csound is trivial and can be done in 2 ways. The first mechanism is a score event, which can be sent using the `csound.inputMessage()` function. In the following example, a score message is sent to Csound each time the users jumps.
+Now that Spike can interact with the scene, it might be good to test out some sound design ideas. Sending events to Csound is trivial and can be done in 2 ways. The first mechanism is a score event, which can be sent using the `csound.inputMessage()` function. In the following example, a score message is sent to Csound each time the users jumps.
 
 ```javascript
 update()
