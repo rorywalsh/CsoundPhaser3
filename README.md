@@ -1,6 +1,6 @@
 
 
-This repo contains an example of a basic game created using the Phaser3 framework and Csound. Provided below is an overview of different aspects of the game development, from simple sprite movements to object collision. The code uses ES6-based techniques (i.e., classes), but works just as well in traditional JS code. 
+This repo contains a demo game, and examples of simple scenes created using the Phaser3 framework and Csound. Provided below is an overview of different aspects of the game development, from simple sprite movements to object collision. The code uses ES6-based techniques (i.e., classes), but works just as well in traditional JS code. 
 
 ## Getting started: Loading Phaser3 and WebCsound
  
@@ -15,7 +15,6 @@ Phaser3 is a framework for generating Javascript based games. Csound-WASM is a w
     <script src="//cdn.jsdelivr.net/npm/phaser@3.15.0/dist/phaser.js"></script>
     <script src="csound-wasm-browser.js"></script>
     <script src="csound.js"></script>
-    <script src="mainLevel.js"></script>
     <script src="game.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css"> -->
 </head>
@@ -24,6 +23,33 @@ Phaser3 is a framework for generating Javascript based games. Csound-WASM is a w
 </html>
 ```
 * Note that the demos presented here use a forked version of WebCsound available through [this](https://github.com/hlolli/csound-wasm) repo. It works just the same as the official Csound-WASM, but is provided as a single JS file rather a collection of different scripts.  
+
+A 'csd.js' script is called just after Csound-WASM_Browser is called. It will compile our Csound orchestra.
+
+```javascript
+const csd = `
+<CsoundSynthesizer>
+<CsInstruments>
+ksmps = 512
+
+;jumping sound
+instr 1
+    a1 expon 1, p3, 0.001
+    a2 oscili a1, (1-a1)*p4+p5
+    outs a2, a2 
+endin
+
+</CsInstruments>
+<CsScore>
+f0 z
+</CsScore>
+</CsoundSynthesizer>
+`
+csound.playCSD(csd);
+```
+
+Csound will star running as soon as the game loads. It will then wait for events from the game engine before it does anything. 
+
 
 ## Creating a scene. 
 
@@ -93,39 +119,10 @@ The assets folder in this case is located in the same directory as the game itse
 
 'spike' is the name of the sprite, and is used later when we need to access the sprite. When loading sprite-sheets you can should specify the frame dimensions. How to animate these sprite will be covered later in this text.
 
-The following code will start an instance of Csound.
 
-```javascript
-csound.playCSD("assets/sounds.csd");
-```
+## The create() function. 
 
-The sounds.csd file will contain all the Csound instruments used to create sounds for the game. For now we will just create a single instrument. The score is set to wait for events for as long as the game is running. 
-
-```html
-<CsoundSynthesizer>
-<CsInstruments>
-
-instr 1
-    a1 expon 1, p3, 0.001
-    a2 oscili a1, (1-a1)*p4+p5
-    outs a2, a2 
-endin
-
-
-</CsInstruments>
-<CsScore>
-f0 z
-</CsScore>
-</CsoundSynthesizer>
-```
-The game will load this csd as soon as the game starts. Events can be sent to Csound from the game. The simplest way to do this is to trigger a score event. However, if realtime control of game sounds is required, it's best to use channels to send game data to Csound while it's running.
-sdfdsf
-```To create your own character simply right click the spike.png file above and download it. Then open it in an image editor and replace the frames with your own character.```
-
-
-### The create() function. 
-
-The create function is used to create all of our gameobjects. For example, spike will be created here by creating a new physics sprite. 
+The create function is used to create all of our game objects. For example, spike will be created here by creating a new physics sprite. 
 
 ```javascript
 create ()
@@ -134,12 +131,16 @@ create ()
     this.player.displayHeight = 45;
     this.player.setBounce(.1);  
 }
-```
-A physics sprite can have different properties set to control how it behaves. X and Y coordinates are passed to the `physics.add.sprite()` function, along with the sprite name. `setBounce(.1)` gives Spike a little pep in his step. Running the game now will show Spike fall from the sky and continue falling until he disappears. 
+``` 
+A physics sprite can have different properties set to control how it behaves. X and Y coordinates are passed to the `physics.add.sprite()` function, along with the sprite name. `setBounce(.1)` gives Spike a little pep in his step by adding a slight bounce when he moves. 
+
+Running the game now will show Spike fall from the sky and continue falling until he disappears. 
 
 <img src="gifs/falling.gif" style="width:60%" />
 
-Each platform is a static object which get added to a `staticGroup`. A simple `for` loop is used to place platforms across the entire scene.
+#### Platforms
+
+Spike needs somewhere to land when he falls from the sky. Each platforms will form part of a static group of objects. The `physcis.add.staticGroup()` function will add game objects to a static group. A simple `for` loop is then used to place platforms across the entire scene.
 
 ```javascript
 create()
@@ -155,6 +156,8 @@ create()
 ```
 
 <img src="gifs/falling2.gif" style="width:60%" />
+
+#### Collisions 
 
 Although there is now a platform in the game, the main character will continue to fall through it until a collision callback is created. This is done through the `Physics.add.collider()` method. In this case a collider is created that will check for collisions between the player and the platforms.
 
