@@ -609,7 +609,7 @@ The is unlimited scope for interaction with between game events and sound using 
 
 In this example, we use the amplitudes of 8 oscillators, which is set randomly, to move platforms up and down in the scene. In our k-rate callback function we grab each of the oscillator's current amplitude, and use that to move the platforms up and down. 
 
-The following code will move each platform based on some channel data from Csound. 
+The following code will move each platform based on some channel data from Csound. Note that we only update the platform on every 32nd k-rate cycle. These updates don't need to happen on each frame. Slowing down calls to Csound will improve performance of your game.  
 
 ```javascript
 create()
@@ -641,7 +641,8 @@ create()
 
 ## Where to now?
 
-The demo game is there to be hacked, as too are each of the examples presented in the text above. If any of you wish to contribute a level for the game, I'm more than happy to host it on my github page. 
+The demo game is there to be hacked, as too are each of the examples presented in the text above. If any of you wish to contribute a level for the game, I'm more than happy to host it on my github page. Note that the web assembly version of Csound runs a little slower than native Csound. Therefore is important to make your instruments and game run as efficient as possible. The demo game follows standard Phaser3 protocols but is not optimised for performance. More details on how best to optimise graphics can be found at the Html5GameDevs forums. 
+   
 
 ## Acknowledgments
 
