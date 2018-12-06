@@ -539,7 +539,7 @@ The same type of collision detection is used to collect tokens and bombs, and te
 
 Sounds can easily be added to an event like this by sending a simple score event. In this, a low explosion is heard each time Spikes hits razor grass.
 
-<a href="razorGrassSound.html" target="_blank">Example</a>
+<a href="razorgrassSounds.html" target="_blank">Example</a>
 
 
 ## Cannon fodder
