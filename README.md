@@ -2,7 +2,7 @@
 
 This repo contains a demo game, and examples of simple scenes created using the Phaser3 framework and Csound. Provided below is an overview of different aspects of the game development, from simple sprite movements to object collision. The code uses ES6-based techniques (i.e., classes), but works just as well in traditional JS code. 
 
-## Getting started: Loading Phaser3 and WebCsound
+## Getting started: Loading Phaser3 and Csound
  
 Phaser3 is a framework for generating Javascript based games. Csound-WASM is a web assembly version of the now well established audio programming language Csound. The two libraries need to be loaded before calling any game scripts. The loading of the library scripts happens in the game.html file, before any other scripts are called:
 
@@ -642,7 +642,7 @@ create()
 ## Where to now?
 
 The demo game is there to be hacked, as too are each of the examples presented in the text above. If any of you wish to contribute a level for the game, I'm more than happy to host it on my github page. Note that the web assembly version of Csound runs a little slower than native Csound. Therefore is important to make your instruments and game run as efficient as possible. The demo game follows standard Phaser3 protocols but is not optimised for performance. More details on how best to optimise graphics can be found at the Html5GameDevs forums. 
-   
+
 
 ## Acknowledgments
 
