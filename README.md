@@ -575,7 +575,7 @@ A second collision detector is set up between the cannon ball and the platforms 
 
 Tweens provide a simple way of moving game objects around the screen. The demo game features moving platforms which constantly loop between two points. The platforms themselves form part of a physics group. As each object is added to the group, a tween is added to it. 
 
-```javacript
+```javascript
 create()
 {
     (...)
