@@ -652,4 +652,4 @@ Note that the web assembly version of Csound runs a little slower than native Cs
 
 ## Acknowledgments
 
-Victor, Steven, John, and Hlolli for all the help with the Javascript stuff. To the developers of Phaser3 and their enormous vault of online examples. And a special thanks to those on who took the time to answer my questions on the HTML5GameDev forums.   
+Victor, Steven, and Hlolli for all the help with the CsoundWASM stuff. To the developers of Phaser3 and their enormous vault of online examples. And a special thanks to those on who took the time to answer my noobie questions on the HTML5GameDev forums.   
