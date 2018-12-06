@@ -285,8 +285,6 @@ update()
 ```
 <a href="update.html" target="_blank">Example</a>
 
-[Example](update.html)
-
 <img src="gifs/walking.gif" style="width:60%" />
 
 #### Adding some sounds: Score events
@@ -328,8 +326,8 @@ f0 z
 `
 csound.playCSD(csd);
 ```
+<a href="updateSounds1.html" target="_blank">Example</a>
 
-[Example](updateSounds1.html)
 
 `instr 1` 1 takes two p-field parameters which are sent via the `csound.inputMessage("i1 0 .1 1000 500")` function. These number can be changed on the javascript side at any point in the game to change to parameters of the sounds. In the following code Spike's x position within the world determines the pitch of the tone played. 
 
@@ -345,7 +343,8 @@ update()
         }
     (...)
 ```
-[Example](updateSounds2.html)
+
+<a href="updateSound2.html" target="_blank">Example</a>
 
 
 ## A bad night
@@ -401,8 +400,8 @@ addRain()
     });
 }
 ```
+<a href="rain.html" target="_blank">Example</a>
 
-[Example](rain.html)
 
 <img src="gifs/rain.gif" style="width:60%" />
 
@@ -434,7 +433,8 @@ csound.setControlChannel("cutoff", this.player.y*2);
 
 The noise will change whenever Spike moves up or down the screen.
 
-[Example](moodSounds1.html)
+<a href="moodSounds1.html" target="_blank">Example</a>
+
 
 #### Getting information from Csound
 
@@ -479,7 +479,8 @@ preload()
 
 Where `this.triggerLights` is a variable used to hold the current value of the `triggerLights` Csound channel. Each time it changes the `this.triggerLightning()` function is called and strikes of lightning will appear in the scene. 
 
-[Example](moodSounds2.html)
+<a href="moodSounds2.html" target="_blank">Example</a>
+
 
 Note that the timed function used the drive the strikes of lightning in the previous example have been disabled in this case. 
 
@@ -536,7 +537,7 @@ The same type of collision detection is used to collect tokens and bombs, and te
 
 Sounds can easily be added to an event like this by sending a simple score event. In this, a low explosion is heard each time Spikes hits razor grass.
 
-[Example](razorGrass.html)
+<a href="razorGrass.html" target="_blank">Example</a>
 
 
 ## Cannon fodder
