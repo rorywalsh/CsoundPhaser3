@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <title>Csound and Phaser 3</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.15.0/dist/phaser.js"></script>
+    <script src="https://github.com/hlolli/csound-wasm/releases/download/6.12.0-6/csound-wasm-browser.js"></script>
+    <script src="js/csd.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -41,6 +43,7 @@ class GameScene extends Phaser.Scene {
      
     create()
     {
+        csound.inputMessage("i2 0 -1");
         this.addRain();      
         this.goodGrass = this.physics.add.staticGroup(); 
         this.badGrass = this.physics.add.staticGroup();   
@@ -167,6 +170,7 @@ class GameScene extends Phaser.Scene {
         this.timedEvent2.reset({ delay: 500, callback: this.triggercannonBalls, callbackScope: this, repeat: 1});
         
         this.cannons.children.iterate(function (child) {
+            csound.inputMessage("i1 0 .1 1000 500");
             //  Give each star a slightly different bounce
             var missile = this.cannonBalls.create(child.x, child.y, 'cannonBall').setDisplaySize(8, 8);
             missile.setBounce(1);
@@ -208,11 +212,11 @@ class GameScene extends Phaser.Scene {
         }
 
         if (this.keys.W.isDown && this.player.body.touching.down){
-            //csound.inputMessage("i1 0 .1 1000 500");
             this.player.setVelocityY(-540);
             this.player.setGravityY(1040);
         }
 
+        csound.setControlChannel("cutoff", this.player.y*2);
         this.showLightning();
     }
 };

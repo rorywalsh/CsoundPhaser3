@@ -380,7 +380,7 @@ showLightning()
 
 <img src="gifs/mood.gif" style="width:60%" />
 
-Rain can be created using the particle emitter, which comes with many different parameters for setting all aspects of how the particle are emitted. In this case we set an x range to vary between 0 and 1800. Gravity is set to 100 to pull the rain down the screen, while the raindrops themselves will get a little larger in scale as they fall from the sky.  
+Rain can be created using the particle emitter, which comes with many different parameters for setting all aspects of how the particle are emitted. In this case we set the x range to vary between 0 and 1800. Gravity is set to 100 to pull the rain down the screen, while the raindrops themselves will get a little larger in scale as they fall from the sky.  
 
 ```javascript
 addRain()
@@ -437,7 +437,7 @@ The noise will change whenever Spike moves up or down the screen.
 
 #### Getting information from Csound
 
-Channels can be bi-directional. Csound can just as easily send data to the game as receive it. In this example we time a drum beat to the lightning. We use an always running instrument (`instr 3`) to trigger a drum sounds every second. At the same time it triggers the drum sound it also sends channel data to the 'triggerLights' channel. 
+Channels can be bi-directional. Csound can just as easily send data to the game as receive it. In this next example a drum beat is used to trigger lightning. An always-on instrument (`instr 3`) is used to trigger a drum sound every second. At the same time it triggers the drum sound it also sends channel data to the 'triggerLights' channel. 
 
 ```javascript
 instr 3
@@ -476,17 +476,17 @@ preload()
 }
 ```
 
-Where `this.triggerLights` is a variable used to hold the current value of the `triggerLights` Csound channel. Each time it changes the `this.triggerLightning()` function is called and strikes of lightning will appear in the scene. 
+Where `this.triggerLights` is a variable used to hold the current value of the `triggerLights` Csound channel. The Csound instrument is going to send a new random number every second. Each time it changes, the `this.triggerLightning()` function is called, and strikes of lightning appear on the scene. 
 
 <a href="moodSounds2.html" target="_blank">Example</a>
 
 
-Note that the timed function used the drive the strikes of lightning in the previous example have been disabled in this case. 
+Note that the timed function used to drive the strikes of lightning in the previous example have been disabled in this case. 
 
 
 ## Bad things happen
 
-In the demo game, collisions between certain sprites and the main player result in Spike being cosmically teleported back in time to the start of the level. The bad platforms, or razor grass in this case, is created in the same way as any other platform, but different colliders are used with them. In the simple level designer, we use 'g' to denote the bad grass we wish to use in the scene. This is done my marking certain sprites in the level string array with a 'h' instead of an 'x'. 
+In the demo game, collisions between certain sprites and the main player result in Spike being cosmically teleported back in time to the start of the level. The bad platforms, or razor grass in this case, is created in the same way as any other platform. In the simple level designer, we use 'g' to denote bad grass.
 
 The demo game also features good grass that can be added as a prop anywhere in the scene. Again they are added in the same way as the other game objects. 
 
@@ -532,11 +532,11 @@ badGrassHit()
 }
 ```
 
-The first two parameters passed to `Physics.add.collider()` set the two objects that will be tested for collisions. The next is a callback function that will be called each time a collision takes place. The next parameter gives you a more detailed callback function to testing different types of collisions. It is not needed here so `null` is passed instead. The last parameter is the 'callbackContext'. 
+The first two parameters passed to `Physics.add.collider()` set the two objects that will be tested for collisions. The next is a callback function that will be called each time a collision takes place. The next parameter gives you a more detailed callback function for testing different types of collisions. It is not needed here so `null` is passed instead. The last parameter is the 'callbackContext'. 
 
-The same type of collision detection is used to collect tokens and bombs, and test for fatal missile attacks in the demo game. 
+In the demo game, the same type of collision detection is used to collect tokens and bombs, and test for fatal missile attacks. 
 
-Sounds can easily be added to an event like this by sending a simple score event. In this, a low explosion is heard each time Spikes hits razor grass.
+Sounds can easily be added to events like this by sending a simple score statement to Csound. In this example a low explosion is heard each time Spikes hits razor grass.
 
 <a href="razorgrassSounds.html" target="_blank">Example</a>
 
@@ -570,6 +570,9 @@ triggercannonBalls()
 
 A second collision detector is set up between the cannon ball and the platforms to disable any cannonball that hits a platform.  
 
+
+<a href="canonSounds.html" target="_blank">Example</a>
+
 ## Platforms that move
 
 Tweens provide a simple way of moving game objects around the screen. The demo game features moving platforms which constantly loop between two points. The platforms themselves form part of a physics group. As each object is added to the group, a tween is added to it. 
@@ -602,11 +605,11 @@ The targets field of the tween object sets the sprite to attach the tween to. Th
 
 A collision detector needs to be created to test if Spike hits the platform. Without this Spike will just fall through the object as shown in the previous gif. The demo game features some logic to help the player move while standing on a platform. And it also features a falling platform that drops as soon as the player lands on it. Check out the source code for further details. 
 
-## More fun with sounds
+#### Sound Platforms
 
-The is unlimited scope for interaction with between game events and sound using Phaser3 and Csound. For example, it's not that difficult to build a simple instrument in Csound that can be used to move platforms in the game. The following example is based on the simple update function code previously. 
+There is unlimited scope for interaction with between game events and sound using Phaser3 and Csound. For example, it's not that difficult to build a simple instrument in Csound that can be used to move platforms in the game. The following example is based on the simple update function code presented above. 
 
-In this example, we use the amplitudes of 8 oscillators, which is set randomly, to move platforms up and down in the scene. In our k-rate callback function we grab each of the oscillator's current amplitude, and use that to move the platforms up and down. 
+In this example the amplitudes of 8 oscillators, which are set randomly, are used to move platforms up and down in the scene. In our k-rate callback function we grab each of the oscillator's current amplitude, and use that to move the platforms up and down. 
 
 The following code will move each platform based on some channel data from Csound. Note that we only update the platform on every 32nd k-rate cycle. These updates don't need to happen on each frame. Slowing down calls to Csound will improve performance of your game.  
 
@@ -636,7 +639,6 @@ create()
 <a href="updateSounds3.html" target="_blank">Example</a>
 
 <img src="gifs/movingPlatformSounds.gif" style="width:60%" />
-
 
 ## Where to now?
 

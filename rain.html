@@ -131,8 +131,8 @@ class GameScene extends Phaser.Scene {
             gravityY: 100,
             gravityX: Phaser.Math.Between(100, 200),
             scale: { start: 0.1, end: 0.2 },
-            quantity: 4,
-            blendMode: 'ADD'
+            quantity: 10,
+            blendMode: 'SCREEN'
         });
     }
 
@@ -159,6 +159,7 @@ class GameScene extends Phaser.Scene {
 
 
         this.showLightning();
+        this.rain.x = this.player.x-400;
     }
 };
 
