@@ -1,0 +1,315 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Making your first Phaser 3 Game - Part 1</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.15.0/dist/phaser.js"></script>
+    <script src="https://github.com/hlolli/csound-wasm/releases/download/6.12.0-6/csound-wasm-browser.js"></script>
+    <script src="js/csd.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }    
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+        // var animationThread;
+        // const startAnimation = () => {
+        //                 if (this.animationThread == null) {
+        //                     this.animationThread = setInterval(async () => {
+        //                         csound.on("perform", async () => {
+        //                             const val = await csound.getControlChannel("triggerLights");
+        //                             console.log("CUR VAL", val);
+        //                     });
+        //                     }, 30);
+        //                 }
+        // }    
+    
+let triggerLightingValue = 0;
+class GameScene extends Phaser.Scene {
+
+    constructor (config)
+    {
+        //startAnimation();
+        super(config);
+        this.normalColour = new Phaser.Display.Color(60, 60, 60);
+        this.colour1 = new Phaser.Display.Color(155, 155, 155);
+        this.colour2 = new Phaser.Display.Color(0, 0, 0);
+        this.triggerLightning = 0;
+        this.shouldTriggerLightning = false;
+    }
+
+
+    preload()
+    {
+        this.load.spritesheet('spike', 'assets/spike.png', { frameWidth: 39, frameHeight: 48 });
+        this.load.image('platform', 'assets/platform.png');   
+        this.load.image('raindrop', 'assets/rainDrop.png'); 
+        this.load.image('badGrass', 'assets/badGrass.png');  
+        this.load.image('goodGrass', 'assets/goodGrass.png');  
+        this.load.image('cannonBall', 'assets/cannonBall.png');
+        this.load.image('launcher', 'assets/launcher.png');
+        this.load.image('ulauncher', 'assets/launcherUpsideDown.png');
+        this.load.image('movingPlatform', 'assets/movingPlatform.png');
+
+
+                    
+
+    }
+    
+    create()
+    {
+        
+        
+
+        var mainLevel = [
+                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                '                                  ',
+                '           xxxxxxxxxxxxxxxxx      ',
+                '       xxxxxxx                    ',
+                '     XXXXXXX                      ',
+                '    xxxxxxx                       ',
+                '   XXXXXXX                        ',
+                'xxxxxxx     ggxxxxxxxxgg      xxx ',
+                'xxxxxxxhhhhxxxxxxxxxxxxxxhhhhhxxxx',
+                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+        ];
+        
+
+
+    this.addRain();      
+    var width = mainLevel[0].length*48;
+    var height = (mainLevel.length)*48;
+    this.goodGrass = this.physics.add.staticGroup(); 
+    this.badGrass = this.physics.add.staticGroup();   
+    this.cannons = this.physics.add.staticGroup(); 
+    this.cannonBalls = this.physics.add.group(); 
+    this.movingPlatforms = this.physics.add.group();
+    this.player = this.physics.add.sprite(100, 10, 'spike');
+    this.player.displayHeight = 45;
+    this.player.setBounce(.1);  
+    this.platforms = this.physics.add.staticGroup();
+    this.physics.world.bounds.width = width;
+    this.physics.world.bounds.height = height
+    this.cameras.main.setBounds(0, 0, width, height); 
+
+
+    for (var y = 0; y < mainLevel.length; y++) {
+        for (var x = 0; x < mainLevel[y].length; x++) {
+            if (mainLevel[y][x] == 'x') {
+                this.platforms.create(48*x, 48*y, 'platform').refreshBody();
+            }
+            else if(mainLevel[y][x] == 'h') {
+                this.badGrass.create(48*x, 48*y, 'badGrass').refreshBody();
+            }
+            else if(mainLevel[y][x] == 'g') {
+                this.goodGrass.create(48*x, 48*y, 'goodGrass').refreshBody();
+            }
+            else if(mainLevel[y][x] == 'l') {
+                this.cannons.create(48*x, 48*y, 'launcher').refreshBody();
+                var launchers = this.cannons.getChildren();
+                launchers[this.cannons.getTotalUsed()-1].orientation = 'up';
+            }
+            else if(mainLevel[y][x] == 'u') {
+                this.cannons.create(48*x, 48*y, 'ulauncher').refreshBody();
+                var launchers = this.cannons.getChildren();
+                launchers[this.cannons.getTotalUsed()-1].orientation = 'down';
+            }
+            else if(mainLevel[y][x] == 'm') {
+                this.movingPlatforms.create(48*x, 48*y-3, 'movingPlatform').body.allowGravity = false;
+                var movingPlatform = this.movingPlatforms.getChildren()[this.movingPlatforms.getTotalUsed()-1];
+                movingPlatform.setImmovable(true);
+                this.tweens.add({
+                    targets: movingPlatform,
+                    x: '+=96',
+                    delay: Phaser.Math.Between(10, 1000),
+                    ease: 'Power1',
+                    duration: Phaser.Math.Between(500, 5000),
+                    yoyo: true,
+                    repeat: -1
+                });                       
+            }
+        }
+    }
+
+    this.keys = this.input.keyboard.addKeys('W,S,A,D,B');
+
+    //  Our player animations, turning, walking left and walking right
+    this.anims.create({
+        key: 'left',
+        frames: this.anims.generateFrameNumbers('spike', { start: 0, end: 3 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'turn',
+        frames: [ { key: 'spike', frame: 4 } ],
+        frameRate: 20
+    });
+
+    this.anims.create({
+        key: 'right',
+        frames: this.anims.generateFrameNumbers('spike', { start: 5, end: 8 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    //this.timedEvent1 = this.time.addEvent({ delay: 1000, callback: this.triggerLightning, callbackScope: this});
+    this.timedEvent2 = this.time.addEvent({ delay: 1000, callback: this.triggerCannonBalls, callbackScope: this});
+
+    this.physics.add.collider(this.player, this.movingPlatforms,function(s1, s2){asdsd});
+    this.physics.add.collider(this.player, this.cannonBalls, this.movingPlatformHit, null, this);
+    this.physics.add.collider(this.player, this.platforms);
+    //this.physics.add.overlap(this.player, this.badGrass, this.badGrassHit, null, this);
+    //this.physics.add.collider(this.cannonBalls, this.platforms, this.cannonBallHitPlatform, null, this);
+    
+    }
+
+
+    triggerLightning ()
+    {
+        //this.timedEvent1.reset({ delay: Phaser.Math.Between(500,2500), callback: this.triggerLightning, callbackScope: this, repeat: 1});
+        this.lightningTime = 0;
+    }
+
+    showLightning()
+    {
+        if(triggerLightingValue<19){
+            var hexColour = Phaser.Display.Color.Interpolate.ColorWithColor(this.colour1, this.colour2, Phaser.Math.FloatBetween(0, 10), Phaser.Math.FloatBetween(0, 10));
+            this.cameras.main.setBackgroundColor(hexColour);
+            this.lightningTime++;
+        }
+        else
+            this.cameras.main.setBackgroundColor(this.normalColour);
+    }
+
+    addRain()
+    {
+        this.rain = this.add.particles('raindrop');
+        this.rain.createEmitter({
+            x: { min: 1, max: 1800 },
+            y: 0,
+            lifespan: 1200,
+            speedY: { min: 200, max: 400 },
+            gravityY: 100,
+            gravityX: Phaser.Math.Between(100, 200),
+            scale: { start: 0.1, end: 0.2 },
+            quantity: 4,
+            blendMode: 'ADD'
+        });
+    }
+
+    triggerCannonBalls()
+    {
+        this.timedEvent2.reset({ delay: 1500, callback: this.triggerCannonBalls, callbackScope: this, repeat: 1});
+        
+        this.cannons.children.iterate(function (child) {
+            //  Give each star a slightly different bounce
+            var cannonBall = this.cannonBalls.create(child.x, child.y, 'cannonBall').setDisplaySize(8, 8);
+            cannonBall.setBounce(1);
+            cannonBall.setCollideWorldBounds(true);
+            if(child.orientation == 'up')
+                cannonBall.setVelocity(this.cannonBallAngle, Phaser.Math.Between(-1000, -600));
+            else
+                cannonBall.setVelocity(this.cannonBallAngle, Phaser.Math.Between(1000, 600));
+
+            cannonBall.allowGravity = false;
+            }, this);
+        this.cannonBallAngle = this.cannonBallAngle < 400 ? this.cannonBallAngle + 50 : -400;
+
+    }
+
+    cannonBallHitPlatform(cannonBall, platform)
+    {
+        cannonBall.disableBody(true, true);
+    }
+
+    badGrassHit()
+    {
+        //collision between player and bad grass
+    }
+
+    movingPlatformHit(player, platform)
+    {
+        console.log("Hello");
+        if(this.stickToPlatform==false)
+        {
+            this.platformOffset = player.x-platform.x;
+        }
+
+        player.x = platform.x+this.platformOffset;
+        
+        this.stickToPlatform = true;
+        
+    }
+
+    update ()
+    {
+        if (this.keys.A.isDown){
+            this.stickToPlatform = false;
+            this.player.setVelocityX(-160);    
+            this.player.anims.play('left', true);
+        }
+        else if (this.keys.D.isDown){
+            this.stickToPlatform = false;
+            this.player.setVelocityX(160);    
+            this.player.anims.play('right', true);
+        }
+        else{
+            this.player.setVelocityX(0);    
+            this.player.anims.play('turn');
+        }
+
+        if (this.keys.W.isDown && this.player.body.touching.down){
+            //csound.inputMessage("i1 0 .1 1000 " + this.player.x.toString());
+            //csound.inputMessage("i1 0 .1 1000 500");
+            this.player.setVelocityY(-540);
+            this.player.setGravityY(1040);
+            this.stickToPlatform = false;
+        }
+
+        //if(this.player.body.touching.down == false){
+            csound.setControlChannel("cutoff", this.player.y*2);
+        //}
+        //csound.getControlChannel("triggerLightning")
+       
+        //const value = await csound.getControlChannel("chan")
+        this.showLightning();
+       
+        csound.requestControlChannel("triggerLights", function() {
+        step = Math.round(csound.getControlChannel("triggerLights"));
+        console.log(step);
+      });
+    }
+};
+
+
+//basic config for game
+var config = {
+    type: Phaser.AUTO,
+    width: 960,
+    height: 600,
+    backgroundColor: 'rgb(255, 255, 255)',
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 300 },
+            debug: false
+        }
+    },
+    scene: GameScene
+};
+
+
+var game = new Phaser.Game(config);
+
+</script>
+
+</body>
+</html>
