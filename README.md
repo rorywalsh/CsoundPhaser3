@@ -677,6 +677,11 @@ create()
 
 <img src="gifs/movingPlatformSounds.gif" style="width:60%" />
 
+In the next demo mouse movement is used to both move the platforms, and play sounds while doing it. The following functions check for mouse events. When a mouse button is down, dragging commences. During that time the user can drag and draw sounds on the screen. Be careful that you don't lose Spike by moving the platforms too quickly!
+
+<img src="gifs/movingPlatformSounds1.gif" style="width:60%" />
+
+
 ## The demo
 
 <a href="game.html" target="_blank">The demo</a>
