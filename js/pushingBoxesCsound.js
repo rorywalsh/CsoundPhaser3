@@ -3,12 +3,6 @@ const csd = `
 <CsInstruments>
 ksmps = 512
 
-;jumping sound
-instr 1
-    a1 expon 1, p3, 0.001
-    a2 oscili a1, (1-a1)*p4+p5
-    outs a2, a2 
-endin
 
 ;boxSound
 instr 2    
@@ -19,6 +13,12 @@ instr 2
     kGain = tonek(ampdb(-kGain*.1), 10)
     a1 oscili kGain*.1, (kPitch*2)+oscili:k(10, 1)
     outs a1*1/(active(2)), a1*1/(active(2)) 
+endin
+
+instr 8
+    a1 expon .3, p3, 0.001
+    a2 oscili a1, p4
+    outs a2, a2
 endin
 
 </CsInstruments>
