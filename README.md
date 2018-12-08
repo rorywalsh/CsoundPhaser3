@@ -583,7 +583,7 @@ triggercannonBalls()
 
 A second collision detector is set up between the cannon ball and the platforms to disable any cannonball that hits a platform.  
 
-<a href="canonSounds.html" target="_blank">Example</a>
+<a href="cannonSounds.html" target="_blank">Example</a>
 
 ## Platforms that move
 
