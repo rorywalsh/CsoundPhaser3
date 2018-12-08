@@ -118,8 +118,11 @@ class GameScene extends Phaser.Scene {
 
     pushBox(box, player)
     {
-        console.log(box.name);
         csound.setControlChannel("pitch"+box.name.toString(), box.x/2);
+        if(this.inTheAir)
+            csound.inputMessage("i8 0 1 "+player.x.toString());   
+        
+        this.inTheAir = false;
     }
 
     createCsoundPerfCallback()
@@ -153,6 +156,7 @@ class GameScene extends Phaser.Scene {
             //csound.inputMessage("i1 0 .1 1000 500");
             this.player.setVelocityY(-540);
             this.player.setGravityY(1040);
+            this.inTheAir = true;
         }
 
     }
