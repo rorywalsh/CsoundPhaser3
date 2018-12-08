@@ -1,0 +1,184 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Csound and Phaser 3</title>
+    <script src="js/phaser.js"></script>
+    <script src="js/csound-wasm-browser.js"></script>
+    <script src="js/pushingBoxesCsound.js"></script>
+
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+class GameScene extends Phaser.Scene {
+
+    constructor (config)
+    {
+        super(config);
+    }
+
+
+    preload()
+    {
+        this.load.spritesheet('spike', 'assets/spike.png', { frameWidth: 39, frameHeight: 48 });
+        this.load.image('platform', 'assets/platform.png');  
+        this.load.image('yellow', 'assets/yellow.png');         
+    }
+    
+     
+    create()
+    {
+        
+        this.player = this.physics.add.sprite(100, 10, 'spike');
+        this.player.displayHeight = 45;
+        this.player.setBounce(.1);  
+        this.platforms = this.physics.add.staticGroup();
+        this.physics.add.collider(this.player, this.platforms);
+
+        this.yellow = this.physics.add.group();
+        //this.yellow.create(200, 10, 'yellow').body.allowGravity = true;
+        //this.yellow.getChildren()[0].refreshBody();
+        this.physics.add.collider(this.yellow, this.platforms);
+        this.physics.world.bounds.width = width;
+        this.physics.world.bounds.height = height
+        this.cameras.main.setBounds(0, 0, width, height); 
+
+        var mainLevel = [
+                '                 ',
+                '                 ',
+                '                 ',
+                '                 ',
+                '                 ',
+                'x               x',
+                'xxxxxxxxxxxxxxxxx',
+                'xxxxxxxxxxxxxxxxx',
+                'xxxxxxxxxxxxxxxxx',
+                'xxxxxxxxxxxxxxxxx',
+                'xxxxxxxxxxxxxxxxx'
+        ];
+        
+        var width = mainLevel[0].length*48;
+        var height = (mainLevel.length)*48;
+
+        for (var y = 0; y < mainLevel.length; y++) {
+            for (var x = 0; x < mainLevel[y].length; x++) {
+                if (mainLevel[y][x] == 'x') {
+                    this.platforms.create(48*x, 48*y, 'platform').refreshBody();
+                }
+            }
+        }
+
+        this.keys = this.input.keyboard.addKeys('W,S,A,D,B');
+
+        //  Our player animations, turning, walking left and walking right
+        this.anims.create({
+            key: 'left',
+            frames: this.anims.generateFrameNumbers('spike', { start: 0, end: 3 }),
+            frameRate: 10,
+            repeat: -1
+        });
+    
+        this.anims.create({
+            key: 'turn',
+            frames: [ { key: 'spike', frame: 4 } ],
+            frameRate: 20
+        });
+    
+        this.anims.create({
+            key: 'right',
+            frames: this.anims.generateFrameNumbers('spike', { start: 5, end: 8 }),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        this.timedEvent = this.time.addEvent({ delay: 5000, callback: this.createBox, callbackScope: this});
+        this.createBox();
+    }
+
+    createBox()
+    {
+        
+        this.timedEvent.reset({ delay: 10000, callback: this.createBox, callbackScope: this, repeat: 1});
+        this.yellow.create(200, 10, 'yellow').body.allowGravity = true;
+        //this.yellow.getChildren(this.yellow.getChildren.length-1).body.mass = 10;
+        var boxes = this.yellow.getChildren();
+        boxes[boxes.length-1].setDrag(100, 100);
+        boxes[boxes.length-1].name = (boxes.length-1).toString();
+        this.physics.add.collider(boxes[boxes.length-1], this.player, this.pushBox, null, this);
+        csound.inputMessage("i2 0 3600 .1 " + boxes[boxes.length-1].name.toString());
+
+    }
+
+    pushBox(box, player)
+    {
+        console.log(box.name);
+        csound.setControlChannel("pitch"+box.name.toString(), box.x);
+    }
+
+    createCcsoundPerfCallback()
+    {
+        csound.on("perform", async () => {
+            for( var i = 0 ; i < 12 ; i++)
+            {
+                //const yPos = await csound.getControlChannel('platform' + i.toString());
+                //var platform = this.soundPlatforms.getChildren()[i];
+            }
+        });
+    }
+
+    update ()
+    {
+        if (this.keys.A.isDown){
+            this.player.setVelocityX(-160);    
+            this.player.anims.play('left', true);
+        }
+        else if (this.keys.D.isDown){
+            this.player.setVelocityX(160);    
+            this.player.anims.play('right', true);
+        }
+        else{
+            this.player.setVelocityX(0);    
+            this.player.anims.play('turn');
+        }
+
+        if (this.keys.W.isDown && this.player.body.touching.down){
+            csound.inputMessage("i1 0 .1 1000 500");
+            this.player.setVelocityY(-540);
+            this.player.setGravityY(1040);
+        }
+
+
+
+    }
+};
+
+//basic config for game
+var config = {
+    type: Phaser.CANVAS,
+    width: 960,
+    height: 600,
+    backgroundColor: 'rgb(255, 255, 255)',
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 300 },
+            debug: false
+        }
+    },
+    scene: GameScene
+};
+
+
+var game = new Phaser.Game(config);
+
+</script>
+
+</body>
+</html>
