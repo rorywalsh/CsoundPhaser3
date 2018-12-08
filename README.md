@@ -2,7 +2,7 @@
 
 This repo contains a demo game and examples of simple scenes created using the Phaser3 framework and Csound. Provided below is an overview of different aspects of the game development, from simple sprite movements to object collision.
 
-##Examples:
+## Examples:
 <br>
     <a href="updateSounds1.html" target="_blank">Example 1</a> Jumping Sounds<br>
     <a href="updateSounds1.html" target="_blank">Example 2</a> Jumping and using player position to set pitch of tone<br>
