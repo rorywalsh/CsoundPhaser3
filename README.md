@@ -5,7 +5,7 @@ This repo contains a demo game and examples of simple scenes created using the P
 ## Examples:
 <br>
     <a href="updateSounds1.html" target="_blank">Example 1</a> Jumping Sounds<br>
-    <a href="updateSounds1.html" target="_blank">Example 2</a> Jumping and using player position to set pitch of tone<br>
+    <a href="updateSounds2.html" target="_blank">Example 2</a> Jumping and using player position to set pitch of tone<br>
     <a href="moodSounds1.html" target="_blank">Example 3</a> Using player's y position to set filter cut off frequency<br>
     <a href="moodSounds2.html" target="_blank">Example 3</a> Using Csound to trigger a lightning strike<br>
     <a href="razorgrassSounds.html" target="_blank">Example 4</a> Explosion sound when character dies<br>
