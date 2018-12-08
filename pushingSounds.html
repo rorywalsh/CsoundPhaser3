@@ -37,7 +37,8 @@ class GameScene extends Phaser.Scene {
     {
         
         this.player = this.physics.add.sprite(100, 10, 'spike');
-        this.player.displayHeight = 45;
+        this.player.displayHeight = 32;
+        this.player.displayWidth = 32;
         this.player.setBounce(.1);  
         this.platforms = this.physics.add.staticGroup();
         this.physics.add.collider(this.player, this.platforms);
@@ -51,17 +52,15 @@ class GameScene extends Phaser.Scene {
         this.cameras.main.setBounds(0, 0, width, height); 
 
         var mainLevel = [
-                '                 ',
-                '                 ',
-                '                 ',
-                '                 ',
-                '                 ',
-                'x               x',
-                'xxxxxxxxxxxxxxxxx',
-                'xxxxxxxxxxxxxxxxx',
-                'xxxxxxxxxxxxxxxxx',
-                'xxxxxxxxxxxxxxxxx',
-                'xxxxxxxxxxxxxxxxx'
+                '                     ',
+                '                     ',
+                '                     ',
+                '                     ',
+                '                     ',
+                '                     ',
+                '                     ',
+                'x                   x',
+                'xxxxxxxxxxxxxxxxxxxxx'
         ];
         
         var width = mainLevel[0].length*48;
@@ -98,18 +97,19 @@ class GameScene extends Phaser.Scene {
             repeat: -1
         });
 
-        this.timedEvent = this.time.addEvent({ delay: 5000, callback: this.createBox, callbackScope: this});
+        this.timedEvent = this.time.addEvent({ delay: 10, callback: this.createBox, callbackScope: this});
         this.createBox();
+        this.createCsoundPerfCallback();
     }
 
     createBox()
     {
-        
         this.timedEvent.reset({ delay: 10000, callback: this.createBox, callbackScope: this, repeat: 1});
-        this.yellow.create(200, 10, 'yellow').body.allowGravity = true;
-        //this.yellow.getChildren(this.yellow.getChildren.length-1).body.mass = 10;
+        this.yellow.create(Phaser.Math.Between(100, 800), 10, 'yellow').body.allowGravity = true;
         var boxes = this.yellow.getChildren();
         boxes[boxes.length-1].setDrag(100, 100);
+        boxes[boxes.length-1].displayHeight = 16;
+        boxes[boxes.length-1].displayWidth = 16;
         boxes[boxes.length-1].name = (boxes.length-1).toString();
         this.physics.add.collider(boxes[boxes.length-1], this.player, this.pushBox, null, this);
         csound.inputMessage("i2 0 3600 .1 " + boxes[boxes.length-1].name.toString());
@@ -119,16 +119,17 @@ class GameScene extends Phaser.Scene {
     pushBox(box, player)
     {
         console.log(box.name);
-        csound.setControlChannel("pitch"+box.name.toString(), box.x);
+        csound.setControlChannel("pitch"+box.name.toString(), box.x/2);
     }
 
-    createCcsoundPerfCallback()
+    createCsoundPerfCallback()
     {
         csound.on("perform", async () => {
-            for( var i = 0 ; i < 12 ; i++)
+            var boxes = this.yellow.getChildren();
+            for ( var i = 0 ; i < boxes.length ; i++)
             {
-                //const yPos = await csound.getControlChannel('platform' + i.toString());
-                //var platform = this.soundPlatforms.getChildren()[i];
+                // console.log(Phaser.Math.Clamp(Math.abs(boxes[i].x - this.player.x)*.0001, 0,)).toFixed(2));
+                csound.setControlChannel("gain"+boxes[i].name.toString(), Math.abs(boxes[i].x - this.player.x));
             }
         });
     }
@@ -154,8 +155,6 @@ class GameScene extends Phaser.Scene {
             this.player.setGravityY(1040);
         }
 
-
-
     }
 };
 
@@ -164,7 +163,7 @@ var config = {
     type: Phaser.CANVAS,
     width: 960,
     height: 600,
-    backgroundColor: 'rgb(255, 255, 255)',
+    backgroundColor: 'rgb(0, 0, 255)',
     physics: {
         default: 'arcade',
         arcade: {

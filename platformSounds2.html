@@ -27,6 +27,7 @@ class GameScene extends Phaser.Scene {
         this.colour2 = new Phaser.Display.Color(0, 0, 0);
         this.triggerLights = -99;
         this.shouldUpdate = 0;
+        this.drag = false;
     }
 
 
@@ -63,19 +64,12 @@ class GameScene extends Phaser.Scene {
      
     create()
     {
-        this.controls = new Phaser.Cameras.Controls.SmoothedKeyControl(config);
-
-
-        this.input.on('pointermove', function (pointer) {
-        
-        //console.log(pointer.x);
-
-        }, this);
 
         this.addRain(); 
         csound.inputMessage("i2 0 -1");
         csound.inputMessage("i3 0 -1");
-        csound.inputMessage("i6 0 -1");
+        //start instrument that will listen to mouse movement
+        csound.inputMessage("i7 0 -1");
         this.player = this.physics.add.sprite(100, 10, 'spike');
         this.player.displayHeight = 45;
         this.player.setBounce(.1);  
@@ -106,21 +100,6 @@ class GameScene extends Phaser.Scene {
         for (var x = 0; x < 7; x++)
             this.soundPlatforms.create(100+(90*x), 400, 'platform').refreshBody();
 
-        csound.on("perform", async () => {
-            if(this.shouldUpdate>32)
-            {
-                for( var i = 0 ; i < 7 ; i++)
-                {
-                    const yPos = await csound.getControlChannel('platform' + i.toString());
-                    var platform = this.soundPlatforms.getChildren()[i];
-                    platform.y = 200+(yPos*200);
-                    platform.refreshBody();
-                }
-            }
-
-            this.shouldUpdate++;
-        });
-
         this.keys = this.input.keyboard.addKeys('W,S,A,D,B');
 
         //  Our player animations, turning, walking left and walking right
@@ -146,7 +125,29 @@ class GameScene extends Phaser.Scene {
 
         //this.timedEvent1 = this.time.addEvent({ delay: 300, callback: this.triggerLightning, callbackScope: this});
         csound.inputMessage("i3 0 -1");
+
+        this.input.on('pointerdown', function (pointer) {
+            this.draw = true;
+            console.log(this.draw)
+        }, this);
+
+        this.input.on('pointerup', function () {
+            this.draw = false;
+        }, this);
+
+        this.input.on('pointermove', function (pointer) {
+            if(this.draw)
+            {
+                console.log("pointer me");
+                var platformIndex = parseInt((pointer.x/600)*6);
+                var plat = this.soundPlatforms.getChildren()[platformIndex];
+                plat.y = pointer.y;
+                plat.refreshBody();
+                csound.setControlChannel("plat"+platformIndex.toString(), pointer.y/600);
+            }
+        }, this);
     }
+
 
     triggerLightning ()
     {
@@ -166,7 +167,6 @@ class GameScene extends Phaser.Scene {
 
     update (time, delta)
     {
-        this.controls.update(delta);
 
         if (this.keys.A.isDown){
             this.player.setVelocityX(-160);    

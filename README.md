@@ -1,6 +1,15 @@
 
 
-This repo contains a demo game and examples of simple scenes created using the Phaser3 framework and Csound. Provided below is an overview of different aspects of the game development, from simple sprite movements to object collision. 
+This repo contains a demo game and examples of simple scenes created using the Phaser3 framework and Csound. Provided below is an overview of different aspects of the game development, from simple sprite movements to object collision.
+
+Examples:<br>
+    <a href="updateSounds1.html" target="_blank">Jumping Sounds</a><br>
+    <a href="updateSounds1.html" target="_blank">Jumping and using player position to set pitch of tone</a><br>
+    <a href="moodSounds1.html" target="_blank">Using player's y position to set filter cut off frequency</a><br>
+    <a href="moodSounds2.html" target="_blank">Using Csound to trigger a lightning strike</a><br>
+    <a href="razorgrassSounds.html" target="_blank">Explosion sound when character dies</a><br>
+    <a href="cannonSounds.html" target="_blank">Sounds from cannons</a><br>
+    <a href="platformSounds.html" target="_blank">Lightning sounds, and platforms controlled by oscillators</a><br>
 
 ## Getting started: Loading Phaser3 and Csound
  

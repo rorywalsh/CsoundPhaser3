@@ -27,6 +27,7 @@ class GameScene extends Phaser.Scene {
         this.colour2 = new Phaser.Display.Color(0, 0, 0);
         this.triggerLights = -99;
         this.shouldUpdate = 0;
+        this.positions = [];
     }
 
 
@@ -34,15 +35,15 @@ class GameScene extends Phaser.Scene {
     {
         this.load.spritesheet('spike', 'assets/spike.png', { frameWidth: 39, frameHeight: 48 });
         this.load.image('platform', 'assets/platform.png'); 
-        
-        csound.on("perform", async () => {
-            const val = await csound.getControlChannel("triggerLights");
-            if (this.triggerLights!=val)
-            {
-                this.triggerLights = val;
-                this.triggerLightning();
-            }
-        });
+        this.load.image('raindrop', 'assets/raindrop.png'); 
+        // csound.on("perform", async () => {
+        //     const val = await csound.getControlChannel("triggerLights");
+        //     if (this.triggerLights!=val)
+        //     {
+        //         this.triggerLights = val;
+        //         this.triggerLightning();
+        //     }
+        // });
     }
     
     addRain()
@@ -63,15 +64,11 @@ class GameScene extends Phaser.Scene {
      
     create()
     {
+        csound.inputMessage("i40 0 -1");
         this.addRain(); 
         csound.inputMessage("i2 0 -1");
-        csound.inputMessage("i3 0 -1");
+        // csound.inputMessage("i3 0 -1");
         csound.inputMessage("i6 0 -1");
-        this.player = this.physics.add.sprite(100, 10, 'spike');
-        this.player.displayHeight = 45;
-        this.player.setBounce(.1);  
-        this.soundPlatforms = this.physics.add.staticGroup();
-        this.physics.add.collider(this.player, this.soundPlatforms);
         
         this.physics.world.bounds.width = width;
         this.physics.world.bounds.height = height
@@ -93,24 +90,29 @@ class GameScene extends Phaser.Scene {
         
         var width = mainLevel[0].length*48;
         var height = (mainLevel.length)*48;
+        this.soundPlatforms = this.physics.add.staticGroup();
 
         for (var x = 0; x < 7; x++)
+        {
             this.soundPlatforms.create(100+(90*x), 400, 'platform').refreshBody();
+            var platforms = this.soundPlatforms.getChildren(); 
+            platforms[x].name = (x).toString();
+            this.physics.add.collider(this.player, platforms[x], null, this.platformHit, this)
+        }
 
         csound.on("perform", async () => {
-            if(this.shouldUpdate>32)
-            {
-                for( var i = 0 ; i < 12 ; i++)
+                for( var i = 0 ; i < 7 ; i++)
                 {
                     const yPos = await csound.getControlChannel('platform' + i.toString());
-                    var platform = this.soundPlatforms.getChildren()[i];
-                    platform.y = 200+(yPos*200);
-                    platform.refreshBody();
+                    this.positions[i] = 200+(yPos*200);
                 }
-            }
-
-            this.shouldUpdate++;
         });
+
+        this.player = this.physics.add.sprite(100, 0, 'spike');
+        this.player.displayHeight = 45;
+        this.player.body.mass = 1000;
+        this.player.setBounce(.1);  
+        this.physics.add.collider(this.player, this.soundPlatforms);
 
         this.keys = this.input.keyboard.addKeys('W,S,A,D,B');
 
@@ -135,13 +137,14 @@ class GameScene extends Phaser.Scene {
             repeat: -1
         });
 
-        //this.timedEvent1 = this.time.addEvent({ delay: 300, callback: this.triggerLightning, callbackScope: this});
-        csound.inputMessage("i3 0 -1");
+        this.timedEvent1 = this.time.addEvent({ delay: 300, callback: this.triggerLightning, callbackScope: this});
     }
 
     triggerLightning ()
     {
-       this.lightningTime = 0;
+        csound.inputMessage("i30 0 20 2");
+        this.timedEvent1.reset({ delay: Phaser.Math.Between(4500,15500), callback: this.triggerLightning, callbackScope: this, repeat: 1});
+        this.lightningTime = 0;
     }
 
     showLightning()
@@ -153,6 +156,11 @@ class GameScene extends Phaser.Scene {
         }
         else
             this.cameras.main.setBackgroundColor(this.normalColour);
+    }
+
+    platformHit(player, platform)
+    {
+        csound.inputMessage("i7 0 2 "+platform.name);
     }
 
     update ()
@@ -179,6 +187,14 @@ class GameScene extends Phaser.Scene {
         csound.setControlChannel("cutoff", this.player.y*2);
         this.showLightning();
 
+        for ( var i = 0 ; i < 7 ;  i++)
+        {
+            var platform = this.soundPlatforms.getChildren()[i];
+            platform.y = this.positions[i];
+            platform.refreshBody();
+
+        }
+         
     }
 };
 
