@@ -3,13 +3,15 @@
 This repo contains a demo game and examples of simple scenes created using the Phaser3 framework and Csound. Provided below is an overview of different aspects of the game development, from simple sprite movements to object collision.
 
 Examples:<br>
-    <a href="updateSounds1.html" target="_blank">Jumping Sounds</a><br>
-    <a href="updateSounds1.html" target="_blank">Jumping and using player position to set pitch of tone</a><br>
-    <a href="moodSounds1.html" target="_blank">Using player's y position to set filter cut off frequency</a><br>
-    <a href="moodSounds2.html" target="_blank">Using Csound to trigger a lightning strike</a><br>
-    <a href="razorgrassSounds.html" target="_blank">Explosion sound when character dies</a><br>
-    <a href="cannonSounds.html" target="_blank">Sounds from cannons</a><br>
-    <a href="platformSounds.html" target="_blank">Lightning sounds, and platforms controlled by oscillators</a><br>
+    <a href="updateSounds1.html" target="_blank">Example 1</a> Jumping Sounds<br>
+    <a href="updateSounds1.html" target="_blank">Example 2</a> Jumping and using player position to set pitch of tone<br>
+    <a href="moodSounds1.html" target="_blank">Example 3</a> Using player's y position to set filter cut off frequency<br>
+    <a href="moodSounds2.html" target="_blank">Example 3</a> Using Csound to trigger a lightning strike<br>
+    <a href="razorgrassSounds.html" target="_blank">Example 4</a> Explosion sound when character dies<br>
+    <a href="cannonSounds.html" target="_blank">Example 5</a> Sounds from cannons<br>
+    <a href="platformSounds.html" target="_blank">Example 6</a> Lightning sounds, and platforms controlled by oscillators<br>
+    <a href="platformSounds2.html" target="_blank">Example 7</a> Dragging with mouse to control oscillators<br>
+    <a href="pushingSounds.html" target="_blank">Example 8</a> Push the squares to control their pitch. The amplitude of each square is determined by its proximity to the player<br>
 
 ## Getting started: Loading Phaser3 and Csound
  

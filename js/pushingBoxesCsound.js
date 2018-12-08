@@ -12,12 +12,13 @@ endin
 
 ;boxSound
 instr 2    
-    SChannelName sprintf "pitch%d", p5
-    kPitch chnget SChannelName
-    a1 oscili p4, kPitch
-    outs a1, a1 
-    printk2 kPitch
-    print active(2)
+    SChannelPitch sprintf "pitch%d", p5
+    SChannelGain sprintf "gain%d", p5
+    kPitch chnget SChannelPitch
+    kGain chnget SChannelGain
+    kGain = tonek(ampdb(-kGain*.1), 10)
+    a1 oscili kGain*.1, (kPitch*2)+oscili:k(10, 1)
+    outs a1*1/(active(2)), a1*1/(active(2)) 
 endin
 
 </CsInstruments>

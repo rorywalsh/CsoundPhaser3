@@ -28,6 +28,7 @@ class GameScene extends Phaser.Scene {
         this.triggerLights = -99;
         this.shouldUpdate = 0;
         this.positions = [];
+        this.trigger = false;
     }
 
 
@@ -95,10 +96,12 @@ class GameScene extends Phaser.Scene {
         for (var x = 0; x < 7; x++)
         {
             this.soundPlatforms.create(100+(90*x), 400, 'platform').refreshBody();
-            var platforms = this.soundPlatforms.getChildren(); 
-            platforms[x].name = (x).toString();
-            this.physics.add.collider(this.player, platforms[x], null, this.platformHit, this)
+            var platform = this.soundPlatforms.getChildren()[x]; 
+            platform.name = (x).toString();
+            //this.physics.add.collider(platform, this.player, null, this.platformHit, this)
         }
+
+        this.physics.add.collider(this.soundPlatforms, this.player, null, this.platformHit, this)
 
         csound.on("perform", async () => {
                 for( var i = 0 ; i < 7 ; i++)
@@ -112,7 +115,7 @@ class GameScene extends Phaser.Scene {
         this.player.displayHeight = 45;
         this.player.body.mass = 1000;
         this.player.setBounce(.1);  
-        this.physics.add.collider(this.player, this.soundPlatforms);
+        this.physics.add.collider(this.player, this.soundPlatforms, this.platformHit, null, this);
 
         this.keys = this.input.keyboard.addKeys('W,S,A,D,B');
 
@@ -158,9 +161,11 @@ class GameScene extends Phaser.Scene {
             this.cameras.main.setBackgroundColor(this.normalColour);
     }
 
-    platformHit(player, platform)
+    platformHit(platform, player)
     {
-        csound.inputMessage("i7 0 2 "+platform.name);
+        if(this.trigger==true)
+            csound.inputMessage("i7 0 2 "+player.x.toString());
+        this.trigger = false;
     }
 
     update ()
@@ -178,8 +183,9 @@ class GameScene extends Phaser.Scene {
             this.player.anims.play('turn');
         }
 
-        if (this.keys.W.isDown && this.player.body.touching.down){
+        if (this.keys.W.isDown && this.player.body.touching.down && this.trigger==false){
             //csound.inputMessage("i1 0 .1 1000 500");
+            this.trigger = true;
             this.player.setVelocityY(-540);
             this.player.setGravityY(1040);
         }
@@ -187,7 +193,7 @@ class GameScene extends Phaser.Scene {
         csound.setControlChannel("cutoff", this.player.y*2);
         this.showLightning();
 
-        for ( var i = 0 ; i < 7 ;  i++)
+        for ( var i = 0 ; i < this.soundPlatforms.getChildren().length ;  i++)
         {
             var platform = this.soundPlatforms.getChildren()[i];
             platform.y = this.positions[i];
