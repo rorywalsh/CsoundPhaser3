@@ -5,7 +5,7 @@ ksmps = 512
 
 ;jumping sound
 instr 1
-    a1 expon .4, p3, 0.001
+    a1 expon 1, p3, 0.001
     a2 oscili a1, (1-a1)*p4+p5
     outs a2, a2 
 endin
@@ -13,22 +13,22 @@ endin
 ;white noise machine
 instr 2
     a1 rand .1
-    a2 lpf18 a1, chnget:k("cutoff")*2, .5, 0
+    a2 lpf18 a1, chnget:k("cutoff"), .5, 0
     outs a2, a2 
 endin
 
 ;lightning kick triggers
 instr 3
     kRand randh 1000, 4000, 2
-    if metro(.5) == 1 then
-        event "i", 4, 0, 1
+    if metro(1) == 1 then
+        event "i", 4, 0, 10
         chnset kRand, "triggerLights"
     endif
 endin
 
 ;kick
 instr 4
-    a1 expon .1, p3, 0.001
+    a1 expon .5, p3, 0.001
     a2 expon 150, p3, 50
     a3 oscili a1, a2
     outs a3, a3
@@ -63,15 +63,15 @@ instr 6
     chnset abs(k7), "platform6"
     chnset abs(k8), "platform7"
 
-    iF0 = 50
-    aOut1 oscili k1, iF0*1
-    aOut2 oscili k2, iF0*2
-    aOut3 oscili k3, iF0*3
-    aOut4 oscili k4, iF0*4
-    aOut5 oscili k5, iF0*5
-    aOut6 oscili k6, iF0*6
-    aOut7 oscili k7, iF0*7
-    aOut8 oscili k8, iF0*8
+
+    aOut1 oscili k1, 100
+    aOut2 oscili k2, 200
+    aOut3 oscili k3, 300
+    aOut4 oscili k4, 400
+    aOut5 oscili k5, 500
+    aOut6 oscili k6, 600
+    aOut7 oscili k7, 700
+    aOut8 oscili k8, 800
 
     aMix = aOut1+aOut2+aOut3+aOut4+aOut5+aOut6+aOut7+aOut8
 
@@ -79,12 +79,23 @@ instr 6
 endin
 
 instr 7
-    print p4
-    a1 expon .1, p3, 0.001
-    a2 oscili a1, (1+p4)*2
-    outs a2, a2 
+    aOut1 oscili chnget:k("plat1"), 100
+    aOut2 oscili chnget:k("plat2"), 200
+    aOut3 oscili chnget:k("plat3"), 300
+    aOut4 oscili chnget:k("plat4"), 500
+    aOut5 oscili chnget:k("plat5"), 600
+    aOut6 oscili chnget:k("plat6"), 700
+    aOut7 oscili chnget:k("plat7"), 800
+    aOut8 oscili chnget:k("plat8"), 900
+    aMix = aOut1+aOut2+aOut3+aOut4+aOut5+aOut6+aOut7+aOut8
+    outs aMix*.1, aMix*.1
 endin
 
+instr 8
+    a1 expon .3, p3, 0.001
+    a2 oscili a1, p4
+    outs a2, a2
+endin
 
 seed 0
 
@@ -160,7 +171,14 @@ endin
 
 </CsInstruments>
 <CsScore>
-f1 0 1024 10 1 .5 .2 .17 .12 .10 .8 .7
+f1 0 1024 10 1
+f2 0 1024 10 1 .5
+f3 0 1024 10 1 .5 .2
+f4 0 1024 10 1 .5 .2 .17
+f5 0 1024 10 1 .5 .2 .17 .12
+f6 0 1024 10 1 .5 .2 .17 .12 .10
+f7 0 1024 10 1 .5 .2 .17 .12 .10 .8
+f8 0 1024 10 1 .5 .2 .17 .12 .10 .8 .7
 
 
 f0 z

@@ -164,7 +164,7 @@ class GameScene extends Phaser.Scene {
     platformHit(platform, player)
     {
         if(this.trigger==true)
-            csound.inputMessage("i7 0 2 "+player.x.toString());
+            csound.inputMessage("i8 0 2 "+player.x.toString());
         this.trigger = false;
     }
 

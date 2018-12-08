@@ -70,6 +70,7 @@ class GameScene extends Phaser.Scene {
         csound.inputMessage("i3 0 -1");
         //start instrument that will listen to mouse movement
         csound.inputMessage("i7 0 -1");
+        csound.inputMessage("i6 0 -1");
         this.player = this.physics.add.sprite(100, 10, 'spike');
         this.player.displayHeight = 45;
         this.player.setBounce(.1);  
