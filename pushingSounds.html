@@ -188,28 +188,26 @@ class GameScene extends Phaser.Scene {
 
     update ()
     {
+            if (this.keys.A.isDown || this.moveRight==true){
+                this.player.setVelocityX(-160);    
+                this.player.anims.play('left', true);
+            }
+            else if (this.keys.D.isDown || this.moveLeft==true){
+                this.player.setVelocityX(160);    
+                this.player.anims.play('right', true);
+            }
+            else{
+                this.player.setVelocityX(0);    
+                this.player.anims.play('turn');
+            }
 
-        if (this.keys.A.isDown || this.moveRight==true){
-            this.player.setVelocityX(-160);    
-            this.player.anims.play('left', true);
+            if ((this.keys.W.isDown || this.shouldJump )&& this.player.body.touching.down ){
+                //csound.inputMessage("i1 0 .1 1000 500");
+                this.player.setVelocityY(-540);
+                this.player.setGravityY(1040);
+                this.inTheAir = true;
+            }
         }
-        else if (this.keys.D.isDown || this.moveLeft==true){
-            this.player.setVelocityX(160);    
-            this.player.anims.play('right', true);
-        }
-        else{
-            this.player.setVelocityX(0);    
-            this.player.anims.play('turn');
-        }
-
-        if ((this.keys.W.isDown || this.shouldJump )&& this.player.body.touching.down ){
-            //csound.inputMessage("i1 0 .1 1000 500");
-            this.player.setVelocityY(-540);
-            this.player.setGravityY(1040);
-            this.inTheAir = true;
-        }
-
-    }
 };
 
 //basic config for game
@@ -229,8 +227,9 @@ var config = {
 };
 
 
-var game = new Phaser.Game(config);
-
+csound.on("start", async () => {
+    var game = new Phaser.Game(config);
+});
 </script>
 
 </body>
