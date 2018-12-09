@@ -1,0 +1,107 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Csound and Phaser 3</title>
+    <script src="js/phaser.js"></script>
+    <script src="js/csound-wasm-browser.js"></script>
+    <script src="js/OwlSoundsCsound.js"></script>
+    <script src="js/3dWalkSoundsCsound.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+class GameScene extends Phaser.Scene {
+
+    constructor (config)
+    {
+        super(config);
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.amp = 0;
+    }
+
+    preload ()
+    {
+        this.load.spritesheet('eyes', 'assets/owlEyes.png', { frameWidth: 32, frameHeight: 32 }); 
+    }
+
+    create ()
+    {
+        this.leftEye = this.physics.add.sprite(200, 10, 'eyes');
+        this.rightEye = this.physics.add.sprite(232, 10, 'eyes');
+        
+        this.anims.create({
+            key: 'open',
+            frames: this.anims.generateFrameNumbers('eyes', { start: 0, end: 4 }),
+            frameRate: 30,
+            repeat: 0
+        });
+        this.anims.create({
+            key: 'close',
+            frames: this.anims.generateFrameNumbers('eyes', { start: 5, end: 10 }),
+            frameRate: 20,
+            repeat: 0
+        });   
+        
+        this.input.on('pointerdown', function (pointer) {
+            this.mouseX = Phaser.Math.Between(0, 600);
+            this.mouseY = Phaser.Math.Between(0, 400);
+            this.amp = Phaser.Math.FloatBetween(0, 1);
+            this.leftEye.displayHeight = this.amp*32;
+            this.leftEye.displayWidth = this.amp*32;
+            this.rightEye.displayHeight = this.amp*32;
+            this.rightEye.displayWidth = this.amp*32;
+            const scoreEvent = "i1 0 " + (this.amp+.25).toString() + " " +Phaser.Math.Between(36, 60).toString() + " " +  (this.amp).toString() + " " +  Phaser.Math.FloatBetween(0, .5).toString();
+            csound.inputMessage(scoreEvent);
+            this.leftEye.anims.play('open', true);
+            this.rightEye.anims.play('open', true);
+        }, this);
+
+        this.input.on('pointerup', function () {
+           this.rightEye.anims.play('close', true);
+           this.leftEye.anims.play('close', true);
+        }, this);
+
+    }
+
+    update ()
+    {
+        const offset = -20;
+        this.leftEye.x = this.mouseX+offset;
+        this.leftEye.y = this.mouseY+offset;
+        this.rightEye.x = this.mouseX+(this.amp*32)+offset;
+        this.rightEye.y = this.mouseY+offset;
+
+    }
+};
+
+
+var config = {
+    type: Phaser.CANVAS,
+    width: 960,
+    height: 600,
+    backgroundColor: 'rgb(0, 0, 0)',
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 300 },
+            debug: false
+        }
+    },
+    scene: GameScene
+};
+
+
+var game = new Phaser.Game(config);
+
+</script>
+
+</body>
+</html>

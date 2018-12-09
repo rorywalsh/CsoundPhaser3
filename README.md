@@ -13,6 +13,8 @@ This repo contains a demo game and examples of simple scenes created using the P
     <a href="platformSounds.html" target="_blank">Example 6</a> Lightning sounds, and platforms controlled by oscillators<br>
     <a href="platformSounds2.html" target="_blank">Example 7</a> Dragging with mouse to control oscillators<br>
     <a href="pushingSounds.html" target="_blank">Example 8</a> Push the squares to control their pitch. The amplitude of each square is determined by its proximity to the player<br>
+    <a href="owlSounds.html" target="_blank">Example 9</a> Tap the screen or click the mouse to hear owl sounds.<br>
+
 
 ## Getting started: Loading Phaser3 and Csound
  
