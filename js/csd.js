@@ -1,7 +1,6 @@
 const csd = `
 <CsoundSynthesizer>
 <CsInstruments>
-ksmps = 512
 
 ;jumping sound
 instr 1
