@@ -49,4 +49,6 @@ i1 0 z
 
 </CsoundSynthesizer>
 `
+csound.removeListener( "log" )
+
 csound.playCSD(csd);

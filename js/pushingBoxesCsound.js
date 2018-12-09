@@ -26,5 +26,7 @@ f0 z
 </CsScore>
 </CsoundSynthesizer>
 `
+csound.removeListener( "log" )
+
 csound.playCSD(csd);
         
