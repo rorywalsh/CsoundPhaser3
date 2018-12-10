@@ -18,6 +18,7 @@ Note that each of these examples use the WASD keys to control the scene. Some ex
     <a href="pushingSounds.html" target="_blank">Example 8</a> Push the squares to control their pitch. The amplitude of each square is determined by its proximity to the player<br>
     <a href="owlSounds.html" target="_blank">Example 9</a> Tap the screen or click the mouse to hear owl sounds.<br>
     <a href="3dWalkSounds.html" target="_blank">Example 10</a> 3d support is currently being added to Phaser 3. This simple first person example uses the camera's position to control the amplitudes of each object in the screen. Note that the controls in this one get a little messed up at some point!<br>
+    <a href="ballMovement.html" target="_blank">Example 11</a> Tap the screen or click the mouse to add a new ball to the scene. Collisions are used to trigger sounds.<br>
 
 ## Getting started: Loading Phaser3 and Csound
  
