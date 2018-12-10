@@ -1,8 +1,11 @@
 
 
-This repo contains a demo game and examples of simple scenes created using the Phaser3 framework and Csound. Provided below is an overview of different aspects of the game development, from simple sprite movements to object collision.
+This repo contains a demo game and examples of simple scenes created using the Phaser3 framework and Csound. Provided below is an overview of different aspects of the game development, from simple sprite movements to object collision. If anyone is interested in using Csound for games and would like more information, please visit the Cabbage audio forum on [Csound for Games](http://forum.cabbageaudio.com/c/csound-for-games) 
 
 ## Examples:
+
+Note that each of these examples use the WASD keys to control the scene. Some example will run on mobile devices, but Csound will need some time to compile. In practice it would be better to wait until Csound has completely loaded before running the game. This will be left is as an exercise for the reader. 
+
 <br>
     <a href="updateSounds1.html" target="_blank">Example 1</a> Jumping Sounds<br>
     <a href="updateSounds2.html" target="_blank">Example 2</a> Jumping and using player position to set pitch of tone<br>
@@ -14,7 +17,7 @@ This repo contains a demo game and examples of simple scenes created using the P
     <a href="platformSounds2.html" target="_blank">Example 7</a> Dragging with mouse to control oscillators<br>
     <a href="pushingSounds.html" target="_blank">Example 8</a> Push the squares to control their pitch. The amplitude of each square is determined by its proximity to the player<br>
     <a href="owlSounds.html" target="_blank">Example 9</a> Tap the screen or click the mouse to hear owl sounds.<br>
-
+    <a href="3dWalkSounds.html" target="_blank">Example 10</a> 3d support is currently being added to Phaser 3. This simple first person example uses the camera's position to control the amplitudes of each object in the screen. Note that the controls in this one get a little messed up at some point!<br>
 
 ## Getting started: Loading Phaser3 and Csound
  
