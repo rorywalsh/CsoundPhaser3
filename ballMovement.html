@@ -114,8 +114,9 @@ var config = {
 };
 
 
-var game = new Phaser.Game(config);
-
+csound.on("start", async () => {
+    var game = new Phaser.Game(config);
+});
 </script>
 
 </body>
