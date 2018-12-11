@@ -36,7 +36,6 @@ class GameScene extends Phaser.Scene {
 
     addBall()
     {
-        this.timedEvent = this.time.addEvent({ delay: 1000, callback: this.triggerLightning, callbackScope: this});
         var ball = this.balls.create(300, 0, 'ball').setTint(0xff0000);
         ball.setBounce(1);
         ball.setVelocityY(Phaser.Math.Between(-500, 500));
