@@ -1,0 +1,122 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Csound and Phaser 3</title>
+    <script src="../js/phaser.js"></script>
+    <script src="../js/csound-wasm-browser.js"></script>
+    <script src="../js/ballCsound.js"></script>
+    <style type="text/css">
+        body {  
+            margin: 0;
+            }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+class GameScene extends Phaser.Scene {
+
+    constructor (config)
+    {
+        super(config);
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.amp = 0;
+        this.ballCount = 0;
+        this.lightningTime = 100;
+        this.colour = new Phaser.Display.Color(0, 0, 0);
+    }
+
+    preload ()
+    {
+        this.load.image('ball', 'assets/cannonBall.png', { frameWidth: 32, frameHeight: 32 }); 
+    }
+
+    addBall()
+    {
+        var ball = this.balls.create(300, 0, 'ball').setTint(0xff0000);
+        ball.setBounce(1);
+        ball.setVelocityY(Phaser.Math.Between(-500, 500));
+        ball.setVelocityX(Phaser.Math.Between(-500, 500));
+        ball.body.setCollideWorldBounds(true);
+        this.physics.add.collider(this.balls, this.balls, this.ballCollision, null, this);
+        ball.body.onWorldBounds = true;
+        this.ballCount++;
+    }
+
+    ballCollision(ball)
+    {
+        this.lightningTime = 0;
+        csound.inputMessage("i1 0 .1 " + 2*ball.x.toString() + ' ' + this.ballCount.toString());
+        csound.inputMessage("i1 .1 .1 " + 2*ball.x.toString() + ' ' + this.ballCount.toString());
+        csound.inputMessage("i1 .2 .1 " + 2*ball.x.toString() + ' ' + this.ballCount.toString());
+        csound.inputMessage("i1 .3 .1 " + 2*ball.x.toString() + ' ' + this.ballCount.toString());
+    }
+
+    create ()
+    {
+        this.balls = this.physics.add.group();
+        this.addBall();
+
+        this.physics.world.on('worldbounds', function(body){
+            csound.inputMessage("i1 0 .5 " + 2*body.x.toString() + ' ' + this.ballCount.toString());
+            //if (body.y==364)        
+        },this);
+
+        this.input.on('pointerdown', function (pointer) {
+            this.addBall();
+        }, this);
+
+        this.input.on('pointerup', function () {
+        }, this);
+
+    }
+
+    update ()
+    {
+        this.lightning();
+    }
+
+    lightning()
+    {
+
+        if(this.lightningTime<20){
+            var randomColour = new Phaser.Display.Color(Phaser.Math.Between(0, 255),
+                                                    Phaser.Math.Between(0, 255),
+                                                    Phaser.Math.Between(0, 255));
+            var hexColour = Phaser.Display.Color.Interpolate.ColorWithColor(randomColour, this.colour, Phaser.Math.FloatBetween(0, 10), Phaser.Math.FloatBetween(0, 10));
+            this.cameras.main.setBackgroundColor(hexColour);
+            this.lightningTime++;
+        }
+        else
+            this.cameras.main.setBackgroundColor(this.colour2);
+    }
+        
+};
+
+
+var config = {
+    type: Phaser.CANVAS,
+    width: 600,
+    height: 400,
+    backgroundColor: 'rgb(0, 0, 0)',
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 300 },
+            debug: false
+        }
+    },
+    scene: GameScene
+};
+
+
+csound.on("start", async () => {
+    var game = new Phaser.Game(config);
+});
+</script>
+
+</body>
+</html>
