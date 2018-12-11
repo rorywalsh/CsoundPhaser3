@@ -3,9 +3,9 @@
 <head> 
     <meta charset="UTF-8" />
     <title>Csound and Phaser 3</title>
-    <script src="js/phaser.js"></script>
-    <script src="js/csound-wasm-browser.js"></script>
-    <script src="js/csd.js"></script>
+    <script src="../js/phaser.js"></script>
+    <script src="../js/csound-wasm-browser.js"></script>
+    <script src="../js/csd.js"></script>
 
     <style type="text/css">
         body {
@@ -22,20 +22,15 @@ class GameScene extends Phaser.Scene {
     constructor (config)
     {
         super(config);
-        this.normalColour = new Phaser.Display.Color(60, 60, 60);
-        this.colour1 = new Phaser.Display.Color(155, 155, 155);
-        this.colour2 = new Phaser.Display.Color(0, 0, 0);
-        this.triggerLights = -99;
     }
 
 
     preload()
     {
         this.load.spritesheet('spike', 'assets/spike.png', { frameWidth: 39, frameHeight: 48 });
-        this.load.image('platform', 'assets/platform.png'); 
-        this.load.image('raindrop', 'assets/rainDrop.png'); 
+        this.load.image('platform', 'assets/platform.png');        
     }
-    
+ 
     addRain()
     {
         this.rain = this.add.particles('raindrop');
@@ -51,11 +46,10 @@ class GameScene extends Phaser.Scene {
             blendMode: 'ADD'
         });
     }
-     
+
     create()
     {
-        this.addRain(); 
-        csound.inputMessage("i2 0 -1");
+        this.addRain();  
         this.player = this.physics.add.sprite(100, 10, 'spike');
         this.player.displayHeight = 45;
         this.player.setBounce(.1);  
@@ -68,19 +62,17 @@ class GameScene extends Phaser.Scene {
         this.cameras.main.setBounds(0, 0, width, height); 
 
         var mainLevel = [
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                '                                  ',
-                '                                  ',
-                'xx                                ',
-                '                                  ',
-                '                  xxxxxxx         ',
-                '            xxxxxxx               ',
-                '        xxxxxxxxxxxxxxxxxx        ',
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+                '                 ',
+                '                 ',
+                '                 ',
+                '             xxxx',
+                'xx               ',
+                '                 ',
+                '          xxxxxxx',
+                '                 ',
+                '        xxxxxxxxx',
+                '                 ',
+                'xxxxxxxxxxxxxxxxx'
         ];
         
         var width = mainLevel[0].length*48;
@@ -117,25 +109,8 @@ class GameScene extends Phaser.Scene {
             repeat: -1
         });
 
-        this.timedEvent1 = this.time.addEvent({ delay: 300, callback: this.triggerLightning, callbackScope: this});
     }
 
-    triggerLightning ()
-    {
-       this.timedEvent1.reset({ delay: Phaser.Math.Between(500,1500), callback: this.triggerLightning, callbackScope: this, repeat: 1});
-       this.lightningTime = 0;
-    }
-
-    showLightning()
-    {
-        if(this.lightningTime<20){
-            var hexColour = Phaser.Display.Color.Interpolate.ColorWithColor(this.colour1, this.colour2, Phaser.Math.FloatBetween(0, 10), Phaser.Math.FloatBetween(0, 10));
-            this.cameras.main.setBackgroundColor(hexColour);
-            this.lightningTime++;
-        }
-        else
-            this.cameras.main.setBackgroundColor(this.normalColour);
-    }
 
     update ()
     {
@@ -153,12 +128,13 @@ class GameScene extends Phaser.Scene {
         }
 
         if (this.keys.W.isDown && this.player.body.touching.down){
+            if (this.keys.W.isDown && this.player.body.touching.down){
+            csound.inputMessage("i1 0 .1 1000 " + (this.player.x*2).toString());
             this.player.setVelocityY(-540);
             this.player.setGravityY(1040);
         }
+    }
 
-        this.showLightning();
-        csound.setControlChannel("cutoff", this.player.y*2);
     }
 };
 
@@ -167,7 +143,7 @@ var config = {
     type: Phaser.CANVAS,
     width: 960,
     height: 600,
-    backgroundColor: 'rgb(255, 255, 255)',
+    backgroundColor: 'rgb(0, 0, 255)',
     physics: {
         default: 'arcade',
         arcade: {

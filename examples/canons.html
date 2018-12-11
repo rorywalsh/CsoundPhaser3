@@ -3,7 +3,7 @@
 <head> 
     <meta charset="UTF-8" />
     <title>Csound and Phaser 3</title>
-    <script src="js/phaser.js"></script>
+    <script src="../js/phaser.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -22,7 +22,6 @@ class GameScene extends Phaser.Scene {
         this.normalColour = new Phaser.Display.Color(60, 60, 60);
         this.colour1 = new Phaser.Display.Color(155, 155, 155);
         this.colour2 = new Phaser.Display.Color(0, 0, 0);
-        this.cannonAngle = -600;
     }
 
 
@@ -33,7 +32,10 @@ class GameScene extends Phaser.Scene {
         this.load.image('raindrop', 'assets/rainDrop.png'); 
         this.load.image('badGrass', 'assets/badGrass.png');  
         this.load.image('goodGrass', 'assets/goodGrass.png');  
-          
+        this.load.image('cannonBall', 'assets/cannonBall.png');
+        this.load.image('launcher', 'assets/launcher.png');
+        this.load.image('ulauncher', 'assets/launcherUpsideDown.png');
+                  
     }
     
      
@@ -41,15 +43,18 @@ class GameScene extends Phaser.Scene {
     {
         this.addRain();      
         this.goodGrass = this.physics.add.staticGroup(); 
-        this.badGrass = this.physics.add.staticGroup();    
+        this.badGrass = this.physics.add.staticGroup();   
+        this.cannons = this.physics.add.staticGroup(); 
+        this.cannonBalls = this.physics.add.group(); 
         this.player = this.physics.add.sprite(100, 10, 'spike');
         this.player.displayHeight = 45;
         this.player.setBounce(.1);  
         this.platforms = this.physics.add.staticGroup();
         this.physics.add.collider(this.player, this.platforms);
 
-        this.physics.add.collider(this.player, this.badGrass, this.badGrassHit, null, this);
-
+        this.physics.add.overlap(this.player, this.badGrass, this.badGrassHit, null, this);
+        this.physics.add.collider(this.cannonBalls, this.platforms, this.missileHitPlatform, null, this);
+        
         this.physics.world.bounds.width = width;
         this.physics.world.bounds.height = height
         this.cameras.main.setBounds(0, 0, width, height); 
@@ -57,14 +62,14 @@ class GameScene extends Phaser.Scene {
         var mainLevel = [
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                '                                  ',
-                ' gg         ggggggg               ',
-                ' xx gggg    xxxxxxx               ',
-                '    xxxx           ggggggg        ',
+                '    u                             ',
+                '            ggggggg               ',
+                'l    gggg    xxxxxxx               ',
+                'x    xxxx           ggggggg        ',
                 '                   xxxxxxx        ',
-                'hhhhhhh       hhhhhhhh            ',
-                'xxxxxxx    gggxxxxxxxxggg      xxx',
-                'xxxxxxxhhhhxxxxxxxxxxxxxxhhhhhhxxxx',
+                'hhhhhhh      hhhhhhhh            ',
+                'xxxxxxx    lggxxxxxxxxggg      xxx',
+                'xxxxxxxhhhhxxxxxxxxxxxxxxhhhhhxxxx',
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
         ];
@@ -82,6 +87,16 @@ class GameScene extends Phaser.Scene {
                 }
                 else if(mainLevel[y][x] == 'g') {
                     this.goodGrass.create(48*x, 48*y, 'goodGrass').refreshBody();
+                }
+                else if(mainLevel[y][x] == 'l') {
+                    this.cannons.create(48*x, 48*y, 'launcher').refreshBody();
+                    var launchers = this.cannons.getChildren();
+                    launchers[this.cannons.getTotalUsed()-1].orientation = 'up';
+                }
+                else if(mainLevel[y][x] == 'u') {
+                    this.cannons.create(48*x, 48*y, 'ulauncher').refreshBody();
+                    var launchers = this.cannons.getChildren();
+                    launchers[this.cannons.getTotalUsed()-1].orientation = 'down';
                 }
             }
         }
@@ -110,9 +125,8 @@ class GameScene extends Phaser.Scene {
         });
 
         this.timedEvent1 = this.time.addEvent({ delay: 1000, callback: this.triggerLightning, callbackScope: this});
-
-
-
+        this.timedEvent2 = this.time.addEvent({ delay: 1000, callback: this.triggercannonBalls, callbackScope: this});
+ 
     }
 
     triggerLightning ()
@@ -148,31 +162,36 @@ class GameScene extends Phaser.Scene {
         });
     }
 
-    triggerCannonBalls()
+    triggercannonBalls()
     {
-        this.timedEvent2.reset({ delay: 500, callback: this.triggerCannonBalls, callbackScope: this, repeat: 1});
+        this.timedEvent2.reset({ delay: 500, callback: this.triggercannonBalls, callbackScope: this, repeat: 1});
         
         this.cannons.children.iterate(function (child) {
             //  Give each star a slightly different bounce
-            var cannon = this.cannonBalls.create(child.x, child.y, 'cannon').setDisplaySize(8, 8);
-            cannon.setBounce(1);
-            cannon.setCollideWorldBounds(true);
+            var missile = this.cannonBalls.create(child.x, child.y, 'cannonBall').setDisplaySize(8, 8);
+            missile.setBounce(1);
+            missile.setCollideWorldBounds(true);
             if(child.orientation == 'up')
-                cannon.setVelocity(this.cannonAngle, Phaser.Math.Between(-1000, -600));
+                missile.setVelocity(this.missileAngle, Phaser.Math.Between(-1000, -600));
             else
-                cannon.setVelocity(this.cannonAngle, Phaser.Math.Between(1000, 600));
+                missile.setVelocity(this.missileAngle, Phaser.Math.Between(1000, 600));
 
-            cannon.allowGravity = false;
+            missile.allowGravity = false;
             }, this);
-        this.cannonAngle = this.cannonAngle < 400 ? this.cannonAngle + 50 : -400;
+        this.missileAngle = this.missileAngle < 400 ? this.missileAngle + 50 : -400;
 
+    }
+
+    missileHitPlatform(missile, platform)
+    {
+        missile.disableBody(true, true);
     }
 
     badGrassHit()
     {
         //collision between player and bad grass
     }
-    
+
     update ()
     {
         if (this.keys.A.isDown){

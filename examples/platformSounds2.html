@@ -3,11 +3,14 @@
 <head> 
     <meta charset="UTF-8" />
     <title>Csound and Phaser 3</title>
-    <script src="js/phaser.js"></script>
+    <script src="../js/phaser.js"></script>
+    <script src="../js/csound-wasm-browser.js"></script>
+    <script src="../js/csd.js"></script>
+
     <style type="text/css">
         body {
             margin: 0;
-        }
+        }  
     </style>
 </head>
 <body>
@@ -23,57 +26,80 @@ class GameScene extends Phaser.Scene {
         this.colour1 = new Phaser.Display.Color(155, 155, 155);
         this.colour2 = new Phaser.Display.Color(0, 0, 0);
         this.triggerLights = -99;
+        this.shouldUpdate = 0;
+        this.drag = false;
     }
 
 
     preload()
     {
         this.load.spritesheet('spike', 'assets/spike.png', { frameWidth: 39, frameHeight: 48 });
-        this.load.image('platform', 'assets/platform.png');   
-        this.load.image('raindrop', 'assets/rainDrop.png');      
+        this.load.image('platform', 'assets/platform.png'); 
+        
+        csound.on("perform", async () => {
+            const val = await csound.getControlChannel("triggerLights");
+            if (this.triggerLights!=val)
+            {
+                this.triggerLights = val;
+                this.triggerLightning();
+            }
+        });
     }
     
+    addRain()
+    {
+        this.rain = this.add.particles('raindrop');
+        this.rain.createEmitter({
+            x: { min: 1, max: 1800 },
+            y: 0,
+            lifespan: 1200,
+            speedY: { min: 200, max: 400 },
+            gravityY: 100,
+            gravityX: Phaser.Math.Between(100, 200),
+            scale: { start: 0.1, end: 0.2 },
+            quantity: 4,
+            blendMode: 'ADD'
+        });
+    }
      
     create()
     {
-        csound.inputMessage("i3 0 36000");
+
+        this.addRain(); 
+        csound.inputMessage("i2 0 -1");
+        csound.inputMessage("i3 0 -1");
+        //start instrument that will listen to mouse movement
+        csound.inputMessage("i7 0 -1");
+        csound.inputMessage("i6 0 -1");
         this.player = this.physics.add.sprite(100, 10, 'spike');
         this.player.displayHeight = 45;
         this.player.setBounce(.1);  
-        this.platforms = this.physics.add.staticGroup();
-        this.physics.add.collider(this.player, this.platforms);
-
+        this.soundPlatforms = this.physics.add.staticGroup();
+        this.physics.add.collider(this.player, this.soundPlatforms);
         
         this.physics.world.bounds.width = width;
         this.physics.world.bounds.height = height
         this.cameras.main.setBounds(0, 0, width, height); 
 
         var mainLevel = [
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                '                                  ',
-                '                                  ',
-                'xx                                ',
-                '                                  ',
-                '                  xxxxxxx         ',
-                '            xxxxxxx               ',
-                '        xxxxxxxxxxxxxxxxxx        ',
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+                '                 ',
+                '                 ',
+                '                 ',
+                '                 ',
+                '                ',
+                '                 ',
+                '                 ',
+                'xxxxxxxxxxxxxxxxx',
+                '                 ',
+                '                 ',
+                '                 '
         ];
         
         var width = mainLevel[0].length*48;
         var height = (mainLevel.length)*48;
 
-        for (var y = 0; y < mainLevel.length; y++) {
-            for (var x = 0; x < mainLevel[y].length; x++) {
-                if (mainLevel[y][x] == 'x') {
-                    this.platforms.create(48*x, 48*y, 'platform').refreshBody();
-                }
-            }
-        }
+        for (var x = 0; x < 7; x++)
+            this.soundPlatforms.create(100+(90*x), 400, 'platform').refreshBody();
 
         this.keys = this.input.keyboard.addKeys('W,S,A,D,B');
 
@@ -98,14 +124,35 @@ class GameScene extends Phaser.Scene {
             repeat: -1
         });
 
-        this.timedEvent1 = this.time.addEvent({ delay: 300, callback: this.triggerLightning, callbackScope: this});
+        //this.timedEvent1 = this.time.addEvent({ delay: 300, callback: this.triggerLightning, callbackScope: this});
+        csound.inputMessage("i3 0 -1");
 
+        this.input.on('pointerdown', function (pointer) {
+            this.draw = true;
+            console.log(this.draw)
+        }, this);
+
+        this.input.on('pointerup', function () {
+            this.draw = false;
+        }, this);
+
+        this.input.on('pointermove', function (pointer) {
+            if(this.draw)
+            {
+                console.log("pointer me");
+                var platformIndex = parseInt((pointer.x/600)*6);
+                var plat = this.soundPlatforms.getChildren()[platformIndex];
+                plat.y = pointer.y;
+                plat.refreshBody();
+                csound.setControlChannel("plat"+platformIndex.toString(), pointer.y/600);
+            }
+        }, this);
     }
+
 
     triggerLightning ()
     {
-       this.timedEvent1.reset({ delay: Phaser.Math.Between(500,1500), callback: this.triggerLightning, callbackScope: this, repeat: 1});
-        this.lightningTime = 0;
+       this.lightningTime = 0;
     }
 
     showLightning()
@@ -119,8 +166,9 @@ class GameScene extends Phaser.Scene {
             this.cameras.main.setBackgroundColor(this.normalColour);
     }
 
-    update ()
+    update (time, delta)
     {
+
         if (this.keys.A.isDown){
             this.player.setVelocityX(-160);    
             this.player.anims.play('left', true);
@@ -139,9 +187,9 @@ class GameScene extends Phaser.Scene {
             this.player.setVelocityY(-540);
             this.player.setGravityY(1040);
         }
-
+        
+        csound.setControlChannel("cutoff", this.player.y*2);
         this.showLightning();
-
 
     }
 };

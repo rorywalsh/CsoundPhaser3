@@ -3,7 +3,7 @@
 <head> 
     <meta charset="UTF-8" />
     <title>Csound and Phaser 3</title>
-    <script src="js/phaser.js"></script>
+    <script src="../js/phaser.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -22,6 +22,7 @@ class GameScene extends Phaser.Scene {
         this.normalColour = new Phaser.Display.Color(60, 60, 60);
         this.colour1 = new Phaser.Display.Color(155, 155, 155);
         this.colour2 = new Phaser.Display.Color(0, 0, 0);
+        this.triggerLights = -99;
     }
 
 
@@ -29,31 +30,19 @@ class GameScene extends Phaser.Scene {
     {
         this.load.spritesheet('spike', 'assets/spike.png', { frameWidth: 39, frameHeight: 48 });
         this.load.image('platform', 'assets/platform.png');   
-        this.load.image('raindrop', 'assets/rainDrop.png'); 
-        this.load.image('badGrass', 'assets/badGrass.png');  
-        this.load.image('goodGrass', 'assets/goodGrass.png');  
-        this.load.image('cannonBall', 'assets/cannonBall.png');
-        this.load.image('launcher', 'assets/launcher.png');
-        this.load.image('ulauncher', 'assets/launcherUpsideDown.png');
-                  
+        this.load.image('raindrop', 'assets/rainDrop.png');      
     }
     
      
     create()
     {
-        this.addRain();      
-        this.goodGrass = this.physics.add.staticGroup(); 
-        this.badGrass = this.physics.add.staticGroup();   
-        this.cannons = this.physics.add.staticGroup(); 
-        this.cannonBalls = this.physics.add.group(); 
+        csound.inputMessage("i3 0 36000");
         this.player = this.physics.add.sprite(100, 10, 'spike');
         this.player.displayHeight = 45;
         this.player.setBounce(.1);  
         this.platforms = this.physics.add.staticGroup();
         this.physics.add.collider(this.player, this.platforms);
 
-        this.physics.add.overlap(this.player, this.badGrass, this.badGrassHit, null, this);
-        this.physics.add.collider(this.cannonBalls, this.platforms, this.missileHitPlatform, null, this);
         
         this.physics.world.bounds.width = width;
         this.physics.world.bounds.height = height
@@ -62,14 +51,15 @@ class GameScene extends Phaser.Scene {
         var mainLevel = [
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                '    u                             ',
-                '            ggggggg               ',
-                'l    gggg    xxxxxxx               ',
-                'x    xxxx           ggggggg        ',
-                '                   xxxxxxx        ',
-                'hhhhhhh      hhhhhhhh            ',
-                'xxxxxxx    lggxxxxxxxxggg      xxx',
-                'xxxxxxxhhhhxxxxxxxxxxxxxxhhhhhxxxx',
+                '                                  ',
+                '                                  ',
+                'xx                                ',
+                '                                  ',
+                '                  xxxxxxx         ',
+                '            xxxxxxx               ',
+                '        xxxxxxxxxxxxxxxxxx        ',
+                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
         ];
@@ -81,22 +71,6 @@ class GameScene extends Phaser.Scene {
             for (var x = 0; x < mainLevel[y].length; x++) {
                 if (mainLevel[y][x] == 'x') {
                     this.platforms.create(48*x, 48*y, 'platform').refreshBody();
-                }
-                else if(mainLevel[y][x] == 'h') {
-                    this.badGrass.create(48*x, 50*y, 'badGrass').refreshBody();
-                }
-                else if(mainLevel[y][x] == 'g') {
-                    this.goodGrass.create(48*x, 48*y, 'goodGrass').refreshBody();
-                }
-                else if(mainLevel[y][x] == 'l') {
-                    this.cannons.create(48*x, 48*y, 'launcher').refreshBody();
-                    var launchers = this.cannons.getChildren();
-                    launchers[this.cannons.getTotalUsed()-1].orientation = 'up';
-                }
-                else if(mainLevel[y][x] == 'u') {
-                    this.cannons.create(48*x, 48*y, 'ulauncher').refreshBody();
-                    var launchers = this.cannons.getChildren();
-                    launchers[this.cannons.getTotalUsed()-1].orientation = 'down';
                 }
             }
         }
@@ -124,14 +98,13 @@ class GameScene extends Phaser.Scene {
             repeat: -1
         });
 
-        this.timedEvent1 = this.time.addEvent({ delay: 1000, callback: this.triggerLightning, callbackScope: this});
-        this.timedEvent2 = this.time.addEvent({ delay: 1000, callback: this.triggercannonBalls, callbackScope: this});
- 
+        this.timedEvent1 = this.time.addEvent({ delay: 300, callback: this.triggerLightning, callbackScope: this});
+
     }
 
     triggerLightning ()
     {
-        this.timedEvent1.reset({ delay: Phaser.Math.Between(500,2500), callback: this.triggerLightning, callbackScope: this, repeat: 1});
+       this.timedEvent1.reset({ delay: Phaser.Math.Between(500,1500), callback: this.triggerLightning, callbackScope: this, repeat: 1});
         this.lightningTime = 0;
     }
 
@@ -144,52 +117,6 @@ class GameScene extends Phaser.Scene {
         }
         else
             this.cameras.main.setBackgroundColor(this.normalColour);
-    }
-
-    addRain()
-    {
-        this.rain = this.add.particles('raindrop');
-        this.rain.createEmitter({
-            x: { min: 1, max: 1800 },
-            y: 0,
-            lifespan: 1200,
-            speedY: { min: 200, max: 400 },
-            gravityY: 100,
-            gravityX: Phaser.Math.Between(100, 200),
-            scale: { start: 0.1, end: 0.2 },
-            quantity: 4,
-            blendMode: 'ADD'
-        });
-    }
-
-    triggercannonBalls()
-    {
-        this.timedEvent2.reset({ delay: 500, callback: this.triggercannonBalls, callbackScope: this, repeat: 1});
-        
-        this.cannons.children.iterate(function (child) {
-            //  Give each star a slightly different bounce
-            var missile = this.cannonBalls.create(child.x, child.y, 'cannonBall').setDisplaySize(8, 8);
-            missile.setBounce(1);
-            missile.setCollideWorldBounds(true);
-            if(child.orientation == 'up')
-                missile.setVelocity(this.missileAngle, Phaser.Math.Between(-1000, -600));
-            else
-                missile.setVelocity(this.missileAngle, Phaser.Math.Between(1000, 600));
-
-            missile.allowGravity = false;
-            }, this);
-        this.missileAngle = this.missileAngle < 400 ? this.missileAngle + 50 : -400;
-
-    }
-
-    missileHitPlatform(missile, platform)
-    {
-        missile.disableBody(true, true);
-    }
-
-    badGrassHit()
-    {
-        //collision between player and bad grass
     }
 
     update ()
@@ -214,6 +141,8 @@ class GameScene extends Phaser.Scene {
         }
 
         this.showLightning();
+
+
     }
 };
 

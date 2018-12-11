@@ -3,7 +3,10 @@
 <head> 
     <meta charset="UTF-8" />
     <title>Csound and Phaser 3</title>
-    <script src="js/phaser.js"></script>
+    <script src="../js/phaser.js"></script>
+    <script src="../js/csound-wasm-browser.js"></script>
+    <script src="../js/csd.js"></script>
+    
     <style type="text/css">
         body {
             margin: 0;
@@ -22,6 +25,7 @@ class GameScene extends Phaser.Scene {
         this.normalColour = new Phaser.Display.Color(60, 60, 60);
         this.colour1 = new Phaser.Display.Color(155, 155, 155);
         this.colour2 = new Phaser.Display.Color(0, 0, 0);
+        this.cannonAngle = -600;
     }
 
 
@@ -29,20 +33,27 @@ class GameScene extends Phaser.Scene {
     {
         this.load.spritesheet('spike', 'assets/spike.png', { frameWidth: 39, frameHeight: 48 });
         this.load.image('platform', 'assets/platform.png');   
-        this.load.image('raindrop', 'assets/rainDrop.png');     
+        this.load.image('raindrop', 'assets/rainDrop.png'); 
+        this.load.image('badGrass', 'assets/badGrass.png');  
+        this.load.image('goodGrass', 'assets/goodGrass.png');  
+          
     }
     
      
     create()
     {
-        this.addRain();          
+        this.addRain();  
+        csound.inputMessage("i2 0 -1");   
+        this.goodGrass = this.physics.add.staticGroup(); 
+        this.badGrass = this.physics.add.staticGroup();    
         this.player = this.physics.add.sprite(100, 10, 'spike');
         this.player.displayHeight = 45;
         this.player.setBounce(.1);  
         this.platforms = this.physics.add.staticGroup();
         this.physics.add.collider(this.player, this.platforms);
 
-        
+        this.physics.add.collider(this.player, this.badGrass, this.badGrassHit, null, this);
+
         this.physics.world.bounds.width = width;
         this.physics.world.bounds.height = height
         this.cameras.main.setBounds(0, 0, width, height); 
@@ -51,14 +62,13 @@ class GameScene extends Phaser.Scene {
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
                 '                                  ',
-                '                                  ',
-                'xx                                ',
-                '                                  ',
-                '                  xxxxxxx         ',
-                '            xxxxxxx               ',
-                '        xxxxxxxxxxxxxxxxxx        ',
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                ' gg         ggggggg               ',
+                ' xx gggg    xxxxxxx               ',
+                '    xxxx           ggggggg        ',
+                '                   xxxxxxx        ',
+                'hhhhhhh       hhhhhhhh            ',
+                'xxxxxxx    gggxxxxxxxxggg      xxx',
+                'xxxxxxxhhhhxxxxxxxxxxxxxxhhhhhhxxxx',
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
         ];
@@ -70,6 +80,12 @@ class GameScene extends Phaser.Scene {
             for (var x = 0; x < mainLevel[y].length; x++) {
                 if (mainLevel[y][x] == 'x') {
                     this.platforms.create(48*x, 48*y, 'platform').refreshBody();
+                }
+                else if(mainLevel[y][x] == 'h') {
+                    this.badGrass.create(48*x, 50*y, 'badGrass').refreshBody();
+                }
+                else if(mainLevel[y][x] == 'g') {
+                    this.goodGrass.create(48*x, 48*y, 'goodGrass').refreshBody();
                 }
             }
         }
@@ -131,9 +147,50 @@ class GameScene extends Phaser.Scene {
             gravityY: 100,
             gravityX: Phaser.Math.Between(100, 200),
             scale: { start: 0.1, end: 0.2 },
-            quantity: 10,
-            blendMode: 'SCREEN'
+            quantity: 4,
+            blendMode: 'ADD'
         });
+    }
+
+    triggerCannonBalls()
+    {
+        this.timedEvent2.reset({ delay: 500, callback: this.triggerCannonBalls, callbackScope: this, repeat: 1});
+        
+        this.cannons.children.iterate(function (child) {
+            //  Give each star a slightly different bounce
+            var cannon = this.cannonBalls.create(child.x, child.y, 'cannon').setDisplaySize(8, 8);
+            cannon.setBounce(1);
+            cannon.setCollideWorldBounds(true);
+            if(child.orientation == 'up')
+                cannon.setVelocity(this.cannonAngle, Phaser.Math.Between(-1000, -600));
+            else
+                cannon.setVelocity(this.cannonAngle, Phaser.Math.Between(1000, 600));
+
+            cannon.allowGravity = false;
+            }, this);
+        this.cannonAngle = this.cannonAngle < 400 ? this.cannonAngle + 50 : -400;
+
+    }
+
+    badGrassHit()
+    {
+        //collision between player and bad grass
+        csound.inputMessage("i5 0 1");
+        this.gameOver() 
+    }
+    
+    
+    gameOver()  //game over method
+    {
+        console.log("GameOver");
+        this.score = 0;
+        this.physics.pause();
+        this.player.setTint(0xff0000);
+        this.player.anims.play('turn');
+        this.cameras.main.shake(200);        
+        this.time.delayedCall(500, function() {
+        this.scene.restart();
+        }, [], this);
     }
 
     update ()
@@ -157,9 +214,8 @@ class GameScene extends Phaser.Scene {
             this.player.setGravityY(1040);
         }
 
-
+                csound.setControlChannel("cutoff", this.player.y*2);
         this.showLightning();
-        this.rain.x = this.player.x-400;
     }
 };
 

@@ -7,18 +7,18 @@ This repo contains a demo game and examples of simple scenes created using the P
 Note that each of these examples use the WASD keys to control the scene. Some example will run on mobile devices, but Csound will need some time to compile. In practice it would be better to wait until Csound has completely loaded before running the game. This will be left is as an exercise for the reader. 
 
 <br>
-    <a href="updateSounds1.html" target="_blank">Example 1</a> Jumping Sounds<br>
-    <a href="updateSounds2.html" target="_blank">Example 2</a> Jumping and using player position to set pitch of tone<br>
-    <a href="moodSounds1.html" target="_blank">Example 3</a> Using player's y position to set filter cut off frequency<br>
-    <a href="moodSounds2.html" target="_blank">Example 3</a> Using Csound to trigger a lightning strike<br>
-    <a href="razorgrassSounds.html" target="_blank">Example 4</a> Explosion sound when character dies<br>
-    <a href="cannonSounds.html" target="_blank">Example 5</a> Sounds from cannons<br>
-    <a href="platformSounds.html" target="_blank">Example 6</a> Lightning sounds, and platforms controlled by oscillators<br>
-    <a href="platformSounds2.html" target="_blank">Example 7</a> Dragging with mouse to control oscillators<br>
-    <a href="pushingSounds.html" target="_blank">Example 8</a> Push the squares to control their pitch. The amplitude of each square is determined by its proximity to the player<br>
-    <a href="owlSounds.html" target="_blank">Example 9</a> Tap the screen or click the mouse to hear owl sounds.<br>
-    <a href="3dWalkSounds.html" target="_blank">Example 10</a> 3d support is currently being added to Phaser 3. This simple first person example uses the camera's position to control the amplitudes of each object in the screen. Note that the controls in this one get a little messed up at some point!<br>
-    <a href="ballMovement.html" target="_blank">Example 11</a> Tap the screen or click the mouse to add a new ball to the scene. Collisions are used to trigger sounds.<br>
+    <a href="examples/updateSounds1.html" target="_blank">Example 1</a> Jumping Sounds<br>
+    <a href="examples/updateSounds2.html" target="_blank">Example 2</a> Jumping and using player position to set pitch of tone<br>
+    <a href="examples/moodSounds1.html" target="_blank">Example 3</a> Using player's y position to set filter cut off frequency<br>
+    <a href="examples/moodSounds2.html" target="_blank">Example 3</a> Using Csound to trigger a lightning strike<br>
+    <a href="examples/razorgrassSounds.html" target="_blank">Example 4</a> Explosion sound when character dies<br>
+    <a href="examples/cannonSounds.html" target="_blank">Example 5</a> Sounds from cannons<br>
+    <a href="examples/platformSounds.html" target="_blank">Example 6</a> Lightning sounds, and platforms controlled by oscillators<br>
+    <a href="examples/platformSounds2.html" target="_blank">Example 7</a> Dragging with mouse to control oscillators<br>
+    <a href="examples/pushingSounds.html" target="_blank">Example 8</a> Push the squares to control their pitch. The amplitude of each square is determined by its proximity to the player<br>
+    <a href="examples/owlSounds.html" target="_blank">Example 9</a> Tap the screen or click the mouse to hear owl sounds.<br>
+    <a href="examples/3dWalkSounds.html" target="_blank">Example 10</a> 3d support is currently being added to Phaser 3. This simple first person example uses the camera's position to control the amplitudes of each object in the screen. Note that the controls in this one get a little messed up at some point!<br>
+    <a href="examples/ballMovement.html" target="_blank">Example 11</a> Tap the screen or click the mouse to add a new ball to the scene. Collisions are used to trigger sounds.<br>
 
 ## Getting started: Loading Phaser3 and Csound
  
@@ -300,7 +300,7 @@ update()
     }
 }
 ```
-<a href="update.html" target="_blank">Example</a>
+<a href="examples/update.html" target="_blank">Example</a>
 
 <img src="gifs/walking.gif" style="width:60%" />
 
@@ -344,7 +344,7 @@ f0 z
 csound.playCSD(csd);
 ```
 
-<a href="updateSounds1.html" target="_blank">Example</a>
+<a href="examples/updateSounds1.html" target="_blank">Example</a>
 
 
 `instr 1` 1 takes two p-field parameters which are sent via the `csound.inputMessage("i1 0 .1 1000 500")` function. These number can be changed on the javascript side at any point in the game to change to parameters of the sounds. In the following code Spike's x position within the world determines the pitch of the tone played. 
@@ -361,7 +361,7 @@ update()
         }
     (...)
 ```
-<a href="updateSounds2.html" target="_blank">Example</a>
+<a href="examples/updateSounds2.html" target="_blank">Example</a>
 
 
 ## A bad night
@@ -418,7 +418,7 @@ addRain()
 }
 ```
 
-<a href="rain.html" target="_blank">Example</a>
+<a href="examples/rain.html" target="_blank">Example</a>
 
 
 <img src="gifs/rain.gif" style="width:60%" />
@@ -451,7 +451,7 @@ csound.setControlChannel("cutoff", this.player.y*2);
 
 The noise will change whenever Spike moves up or down the screen.
 
-<a href="moodSounds1.html" target="_blank">Example</a>
+<a href="examples/moodSounds1.html" target="_blank">Example</a>
 
 
 #### Getting information from Csound
@@ -498,7 +498,7 @@ preload()
 Where `this.triggerLights` is a variable used to hold the current value of the `triggerLights` Csound channel. The Csound instrument is going to send a new random number every second. Each time it changes, the `this.triggerLightning()` function is called, and strikes of lightning appear on the scene. 
 
 
-<a href="moodSounds2.html" target="_blank">Example</a>
+<a href="examples/moodSounds2.html" target="_blank">Example</a>
 
 
 Note that the timed function used to drive the strikes of lightning in the previous example have been disabled in this case. 
@@ -531,7 +531,7 @@ create()
 
 ```
 
-<a href="razor.html" target="_blank">Example</a>
+<a href="examples/razor.html" target="_blank">Example</a>
 
 <img src="gifs/grass.gif" style="width:60%" />
 
@@ -558,7 +558,7 @@ In the demo game, the same type of collision detection is used to collect tokens
 
 Sounds can easily be added to events like this by sending a simple score statement to Csound. In this example a low explosion is heard each time Spikes hits razor grass.
 
-<a href="razorgrassSounds.html" target="_blank">Example</a>
+<a href="examples/razorgrassSounds.html" target="_blank">Example</a>
 
 
 ## Cannon fodder
@@ -590,7 +590,7 @@ triggercannonBalls()
 
 A second collision detector is set up between the cannon ball and the platforms to disable any cannonball that hits a platform.  
 
-<a href="cannonSounds.html" target="_blank">Example</a>
+<a href="examples/cannonSounds.html" target="_blank">Example</a>
 
 ## Platforms that move
 
@@ -691,7 +691,7 @@ create()
 }
 ```
 
-<a href="platformSounds.html" target="_blank">Example</a>
+<a href="examples/platformSounds.html" target="_blank">Example</a>
 
 <img src="gifs/movingPlatformSounds.gif" style="width:60%" />
 
@@ -702,7 +702,7 @@ In the next demo mouse movement is used to both move the platforms, and play sou
 
 ## The demo
 
-<a href="game.html" target="_blank">The demo</a>
+<a href="examples/game.html" target="_blank">The demo</a>
 
 The demo game is in pretty raw state but it does import Csound so it's ready to be hacked; as too are each of the examples presented in the text above. The demo adds a few extra features such collectable stars that came straight out of a phaser tutorial!. The bombs can be used blow up platforms. The goal is to get to the yellow door, which Spike must go through to get to the next level. The code for these things can be found in the githug page. If anyone wishes to contribute a level for the game, I'm more than happy to host it on my github page. 
 
