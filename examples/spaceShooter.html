@@ -32,12 +32,22 @@ class GameScene extends Phaser.Scene {
     {
         this.bullet = this.add.graphics();
         this.bullet.fillStyle(0x00ff00);
-        this.bullet.fillCircle(position.x, position.y+8, 2);   
+        //this.bullet.setAngle(playerRotation);
+        this.bullet.fillCircle(position.x, position.y, 2); 
+        this.bullet.setAngle(playerRotation);
+        
+        let offset = new Phaser.Geom.Point(0, -this.bullet.height / 2);
+        Phaser.Math.Rotate(offset, playerRotation);
+        this.bullet.setPosition(offset.x, offset.y)
+        console.log(offset);
+
         this.physics.add.existing(this.bullet, 0);
         this.bullet.name = 'bullet';
-        this.bullet.body.setVelocity(Math.cos(playerRotation)*200, Math.sin(playerRotation)*200);
-        
+        this.physics.velocityFromRotation(playerRotation, 500, this.bullet.body.velocity);
 
+        //this.bullet.body.setVelocity(Math.cos(playerRotation)*200, Math.sin(playerRotation)*200);
+        //this.bullet.body.setCollideWorldBounds(true);
+        this.bullet.lifespan = 10;
     }
 
     create ()
@@ -50,6 +60,7 @@ class GameScene extends Phaser.Scene {
         this.player.lineTo(0, 16);
         this.player.fillPath();
         this.physics.add.existing(this.player, 0);
+        this.player.setPosition(300, 300);
         this.player.body.setMaxVelocity(20);  
         this.player.body.setCollideWorldBounds(true);
         this.physics.world.setBounds(0, 10, 640, 440);
@@ -78,7 +89,7 @@ class GameScene extends Phaser.Scene {
     update ()
     {
         this.player.body.setDrag(500);
-        //this.player.body.setAngularDrag(400);
+        
 
         if (this.keys.A.isDown){
             this.player.rotation -= 0.05;
@@ -87,6 +98,9 @@ class GameScene extends Phaser.Scene {
         else if (this.keys.D.isDown){
             this.player.rotation += 0.05;
             //this.player.body.setAngularVelocity(+150);   
+        }
+        else{
+            this.player.body.setAngularVelocity(0);
         }
         
         if (this.keys.W.isDown){  
