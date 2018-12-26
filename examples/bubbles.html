@@ -5,17 +5,13 @@
     <title>Csound and Phaser 3</title>
     <script src="../js/phaser.js"></script>
     <script src="../js/csound-wasm-browser.js"></script>
-    <style type="text/css">
-        body {  
-            margin: 0;
-            }
-    </style>
 </head>
 <body>
 <button id="startCsound">Start</button>
 
 
 <script type="text/javascript">
+
 
 class GameScene extends Phaser.Scene {
 
@@ -27,11 +23,14 @@ class GameScene extends Phaser.Scene {
 
     preload ()
     {
-        //this.load.image('ball', 'assets/cannonBall.png', { frameWidth: 32, frameHeight: 32 }); 
+        this.load.image('ball', 'assets/cannonBall.png', { frameWidth: 16, frameHeight: 16 });
     }
 
     create ()
     {
+        this.bubbleEvent = this.time.addEvent({ delay: 1000, callback: this.createBubble, callbackScope: this});
+        this.bubbles = this.physics.add.group();
+
         this.input.on('pointerdown', function (pointer) {
             //mouse down
         }, this);
@@ -43,11 +42,34 @@ class GameScene extends Phaser.Scene {
         csound.on("perform", async () => {
              //every k cycle
         });
+
+        this.input.on('gameobjectdown',function (pointer, gameObject){
+            gameObject.destroy();
+        }, this);
     }
 
     update ()
     {
+        this.bubbles.children.iterate(function (child) {
+            child.setDisplaySize(child.size, child.size);
+            child.size += 0.25;
+        }, this);
 
+    }
+
+    createBubble()
+    {
+        var ball = this.bubbles.create(Phaser.Math.Between(0, 800), 600, 'ball');
+        ball.size = 16;
+        ball.setGravity(false);
+        ball.setTint(0xffff00);
+        ball.setBounce(1);
+        //ball.setVelocityY(-10);
+        ball.setInteractive();
+        ball.body.setCollideWorldBounds(false);
+        //this.physics.add.collider(this.balls, this.balls, this.ballCollision, null, this);
+        ball.body.onWorldBounds = true;
+        this.bubbleEvent.reset({ delay: Phaser.Math.Between(1500,5000), callback: this.createBubble, callbackScope: this, repeat: 1});
     }
         
 };
@@ -55,13 +77,13 @@ class GameScene extends Phaser.Scene {
 
 var config = {
     type: Phaser.CANVAS,
-    width: 600,
-    height: 400,
+    width: 800,
+    height: 600,
     backgroundColor: 'rgb(0, 0, 0)',
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 300 },
+            gravity: { y: -100 },
             debug: false
         }
     },
@@ -84,18 +106,9 @@ document.getElementById('startCsound').onclick = ()=>{
             outs a2/iActive, a2/iActive 
         endin
 
-        instr 200
-            a1 randi 300, .5, 2
-            a2 randi 300, .2, 2
-            a3 oscili .2, a1
-            a4 oscili .2, a2
-            outs a3+a4, a3+a4
-        endin
-
         </CsInstruments>
         <CsScore>
         f0 z
-        i200 0 z
         </CsScore>
         </CsoundSynthesizer>
         `
