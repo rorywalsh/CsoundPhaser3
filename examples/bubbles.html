@@ -1,0 +1,114 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Csound and Phaser 3</title>
+    <script src="../js/phaser.js"></script>
+    <script src="../js/csound-wasm-browser.js"></script>
+    <style type="text/css">
+        body {  
+            margin: 0;
+            }
+    </style>
+</head>
+<body>
+<button id="startCsound">Start</button>
+
+
+<script type="text/javascript">
+
+class GameScene extends Phaser.Scene {
+
+    constructor (config)
+    {
+        super(config);
+        this.startAudio = true;
+    }
+
+    preload ()
+    {
+        //this.load.image('ball', 'assets/cannonBall.png', { frameWidth: 32, frameHeight: 32 }); 
+    }
+
+    create ()
+    {
+        this.input.on('pointerdown', function (pointer) {
+            //mouse down
+        }, this);
+
+        this.input.on('pointerup', function () {
+            //mouse up
+        }, this);
+
+        csound.on("perform", async () => {
+             //every k cycle
+        });
+    }
+
+    update ()
+    {
+
+    }
+        
+};
+
+
+var config = {
+    type: Phaser.CANVAS,
+    width: 600,
+    height: 400,
+    backgroundColor: 'rgb(0, 0, 0)',
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 300 },
+            debug: false
+        }
+    },
+    scene: GameScene
+};
+
+document.getElementById('startCsound').onclick = ()=>{
+    const csd = `
+        <CsoundSynthesizer>
+        <CsOptions>
+        </CsOptions>
+        <CsInstruments>
+        0dbfs = 1
+
+        ;bounce sound
+        instr 1
+            iActive active 1
+            a1 expon .2, p3, 0.001
+            a2 oscili a1, 200+p4
+            outs a2/iActive, a2/iActive 
+        endin
+
+        instr 200
+            a1 randi 300, .5, 2
+            a2 randi 300, .2, 2
+            a3 oscili .2, a1
+            a4 oscili .2, a2
+            outs a3+a4, a3+a4
+        endin
+
+        </CsInstruments>
+        <CsScore>
+        f0 z
+        i200 0 z
+        </CsScore>
+        </CsoundSynthesizer>
+        `
+        csound.removeListener( "log" );
+        csound.playCSD(csd);
+}
+
+csound.on("start", async () => {
+    var game = new Phaser.Game(config);
+    var element = document.getElementById('startCsound');
+    element.parentNode.removeChild(element);
+});
+</script>
+
+</body>
+</html>
