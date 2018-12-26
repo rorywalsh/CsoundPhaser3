@@ -5,6 +5,11 @@
     <title>Csound and Phaser 3</title>
     <script src="../js/phaser.js"></script>
     <script src="../js/csound-wasm-browser.js"></script>
+    <style type="text/css">
+        body {
+            background-color: black;
+        }
+    </style>
 </head>
 <body>
 <button id="startCsound">Start</button>
@@ -45,6 +50,7 @@ class GameScene extends Phaser.Scene {
 
         this.input.on('gameobjectdown',function (pointer, gameObject){
             gameObject.destroy();
+            csound.inputMessage('i1 0 1 ' + Phaser.Math.Between(200, 1000));
         }, this);
     }
 
@@ -53,18 +59,17 @@ class GameScene extends Phaser.Scene {
         this.bubbles.children.iterate(function (child) {
             child.setDisplaySize(child.size, child.size);
             child.size += 0.25;
+            child.setVelocityX(Phaser.Math.Between(-100, 100));
         }, this);
 
     }
 
     createBubble()
     {
-        var ball = this.bubbles.create(Phaser.Math.Between(0, 800), 600, 'ball');
+        var ball = this.bubbles.create(Phaser.Math.Between(0, 800), 600, 'ball').setTintFill(0xffff00);;
         ball.size = 16;
         ball.setGravity(false);
-        ball.setTint(0xffff00);
-        ball.setBounce(1);
-        //ball.setVelocityY(-10);
+        ball.setBounce(.1);
         ball.setInteractive();
         ball.body.setCollideWorldBounds(false);
         //this.physics.add.collider(this.balls, this.balls, this.ballCollision, null, this);
@@ -77,8 +82,8 @@ class GameScene extends Phaser.Scene {
 
 var config = {
     type: Phaser.CANVAS,
-    width: 800,
-    height: 600,
+    width: 600,
+    height: 400,
     backgroundColor: 'rgb(0, 0, 0)',
     physics: {
         default: 'arcade',
@@ -98,7 +103,6 @@ document.getElementById('startCsound').onclick = ()=>{
         <CsInstruments>
         0dbfs = 1
 
-        ;bounce sound
         instr 1
             iActive active 1
             a1 expon .2, p3, 0.001
