@@ -24,11 +24,12 @@ class GameScene extends Phaser.Scene {
     {
         super(config);
         this.startAudio = true;
+        this.bubbleNumber = 0;
     }
 
     preload ()
     {
-        this.load.image('ball', 'assets/cannonBall.png', { frameWidth: 16, frameHeight: 16 });
+        //this.load.image('ball', 'assets/cannonBall.png', { frameWidth: 16, frameHeight: 16 });
     }
 
     create ()
@@ -52,6 +53,9 @@ class GameScene extends Phaser.Scene {
             gameObject.destroy();
             csound.inputMessage('i1 0 1 ' + Phaser.Math.Between(200, 1000));
         }, this);
+    
+
+
     }
 
     update ()
@@ -66,15 +70,18 @@ class GameScene extends Phaser.Scene {
 
     createBubble()
     {
-        var ball = this.bubbles.create(Phaser.Math.Between(0, 800), 600, 'ball').setTintFill(0xffff00);;
+        var graphics = this.add.graphics();
+        const color = Phaser.Display.Color.GetColor(Phaser.Math.Between(0, 255), Phaser.Math.Between(0, 255), Phaser.Math.Between(0, 255));
+        graphics.fillStyle(color, 1);
+        graphics.fillCircle(16, 16, 16);
+        const bubbleString = 'bubble'+this.bubbleNumber++;
+        graphics.generateTexture(bubbleString, 32, 32);
+        var ball = this.bubbles.create(Phaser.Math.Between(0, 800), 600, bubbleString);
+        ball.setDisplaySize(16, 16);
+        graphics.destroy();
         ball.size = 16;
-        ball.setGravity(false);
-        ball.setBounce(.1);
         ball.setInteractive();
-        ball.body.setCollideWorldBounds(false);
-        //this.physics.add.collider(this.balls, this.balls, this.ballCollision, null, this);
-        ball.body.onWorldBounds = true;
-        this.bubbleEvent.reset({ delay: Phaser.Math.Between(1500,5000), callback: this.createBubble, callbackScope: this, repeat: 1});
+        this.bubbleEvent.reset({ delay: Phaser.Math.Between(500,2000), callback: this.createBubble, callbackScope: this, repeat: 1});
     }
         
 };
