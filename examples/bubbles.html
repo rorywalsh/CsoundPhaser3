@@ -27,6 +27,8 @@ class GameScene extends Phaser.Scene {
         this.drag = 0;
     }
 
+    
+
     create ()
     {
         this.bubbles = this.physics.add.group();
@@ -89,6 +91,25 @@ var config = {
     scene: GameScene
 };
 
+var elem = document.documentElement;
+      
+function toggleFullScreen() {
+    if (!document.mozFullScreen && !document.webkitFullScreen) {
+        if (elem.mozRequestFullScreen) {
+        elem.mozRequestFullScreen();
+        } else {
+        elem.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+        }
+    } else {
+        if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+        } else {
+        document.webkitCancelFullScreen();
+        }
+    }
+}
+
+
 document.getElementById('startCsound').onclick = ()=>{
     // The following is a simplified version of Iain McCurdy's Bubble instrument
     // from the Cabbage Csound examples
@@ -128,6 +149,7 @@ document.getElementById('startCsound').onclick = ()=>{
         `
         csound.removeListener( "log" );
         csound.playCSD(csd);
+        toggleFullScreen();
 }
 
 csound.on("start", async () => {
@@ -138,4 +160,7 @@ csound.on("start", async () => {
 </script>
 
 </body>
+<script>
+
+  </script>
 </html>
