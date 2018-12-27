@@ -12,7 +12,7 @@
     </style>
 </head>
 <body>
-<button id="startCsound">Start</button>
+<button id="startCsound"  style="font-size : 20px;">Press to start (Based on Iain McCurdy's Bubble example in the Csound Cabbage examples</button>
 
 
 <script type="text/javascript">
@@ -23,49 +23,36 @@ class GameScene extends Phaser.Scene {
     constructor (config)
     {
         super(config);
-        this.startAudio = true;
         this.bubbleNumber = 0;
-    }
-
-    preload ()
-    {
-        //this.load.image('ball', 'assets/cannonBall.png', { frameWidth: 16, frameHeight: 16 });
+        this.drag = 0;
     }
 
     create ()
     {
-        this.bubbleEvent = this.time.addEvent({ delay: 1000, callback: this.createBubble, callbackScope: this});
         this.bubbles = this.physics.add.group();
-
-        this.input.on('pointerdown', function (pointer) {
-            //mouse down
-        }, this);
-
-        this.input.on('pointerup', function () {
-            //mouse up
-        }, this);
-
-        csound.on("perform", async () => {
-             //every k cycle
-        });
-
         this.input.on('gameobjectdown',function (pointer, gameObject){
             gameObject.destroy();
-            csound.inputMessage('i1 0 1 ' + Phaser.Math.Between(200, 1000));
+            csound.inputMessage('i200 0 .1 ' + Phaser.Math.Between(200, 1000));
         }, this);
-    
 
+        this.createBubble();
+        this.changeDrag();
 
     }
 
     update ()
-    {
+    {        
         this.bubbles.children.iterate(function (child) {
             child.setDisplaySize(child.size, child.size);
             child.size += 0.25;
-            child.setVelocityX(Phaser.Math.Between(-100, 100));
+            child.setVelocityX(this.drag);
         }, this);
+    }
 
+    changeDrag()
+    {
+        this.drag = Phaser.Math.Between(-50, 50);
+        this.time.addEvent({ delay: Phaser.Math.Between(500,2000), callback: this.changeDrag, callbackScope: this});
     }
 
     createBubble()
@@ -76,14 +63,14 @@ class GameScene extends Phaser.Scene {
         graphics.fillCircle(16, 16, 16);
         const bubbleString = 'bubble'+this.bubbleNumber++;
         graphics.generateTexture(bubbleString, 32, 32);
-        var ball = this.bubbles.create(Phaser.Math.Between(0, 800), 600, bubbleString);
+        var ball = this.bubbles.create(Phaser.Math.Between(20, 550), 400, bubbleString);
         ball.setDisplaySize(16, 16);
         graphics.destroy();
         ball.size = 16;
         ball.setInteractive();
-        this.bubbleEvent.reset({ delay: Phaser.Math.Between(500,2000), callback: this.createBubble, callbackScope: this, repeat: 1});
-    }
-        
+        this.time.addEvent({ delay: Phaser.Math.Between(500,2000), callback: this.createBubble, callbackScope: this});
+        //this.bubbleEvent.reset({ delay: Phaser.Math.Between(500,2000), callback: this.createBubble, callbackScope: this, repeat: 1});
+    }        
 };
 
 
@@ -95,7 +82,7 @@ var config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: -100 },
+            gravity: { y: -50 },
             debug: false
         }
     },
@@ -103,23 +90,39 @@ var config = {
 };
 
 document.getElementById('startCsound').onclick = ()=>{
+    // The following is a simplified version of Iain McCurdy's Bubble instrument
+    // from the Cabbage Csound examples
+
     const csd = `
         <CsoundSynthesizer>
         <CsOptions>
         </CsOptions>
         <CsInstruments>
+        nchnls = 2
         0dbfs = 1
 
-        instr 1
-            iActive active 1
-            a1 expon .2, p3, 0.001
-            a2 oscili a1, 200+p4
-            outs a2/iActive, a2/iActive 
+        instr 200; Burst sound
+            asig pluck 0.7, p4, p4, 0, 3, .1, 10
+            chnset asig, "output"
         endin
+
+        instr 1000	; Reverb
+            aSignal chnget "output"
+            aL,aR	reverbsc	aSignal,aSignal,0.9,5000
+            outs aL,aR
+            chnclear "output"
+        endin
+
+        instr 1
+            if changed(chnget:k("button1"))== 1 then
+                event "i", 200, 0, .1, 100
+            endif
+        endin
+
 
         </CsInstruments>
         <CsScore>
-        f0 z
+        i1000 0 z
         </CsScore>
         </CsoundSynthesizer>
         `
