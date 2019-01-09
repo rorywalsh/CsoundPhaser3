@@ -40,7 +40,7 @@ class GameScene extends Phaser.Scene {
 
     create() 
     {    
-        csound.inputMessage("i20 0 -1");
+        //csound.inputMessage("i20 0 -1");
         this.timedEvent1 = this.time.addEvent({ delay: 1000, callback: this.triggerLightning, callbackScope: this});
         this.timedEvent2 = this.time.addEvent({ delay: 1000, callback: this.triggerCannonBalls, callbackScope: this});
         
@@ -105,7 +105,7 @@ class GameScene extends Phaser.Scene {
         
     
         if (this.keys.W.isDown && this.player.body.touching.down){
-            csound.inputMessage("i1 0 .1 1000 500");
+            //csound.inputMessage("i1 0 .1 1000 500");
             this.player.setVelocityY(-540);
             this.player.setGravityY(1040);
             this.stickToPlatform = false;
@@ -130,7 +130,7 @@ class GameScene extends Phaser.Scene {
     //========================================================
     addRain()
     {
-        csound.inputMessage("i 10 0 -1");
+        //csound.inputMessage("i 10 0 -1");
         this.rain = this.add.particles('raindrop');
         this.rain.createEmitter({
             x: { min: 1, max: 1800 },
@@ -319,7 +319,7 @@ class GameScene extends Phaser.Scene {
 
     triggerLightning ()
     {
-        csound.inputMessage("i30 0 12 1.5");
+        //csound.inputMessage("i30 0 12 1.5");
         this.timedEvent1.reset({ delay: Phaser.Math.Between(2000,15000), callback: this.triggerLightning, callbackScope: this, repeat: 1});
         this.lightningTime = 0;
     }
@@ -327,7 +327,7 @@ class GameScene extends Phaser.Scene {
     triggerCannonBalls()
     {
         this.timedEvent2.reset({ delay: 500, callback: this.triggerCannonBalls, callbackScope: this, repeat: 1});
-        csound.inputMessage("i 100 0 0.06 " + this.cannonBallAngle + " " + this.player.x/400);
+        //csound.inputMessage("i 100 0 0.06 " + this.cannonBallAngle + " " + this.player.x/400);
             
         this.cannons.children.iterate(function (child) {
             //  Give each star a slightly different bounce
