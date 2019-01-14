@@ -38,8 +38,7 @@
         /*********** this function is the only one you need to modify *************/
         var createScene = function () 
         {
-            csound.inputMessage("i1 0 -1");
-            csound.setControlChannel("distance", 200);
+           
             var scene = new BABYLON.Scene(engine);
 
             // Lights
@@ -51,7 +50,7 @@
             camera.attachControl(canvas, true);
             camera.speed = 1;
             //Ground
-            var ground = BABYLON.Mesh.CreatePlane("ground", 140.0, scene);
+            var ground = BABYLON.Mesh.CreatePlane("ground", 1000.0, scene);
             ground.material = new BABYLON.StandardMaterial("groundMat", scene);
             ground.material.diffuseColor = new BABYLON.Color3(1, 1, 1);
             ground.material.backFaceCulling = false;
@@ -97,6 +96,17 @@
                 inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
             }));
 
+            //start box sound
+            csound.inputMessage("i2 0 -1 \"Box\" ");
+            console.log("i2 0 -1 \"" + box.name.toString() + "\"");
+
+            //function to send distances to audio engine
+            function setDistanceFromListener(source, channel)
+            {
+                const distance = BABYLON.Vector3.Distance(camera.position, source.position)
+                csound.setControlChannel(channel, distance);
+            }
+        
             // Game/Render loop
             scene.onBeforeRenderObservable.add(()=>{
                 if(inputMap["w"] || inputMap["ArrowUp"]){
@@ -112,7 +122,9 @@
                     //console.log("ArrowRight");
                 }  
                 
-                csound.setControlChannel("distance", BABYLON.Vector3.Distance(camera.position, box.position));
+                //sets the distance from the camera to the first object passed to it
+                //and passes it to a channel in the audio engine
+                setDistanceFromListener(box, "box1");
             })
             return scene;
         }

@@ -3,17 +3,36 @@ const csd = `
 <CsInstruments>
 ksmps = 64
 
-instr 1
-kDistance chnget "distance"
-;a1 oscili 1, tonek(100+(kDistance*5), 10)
-a1 oscili 1, tonek(400+(1/kDistance)*60, 10)
-printk 1, 1/kDistance
-outs a1, a1
+
+instr 2
+    ; creates a unique channel with same 
+    ; name as game object
+    SChannel strcpy p4
+    if metro(1) == 1 then
+         printks "%s\n", 1, SChannel
+    endif
+    ; SChannel strcpy p5
+    ; prints p5
+    ; kDistance chnget SChannel
+    ; kDistance tonek kDistance, 10
+
+    ; create or modify sounds
+    ; remembering to adjust for distance
+    ; a1 oscili 1, 300
+
+    ; if p4 == 0 then         ;logarithmic
+    ;     aScale = ampdb(-kDistance)
+    ;     outs a1*aScale, a1*aScale
+    ; else                    ;linear
+    ;     outs a1*(1/kDistance), a1*(1/kDistance)
+    ; endif
 endin
+
 
 </CsInstruments>
 <CsScore>
 f0 z
+i2 0 z
 </CsScore>
 </CsoundSynthesizer>
 `
