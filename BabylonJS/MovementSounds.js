@@ -7,25 +7,20 @@ ksmps = 64
 instr 2
     ; creates a unique channel with same 
     ; name as game object
-    SChannel strcpy p4
-    if metro(1) == 1 then
-         printks "%s\n", 1, SChannel
-    endif
-    ; SChannel strcpy p5
-    ; prints p5
-    ; kDistance chnget SChannel
-    ; kDistance tonek kDistance, 10
+    SChannel strcpy p5
+    kDistance chnget SChannel
+    kDistance tonek kDistance, 10
 
     ; create or modify sounds
     ; remembering to adjust for distance
-    ; a1 oscili 1, 300
+    a1 oscili 1, 300
 
-    ; if p4 == 0 then         ;logarithmic
-    ;     aScale = ampdb(-kDistance)
-    ;     outs a1*aScale, a1*aScale
-    ; else                    ;linear
-    ;     outs a1*(1/kDistance), a1*(1/kDistance)
-    ; endif
+    if p4 == 0 then         ;logarithmic
+        aScale = ampdb(-kDistance)
+        outs a1*aScale, a1*aScale
+    else                    ;linear
+        outs a1*(1/kDistance), a1*(1/kDistance)
+    endif
 endin
 
 
