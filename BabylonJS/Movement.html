@@ -56,7 +56,12 @@
         var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
         /*********** this function is the only one you need to modify *************/
         var createScene = function () 
+<<<<<<< HEAD
         {           
+=======
+        {
+           
+>>>>>>> b460ee03cc9631420a5473731f140bd4d46ca3b3
             var scene = new BABYLON.Scene(engine);
             // Lights
             var light0 = new BABYLON.DirectionalLight("Omni", new BABYLON.Vector3(-2, -5, 2), scene);
@@ -103,6 +108,7 @@
             scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger, function (evt) {								
                 inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
             }));
+
             //start box sound
             
             console.log("i2 0 -1 \"" + box.name.toString() + "\"");
@@ -134,6 +140,7 @@
                 //sets the distance from the camera to the first object passed to it
                 //and passes it to a channel in the audio engine
                 setDistanceFromListener(box);
+
             })
             return scene;
         }
