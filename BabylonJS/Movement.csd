@@ -14,7 +14,7 @@ instr 2
     
     ; create or modify sounds
     ; remembering to adjust for distance
-    a1 oscili 1, 500
+    a1 oscili 1, p6
     
     if p4 == 0 then         ;logarithmic
         aScale = ampdb(-kDistance)
@@ -23,6 +23,7 @@ instr 2
         aOuts = a1*(1/kDistance)
     endif
 
+   
     outs aOut*aDeclick, aOut*aDeclick
 endin
 </CsInstruments>

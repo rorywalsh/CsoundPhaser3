@@ -58,12 +58,21 @@
             ground.material.backFaceCulling = false;
             ground.position = new BABYLON.Vector3(5, -10, -15);
             ground.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
-
-            //Simple box
+            //Simple crate
             var box1 = new BABYLON.Mesh.CreateBox("Box1", 2, scene);
             box1.position = new BABYLON.Vector3(20, -9, -10);
 
+            var box2 = new BABYLON.Mesh.CreateBox("Box2", 2, scene);
+            box2.position = new BABYLON.Vector3(-20, -9, -10);
 
+            //box.checkCollisions = true;
+            // camera.onCollide = function(colMesh) {
+            //     if (colMesh.uniqueId === box.uniqueId) {
+            //         console.log("Ouch!");
+            //     }
+            // }
+        
+            
             //Set gravity for the scene (G force like, on Y-axis)
             scene.gravity = new BABYLON.Vector3(0, -0.9, 0);
             // Enable Collisions
@@ -87,22 +96,20 @@
             }));
 
             
-            // Setup sound engine and load sound script
+            // Setup Csound and load sound script
             CsoundObj.importScripts("./csound/").then(() => {
                 fetch("Movement.csd").then((response) => {
                 response.text().then((csd) => {
                     csound = new CsoundObj();
                     csound.compileCSD(csd);
                     csound.start();
-                    //start any always sounding instruments....
                     csound.readScore('i2 0 z 0 "' + box1.name + '" 200');
                     csoundLoaded = true;
                 })
                 })
             });
-
             //function to send distances to audio engine
-            function setDistanceFromAudioListener(source)
+            function setDistanceFromListener(source)
             {
                 if(csoundLoaded == true)
                 {
@@ -128,7 +135,8 @@
                 
                 //sets the distance from the camera to the first object passed to it
                 //and passes it to a channel in the audio engine
-                setDistanceFromAudioListener(box1);
+                setDistanceFromListener(box1);
+                setDistanceFromListener(box2);
 
             })
             return scene;
