@@ -20,48 +20,61 @@
                 touch-action: none;
             }
         </style>
-        <script src="csound-wasm-browser.js"></script>
-        <script src="MovementSounds.js"></script>
         <script src="https://cdn.babylonjs.com/babylon.js"></script>
         <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
         <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
     </head>
 
    <body>
-
     <canvas id="renderCanvas" touch-action="none"></canvas> //touch-action="none" for best results from PEP
-
+    
+    <script src="csound/CsoundObj.js"></script>
     <script>
-        var canvas = document.getElementById("renderCanvas"); // Get the canvas element 
-        var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+        // load sound engine and compiles script
+        var csoundLoaded = false;
+        var csound;
+        // Setup Csound and load sound script
+        CsoundObj.importScripts("./csound/").then(() => {
+            fetch("Movement.csd").then((response) => {
+            response.text().then((csd) => {
+                csound = new CsoundObj();
+                csound.compileCSD(csd);
+                csound.start();
+                csound.readScore('i2 0 -1 0 "Box"');
+                csoundLoaded = true;
+            })
+            })
+        });
 
+
+        var canvas = document.getElementById("renderCanvas"); // Get the canvas element 
+        // canvas.addEventListener('click', function() { 
+            
+        // }, false);
+
+
+        var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
         /*********** this function is the only one you need to modify *************/
         var createScene = function () 
-        {
-            csound.inputMessage("i1 0 -1");
-            csound.setControlChannel("distance", 200);
+        {           
             var scene = new BABYLON.Scene(engine);
-
             // Lights
             var light0 = new BABYLON.DirectionalLight("Omni", new BABYLON.Vector3(-2, -5, 2), scene);
             var light1 = new BABYLON.PointLight("Omni", new BABYLON.Vector3(2, -5, -2), scene);
-
             // Need a free camera for collisions
             var camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, -8, -80), scene);
             camera.attachControl(canvas, true);
             camera.speed = 1;
             //Ground
-            var ground = BABYLON.Mesh.CreatePlane("ground", 140.0, scene);
+            var ground = BABYLON.Mesh.CreatePlane("ground", 1000.0, scene);
             ground.material = new BABYLON.StandardMaterial("groundMat", scene);
             ground.material.diffuseColor = new BABYLON.Color3(1, 1, 1);
             ground.material.backFaceCulling = false;
             ground.position = new BABYLON.Vector3(5, -10, -15);
             ground.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
-
             //Simple crate
             var box = new BABYLON.Mesh.CreateBox("Box", 2, scene);
            
-
             camera.onCollide = function(colMesh) {
                 if (colMesh.uniqueId === box.uniqueId) {
                     console.log("Ouch!");
@@ -69,24 +82,18 @@
             }
         
             box.position = new BABYLON.Vector3(5, -9, -10);
-
             //Set gravity for the scene (G force like, on Y-axis)
             scene.gravity = new BABYLON.Vector3(0, -0.9, 0);
-
             // Enable Collisions
             scene.collisionsEnabled = true;
-
             //Then apply collisions and gravity to the active camera
             camera.checkCollisions = true;
             camera.applyGravity = true;
-
             //Set the ellipsoid around the camera (e.g. your player's size)
             camera.ellipsoid = new BABYLON.Vector3(1, 1, 1);
-
             //finally, say which mesh will be collisionable
             ground.checkCollisions = true;
             box.checkCollisions = true;
-
             // Keyboard events
             var inputMap ={};
             scene.actionManager = new BABYLON.ActionManager(scene);
@@ -96,7 +103,19 @@
             scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger, function (evt) {								
                 inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
             }));
-
+            //start box sound
+            
+            console.log("i2 0 -1 \"" + box.name.toString() + "\"");
+            //function to send distances to audio engine
+            function setDistanceFromListener(source)
+            {
+                if(csoundLoaded == true)
+                {
+                    const distance = BABYLON.Vector3.Distance(camera.position, source.position)
+                    csound.setControlChannel(source.name, distance);
+                }
+            }
+        
             // Game/Render loop
             scene.onBeforeRenderObservable.add(()=>{
                 if(inputMap["w"] || inputMap["ArrowUp"]){
@@ -112,11 +131,13 @@
                     //console.log("ArrowRight");
                 }  
                 
-                csound.setControlChannel("distance", BABYLON.Vector3.Distance(camera.position, box.position));
+                //sets the distance from the camera to the first object passed to it
+                //and passes it to a channel in the audio engine
+                setDistanceFromListener(box);
             })
             return scene;
         }
-        /******* End of the create scene function ******/    
+        /******* End of the create scene function ******/     
 
 
         var scene = createScene(); //Call the createScene function
@@ -129,6 +150,7 @@
         window.addEventListener("resize", function () { 
                 engine.resize();
         });
+
     </script>
 
    </body>
