@@ -20,7 +20,6 @@
                 touch-action: none;
             }
         </style>
-        <script src="csound-wasm-browser.js"></script>
         <script src="ExplosionSounds.js"></script>
         <script src="https://cdn.babylonjs.com/babylon.js"></script>
         <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
@@ -31,7 +30,12 @@
 
     <canvas id="renderCanvas" touch-action="none"></canvas> //touch-action="none" for best results from PEP
 
+    <script src="csound/CsoundObj.js"></script>
     <script>
+        // load sound engine and compiles script
+        var csoundLoaded = false;
+        var csound;
+
         var canvas = document.getElementById("renderCanvas"); // Get the canvas element 
         var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 
@@ -57,18 +61,6 @@
             ground.position = new BABYLON.Vector3(0, 0, -800);
             ground.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
 
-            //Simple crate
-            var box = new BABYLON.Mesh.CreateBox("Box", 2, scene);
-           
-
-            camera.onCollide = function(colMesh) {
-                if (colMesh.uniqueId === box.uniqueId) {
-                    console.log("Ouch!");
-                }
-            }
-        
-           
-            box.position = new BABYLON.Vector3(5, -9, -10);
 
             //Set gravity for the scene (G force like, on Y-axis)
             scene.gravity = new BABYLON.Vector3(0, -0.9, 0);
@@ -85,7 +77,6 @@
 
             //finally, say which mesh will be collisionable
             ground.checkCollisions = true;
-            box.checkCollisions = true;
 
             // Keyboard events
             var inputMap ={};
@@ -97,34 +88,36 @@
                 inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
             }));
 
-            // Game/Render loop
-            scene.onBeforeRenderObservable.add(()=>{
-                if(inputMap["b"])
+            // Setup sound engine and load sound script
+            CsoundObj.importScripts("./csound/").then(() => {
+                fetch("Explosion.csd").then((response) => {
+                response.text().then((csd) => {
+                    csound = new CsoundObj();
+                    csound.compileCSD(csd);
+                    csound.start();
+                    csoundLoaded = true;
+                })
+                })
+            });
+
+
+            scene.onKeyboardObservable.add((kbInfo) => {
+                switch (kbInfo.type) 
                 {
-                    BABYLON.ParticleHelper.CreateAsync("explosion", scene).then((set) => {
-                        set.systems.forEach(s => {
-                            s.disposeOnStop = true;
-                        });
-                        set.start();
-                    });
-                    csound.inputMessage("i1 0 2");
+                    case BABYLON.KeyboardEventTypes.KEYDOWN:
+                        if(kbInfo.event.key == 'b')
+                        {
+                            BABYLON.ParticleHelper.CreateAsync("explosion", scene).then((set) => {
+                                set.systems.forEach(s => {
+                                    s.disposeOnStop = true;
+                                });
+                                set.start();
+                            });
+                            csound.readScore("i1 0 2");
+                        }
                 }
-                
-                if(inputMap["w"] || inputMap["ArrowUp"]){
-                    //console.log("ArrowUp");
-                } 
-                if(inputMap["a"] || inputMap["ArrowLeft"]){
-                    //console.log("ArrowLeft");
-                } 
-                if(inputMap["s"] || inputMap["ArrowDown"]){
-                   // console.log("ArrowDown");
-                } 
-                if(inputMap["d"] || inputMap["ArrowRight"]){
-                    //console.log("ArrowRight");
-                }  
-                
-                csound.setControlChannel("distance", BABYLON.Vector3.Distance(camera.position, box.position));
-            })
+            });
+
             return scene;
         }
         /******* End of the create scene function ******/    
