@@ -3,13 +3,12 @@
 0dbfs = 1
 nchnls = 2
 
-giSine ftgen 1, 0, 16, 2, 0 
-
+giSine ftgen 1, 0, 1024, 2, 0 
 
 instr 1
 
     iIndex init 0
-    while iIndex < 16 do
+    while iIndex < 1024 do
         tablew (random(0, 10)> 5 ? 0 : 1), iIndex, 1
         print table:i(iIndex, 1);
         iIndex+=1;
@@ -17,13 +16,21 @@ instr 1
     ;copya2ftab iHits, 1
 endin
 
-instr 2
+instr 2 
+    kTrigReinit init 0
     kFreq = .1
     chnset kFreq, "freq"
-    k1 oscili 1, kFreq, 99
-    k2 oscili 1, kFreq, -1, 3.14
+    k1 oscili 1, kFreq, 100+p4
+    k2 oscili 1, kFreq, 100+p4+1, .25
     chnset k1, "x"
     chnset k2, "y"
+
+    kTrigReinit chnget "reset"
+    if kTrigReinit == 1 then
+        chnset k(0), "reset"
+        turnoff
+    endif
+
 endin
 
 instr 3
@@ -35,10 +42,12 @@ endin
 
 </CsInstruments>
 <CsScore>
-f99 0 1024 10 1 1
+f100 0 1024 10 1 .1
+f101 0 1024 10 1 1 .5 .2
+f102 0 1024 10 1 1 .3 .1 .3
 f0 z
-i1 0 1
-i2 0 z
+i1 0 2
+i2 0 z 0
 </CsScore>
 </CsoundSynthesizer>
 
