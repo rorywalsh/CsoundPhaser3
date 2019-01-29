@@ -1,0 +1,178 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Csound and Phaser 3</title>
+    <script src="../js/phaser.js"></script>
+    <style type="text/css">
+        body {
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+
+
+<script type="text/javascript">
+
+// ToDo:
+// Use wavetables for the shapes. 
+// make it support andoird asap
+// write a simulator that will play the game the best it can be played
+// use a shape to create a power meter, when it's back to full you can move
+// use a line to plot the next move if the player decides before full power
+// the stars make sounds each time the planet bases them. 
+// use function tables in csound to generate the patterns for the stars 
+// Add more harmonics to make the shape more complex
+// Don't randomly drop the stars in place. Each level should place them in the same place
+// Consider adding more planets to the scene
+// The ship can't be killed until all the stars have been dropped
+// Add trust to the ship
+// increase harmonic number once all stars have been collected.  
+// Add an enter level option at the start so that you can choose which level to play, no need to save level data then
+<script src="csound/CsoundObj.js"></script>
+
+class GameScene extends Phaser.Scene {
+
+    constructor (config)
+    {
+        super(config);
+        this.freq = .1;
+        this.starCount = 50*this.freq; 
+        this.countdownStartingValue = 7;  
+        this.countdownValue = this.countdownStartingValue;     
+    }
+
+    preload()
+    {
+        this.load.image('star', 'assets/starOrb.png');
+        this.load.image('planet', 'assets/planetOrb.png');
+        this.load.image('ship', 'assets/shipOrb.png');   
+    }
+
+    create ()
+    {
+        this.powerLevel = this.add.rectangle(450, 30, 800, 20, 0x990000).setStrokeStyle(4, 0xefc53f);
+
+
+        // this.countdown = this.add.text(5, 5, '10', { font: '48px Arial', fill: '#ffffff' });
+        this.ship = this.physics.add.image(400, 200, 'ship').setDepth(2);
+        this.ship.setDisplaySize(16, 16);
+
+        this.starPos = new Phaser.Math.Vector2(400, 200); 
+        this.ship.setGravity(false);
+        this.planet = this.physics.add.sprite(400, 200, 'planet');
+        this.planet.setDisplaySize(16, 16);
+        this.stars = this.physics.add.staticGroup();
+        console.log(this.stars.getChildren().length);
+        this.createStars();
+        this.keys = this.input.keyboard.addKeys('W,S,A,D,B');
+        
+        this.physics.add.overlap(this.ship, this.stars, this.reachedStar, null, this);
+        this.physics.add.overlap(this.planet, this.ship, this.resetLevel, null, this);
+
+        this.input.on('gameobjectdown',function (pointer, gameObject){
+            this.moveShip(gameObject);
+        }, this);
+        this.startCountdown();
+    }
+
+    resetLevel()
+    {
+        this.scene.restart();
+        this.starCount = 50*this.freq; 
+    }
+
+    reachedStar(ship, star)
+    {
+        star.destroy();
+        this.starCount--;
+        
+        this.time.delayedCall(500, function() {
+            this.countdownValue = this.countdownStartingValue;
+        }, [], this);
+
+    }
+
+    moveShip(star)
+    {
+        this.starPos.x = star.x;
+        this.starPos.y = star.y;
+        console.log("update position");
+    }
+
+    update (time, delta)
+    {        
+        //use a function table for the sine shape..
+        //var val = Math.sin(2*3.14*(time/1000)*this.freq*2)
+        this.planet.x = 400+ (Math.sin(2*3.14*(time/1000)*this.freq))*200;
+        this.planet.y = 200+ Math.cos(2*3.14*(time/1000)*this.freq)*100;
+        
+        if ( Math.round(this.countdownValue) == 0)
+        {
+            if(this.ship.x != this.starPos.x && this.ship.y != this.starPos.y)
+            {
+                this.ship.x += (this.starPos.x - this.ship.x)*.1;
+                this.ship.y += (this.starPos.y - this.ship.y)*.1;
+            }
+        }
+
+    }
+
+    createStars()
+    {
+        var star = this.stars.create(this.planet.x, this.planet.y, 'star').refreshBody();
+        star.setInteractive();
+        console.log(this.stars.getChildren().length);
+        if ( this.stars.getChildren().length < this.starCount)
+            this.time.addEvent({ delay: Phaser.Math.Between((1/this.starCount)*2500,(1/this.starCount)*15000), callback: this.createStars, callbackScope: this});      
+    }
+
+    startCountdown()
+    {
+        this.powerLevel.width = (this.countdownStartingValue-this.countdownValue)*80;
+
+        if (this.countdownValue>=0)
+        {
+            this.powerLevel.setFillStyle(0x990000);
+            this.countdownValue-=.1;
+        }
+        else
+            this.powerLevel.setFillStyle(0x009900);
+
+        //console.log("Countdown:"+(this.countdownStartingValue-this.countdownValue).toString());
+        //this.countdown.text = (this.countdownValue).toString();
+        this.time.addEvent({ delay: 100, callback: this.startCountdown, callbackScope: this}); 
+        //delay function call
+        // this.time.delayedCall(500, function() {
+        // this.scene.restart();
+        // }, [], this);     
+    }
+
+};
+
+
+var config = {
+    type: Phaser.CANVAS,
+    width: 1000,
+    height: 600,
+    backgroundColor: 'rgb(0, 0, 0)',
+    physics: {
+        default: 'arcade',
+        arcade: {
+            debug: false
+        }
+    },
+    scene: GameScene
+};
+
+    var game = new Phaser.Game(config);
+
+
+</script>
+
+</body>
+<script>
+
+  </script>
+</html>

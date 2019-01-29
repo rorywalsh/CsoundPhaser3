@@ -1,0 +1,263 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Csound and Phaser 3</title>
+    <script src="../js/phaser.js"></script>
+    <style type="text/css">
+        body {
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+<button id="startCsound"  style="font-size : 20px;">Press to start</button>
+
+<script src="csound/csound.js"></script>
+<script type="text/javascript">
+
+// ToDo:
+// Use wavetables for the shapes. 
+// make it support andoird asap
+// write a simulator that will play the game the best it can be played
+// use a shape to create a power meter, when it's back to full you can move
+// use a line to plot the next move if the player decides before full power
+// the stars make sounds each time the planet bases them. 
+// use function tables in csound to generate the patterns for the stars 
+// Add more harmonics to make the shape more complex
+// Don't randomly drop the stars in place. Each level should place them in the same place
+// Consider adding more planets to the scene
+// The ship can't be killed until all the stars have been dropped
+// Add trust to the ship
+// increase harmonic number once all stars have been collected.  
+// Add an enter level option at the start so that you can choose which level to play, no need to save level data then
+
+var xPos = 0;
+var yPos = 0;
+
+var csoundLoaded = false;
+var hitsTable = new Int32Array(16);
+function moduleDidLoad() {
+    //csound.CopyUrlToLocal("audio/explosion01.wav", "explosion01.wav", function(){console.log("Loading...");});
+    csound.PlayCsd("SporbitalSounds.csd");
+    csoundLoaded = true;
+}
+
+document.getElementById('startCsound').onclick = ()=>{
+        csound.Csound.requestTable(1, function() 
+        {
+            hitsTable = csound.Csound.getTable(1);
+            for ( var i = 0 ; i < hitsTable.length ; i++)
+                console.log("Table1:"+hitsTable[i].toString());
+        }); 
+
+        csound.Csound.requestControlChannel('freq', function() {
+             freq = csound.Csound.getControlChannel('freq');         
+        });
+
+        var game = new Phaser.Game(config);
+        var element = document.getElementById('startCsound');
+        element.parentNode.removeChild(element);
+
+};
+
+class GameScene extends Phaser.Scene {
+
+    constructor (config)
+    {
+        super(config);
+        this.starDelays = [.5, 1, .5, 1, .5] 
+        this.freq = 2;
+        this.starCount = 5;
+        this.x = 0;
+        this.y = 0; 
+        this.countdownStartingValue = 7;  
+        this.countdownValue = this.countdownStartingValue;   
+        this.inPhase = new Float32Array(1024);
+        this.outPhase = new Float32Array(1024);        
+        this.createWavetable();
+        this.sampleIndex = 0;
+        this.hitIndex = 0;
+    }
+
+    createWavetable(harmonics)
+    {
+        for ( var i = 0 ; i < 1024 ; i++)
+        {
+            this.inPhase[i] = 1.5 * (Math.sin(2*3.14*(i/1024)*this.freq));
+            this.outPhase[i] = 1.5 * (Math.cos(2*3.14*(i/1024)*this.freq));
+        }
+    }
+    
+    preload()
+    {
+        this.load.image('star', 'assets/starOrb.png');
+        this.load.image('planet', 'assets/planetOrb.png');
+        this.load.image('ship', 'assets/shipOrb.png');   
+    }
+
+    create ()
+    {
+        this.powerLevel = this.add.rectangle(450, 30, 800, 20, 0x990000).setStrokeStyle(4, 0xefc53f);
+        // this.countdown = this.add.text(5, 5, '10', { font: '48px Arial', fill: '#ffffff' });
+        this.ship = this.physics.add.image(50, 50, 'ship').setDepth(2);
+        this.ship.setDisplaySize(10, 10);
+        this.ship.isCircle = true;
+
+        this.starPos = new Phaser.Math.Vector2(50, 50); 
+        this.ship.setGravity(false);
+        this.planet = this.physics.add.sprite(400, 200, 'planet');
+        this.planet.setDisplaySize(16, 16);
+        this.stars = this.physics.add.staticGroup();
+        
+        this.time.addEvent({ delay: 200, callback: this.createStars, callbackScope: this});  
+
+        this.keys = this.input.keyboard.addKeys('W,S,A,D,B');
+        
+        this.physics.add.overlap(this.ship, this.stars, this.reachedStar, null, this);
+        this.physics.add.overlap(this.planet, this.ship, this.resetLevel, null, this);
+        this.physics.add.collider(this.planet, this.stars, this.triggerSound, null, this);
+
+        this.input.on('gameobjectdown',function (pointer, gameObject){
+            this.moveShip(gameObject);
+        }, this);
+        this.startCountdown();
+    }
+
+    triggerSound()
+    {
+        //console.log("here I am");
+        //csound.ReadScore("i3 0 5");   
+    }
+    
+    resetLevel()
+    {
+        this.scene.restart();
+        this.starCount = 2*this.freq; 
+    }
+
+    reachedStar(ship, star)
+    {
+        star.destroy();
+        this.starCount--;
+        
+        this.time.delayedCall(500, function() {
+            this.countdownValue = this.countdownStartingValue;
+        }, [], this);
+
+    }
+
+    moveShip(star)
+    {
+        this.starPos.x = star.x;
+        this.starPos.y = star.y;
+        console.log("update position");
+    }
+
+    update (time, delta)
+    {        
+        //this.sampleIndex = (this.sampleIndex<1023 ? this.sampleIndex+.5 : 0);
+        //use a function table for the sine shape..
+        //var val = Math.sin(2*3.14*(time/1000)*this.freq*2)
+        csound.Csound.requestControlChannel('x', function() {
+             xPos = csound.Csound.getControlChannel('x') ;           
+        });
+
+
+        csound.Csound.requestControlChannel('y', function() {
+            yPos = csound.Csound.getControlChannel('y');             
+        });
+
+        
+        this.planet.x = 400 + xPos * 200;
+        this.planet.y = 200 + yPos * 100;
+
+        //this.planet.x = 400+ this.inPhase[Math.round(this.sampleIndex)]*200;
+        //this.planet.y = 200+ this.outPhase[Math.round(this.sampleIndex)]*100;
+        
+        if ( Math.round(this.countdownValue) == 0)
+        {
+            if(this.ship.x != this.starPos.x && this.ship.y != this.starPos.y)
+            {
+                this.ship.x += (this.starPos.x - this.ship.x)*.1;
+                this.ship.y += (this.starPos.y - this.ship.y)*.1;
+            }
+        }
+
+    }
+
+    createStars()
+    {
+        if(hitsTable[this.hitIndex] == 1)
+        {
+            var star = this.stars.create(this.planet.x, this.planet.y, 'star').refreshBody();
+            star.setDisplaySize(32, 32);
+            star.setOffset(16, 16);
+            star.setCircle(8, 0, 0);
+            
+            star.isCircle = true;
+            star.setInteractive();
+        }
+
+
+        csound.Csound.requestControlChannel('freq', function() {
+             freq = csound.Csound.getControlChannel('freq');         
+        });
+
+
+        if ( this.hitIndex < hitsTable.length+1){
+            this.time.addEvent({ delay: 10000*(1/hitsTable.length), callback: this.createStars, callbackScope: this});      
+        }
+
+        this.hitIndex++;
+            
+    }
+
+    startCountdown()
+    {
+        this.powerLevel.width = (this.countdownStartingValue-this.countdownValue)*80;
+
+        if (this.countdownValue>=0)
+        {
+            this.powerLevel.setFillStyle(0x990000);
+            this.countdownValue-=.15;
+        }
+        else
+            this.powerLevel.setFillStyle(0x009900);
+
+        //console.log("Countdown:"+(this.countdownStartingValue-this.countdownValue).toString());
+        //this.countdown.text = (this.countdownValue).toString();
+        this.time.addEvent({ delay: 100, callback: this.startCountdown, callbackScope: this}); 
+        //delay function call
+        // this.time.delayedCall(500, function() {
+        // this.scene.restart();
+        // }, [], this);     
+    }
+
+};
+
+
+var config = {
+    type: Phaser.CANVAS,
+    width: 1000,
+    height: 600,
+    backgroundColor: 'rgb(0, 0, 0)',
+    physics: {
+        default: 'arcade',
+        arcade: {
+            debug: true
+        }
+    },
+    scene: GameScene
+};
+
+    
+
+
+</script>
+
+</body>
+<script>
+
+  </script>
+</html>
