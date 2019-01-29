@@ -20,8 +20,8 @@ instr 2
     kTrigReinit init 0
     kFreq = .1
     chnset kFreq, "freq"
-    k1 oscili 1, kFreq, 100+p4
-    k2 oscili 1, kFreq, 100+p4+1, .25
+    k1 oscili 1, kFreq, 101+p4
+    k2 oscili 1, -kFreq, 101+p4+1, .5
     chnset k1, "x"
     chnset k2, "y"
 
@@ -42,9 +42,12 @@ endin
 
 </CsInstruments>
 <CsScore>
-f100 0 1024 10 1 .1
-f101 0 1024 10 1 1 .5 .2
-f102 0 1024 10 1 1 .3 .1 .3
+f100 0 1024 10 0 1
+f101 0 1024 10 1 .5 .2
+f102 0 1024 10 1  1 .3 .1 .3
+f103 0 1024 10 1  0 .3 0 .3
+f104 0 1024 10 1  .5 .26 .1 .3
+f105 0 1024 10 1  .1 0 .17 .1 .3
 f0 z
 i1 0 2
 i2 0 z 0
