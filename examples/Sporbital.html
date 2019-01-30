@@ -6,7 +6,7 @@
     <script src="../js/phaser.js"></script>
     <style type="text/css">
         body {
-            background-color: black;
+            background-color: white;
         }
     </style>
 </head>
@@ -32,8 +32,11 @@
 // increase harmonic number once all stars have been collected.  
 // Add an enter level option at the start so that you can choose which level to play, no need to save level data then
 
-var xPos = 0;
-var yPos = 0;
+var xPos1 = 0;
+var yPos1 = 0;
+var xPos2 = 0;
+var yPos2 = 0;
+
 var firstTime = true;
 var csoundLoaded = false;
 var hitsTable = new Int32Array(1024);
@@ -102,6 +105,15 @@ class GameScene extends Phaser.Scene {
 
     create ()
     {
+        this.planet1Path = this.add.graphics();        
+        this.planet1Path.lineStyle(2, 0x2ECC40);
+        this.planet1Path.moveTo(400, 200);
+        
+        this.planet2Path = this.add.graphics();        
+        this.planet2Path.lineStyle(2, 0x2ECC40);
+        this.planet2Path.moveTo(400, 200);
+        
+        
         this.powerLevel = this.add.rectangle(450, 30, 800, 20, 0x990000).setStrokeStyle(4, 0xefc53f);
         // this.countdown = this.add.text(5, 5, '10', { font: '48px Arial', fill: '#ffffff' });
         this.ship = this.physics.add.image(50, 50, 'ship').setDepth(2);
@@ -110,8 +122,13 @@ class GameScene extends Phaser.Scene {
         this.startCountdown();
         this.starPos = new Phaser.Math.Vector2(50, 50); 
         this.ship.setGravity(false);
-        this.planet = this.physics.add.sprite(400, 200, 'planet');
-        this.planet.setDisplaySize(16, 16);
+        this.planet1 = this.physics.add.sprite(400, 200, 'planet');
+        this.planet2 = this.physics.add.sprite(400, 200, 'planet');
+
+        this.planet1.setDisplaySize(16, 16);
+        this.planet2.setDisplaySize(16, 16);
+        
+
         this.stars = this.physics.add.staticGroup();
         
         this.time.addEvent({ delay: 200, callback: this.createStars, callbackScope: this});  
@@ -119,8 +136,9 @@ class GameScene extends Phaser.Scene {
         this.keys = this.input.keyboard.addKeys('W,S,A,D,B');
         
         this.physics.add.overlap(this.ship, this.stars, this.reachedStar, null, this);
-        this.physics.add.overlap(this.planet, this.ship, this.death, null, this);
-        this.physics.add.collider(this.planet, this.stars, this.triggerSound, null, this);
+        this.physics.add.overlap(this.planet1, this.ship, this.death, null, this);
+        this.physics.add.overlap(this.planet2, this.ship, this.death, null, this);
+        // this.physics.add.collider(this.planet1, this.stars, this.triggerSound, null, this);
 
         this.input.on('gameobjectdown',function (pointer, gameObject){
             this.moveShip(gameObject);
@@ -150,9 +168,6 @@ class GameScene extends Phaser.Scene {
     resetLevel(death)
     {
         this.scene.restart();
-        //this.starsInScene = 2*this.freq; 
-       // this.numberOfStarsLeft = this.starsInScene;
-        this.levelIndex = 0;
         this.hitIndex = 0;
         this.numberOfStarsLeft = 5;
         this.numberOfStarsInScene = 0;
@@ -164,8 +179,11 @@ class GameScene extends Phaser.Scene {
         else
             csound.ReadScore("i2 0 z 1");
         
-        xPos = 0;
-        yPos = 0;
+        xPos1 = 0;
+        yPos1 = 0;
+        xPos2 = 0;
+        yPos2 = 0;
+        
        // this.createStars();
     }
 
@@ -178,18 +196,12 @@ class GameScene extends Phaser.Scene {
         }, [], this);
 
         this.numberOfStarsLeft--;
-        console.log(this.numberOfStarsLeft);
+        this.numberOfStarsInScene--;
         
 
         if (this.numberOfStarsLeft == 0){
-            // this.numberOfStarsLeft = 5;
             this.resetLevel(false);
             this.levelIndex+=16;
-            // this.hitIndex = 0;
-            // this.ship.setPosition(50, 50);
-            // this.starPos.x = 50;
-            // this.starPos.y = 50;
-            // this.createStars();
         }
             
 
@@ -198,10 +210,10 @@ class GameScene extends Phaser.Scene {
 
     moveShip(star)
     {
-        if(this.starsHaveBeenCreated == true){
+        //if(this.starsHaveBeenCreated == true){
             this.starPos.x = star.x;
             this.starPos.y = star.y;
-        }        
+        //}        
     }
 
     update (time, delta)
@@ -209,19 +221,29 @@ class GameScene extends Phaser.Scene {
         //this.sampleIndex = (this.sampleIndex<1023 ? this.sampleIndex+.5 : 0);
         //use a function table for the sine shape..
         //var val = Math.sin(2*3.14*(time/1000)*this.freq*2)
-        csound.Csound.requestControlChannel('x', function() {
-             xPos = csound.Csound.getControlChannel('x') ;           
+        csound.Csound.requestControlChannel('x1', function() {
+             xPos1 = csound.Csound.getControlChannel('x1') ;           
         });
-
-
-        csound.Csound.requestControlChannel('y', function() {
-            yPos = csound.Csound.getControlChannel('y');             
-        });
-
         
-        this.planet.x = 400 + xPos * 200;
-        this.planet.y = 200 + yPos * 100;
+        csound.Csound.requestControlChannel('y1', function() {
+            yPos1 = csound.Csound.getControlChannel('y1');             
+        });
 
+        csound.Csound.requestControlChannel('x2', function() {
+             xPos2 = csound.Csound.getControlChannel('x2') ;           
+        });
+        
+        csound.Csound.requestControlChannel('y2', function() {
+            yPos2 = csound.Csound.getControlChannel('y2');             
+        });
+
+        this.planet1.x = 400 + xPos1 * 200;
+        this.planet1.y = 200 + yPos1 * 100;
+
+        this.planet2.x = 400 + xPos2 * 200;
+        this.planet2.y = 200 + yPos2 * 100;
+
+        this.drawPath();
         //this.planet.x = 400+ this.inPhase[Math.round(this.sampleIndex)]*200;
         //this.planet.y = 200+ this.outPhase[Math.round(this.sampleIndex)]*100;
         
@@ -240,14 +262,23 @@ class GameScene extends Phaser.Scene {
     {
         if(hitsTable[this.levelIndex+this.hitIndex] == 1)
         {
-            var star = this.stars.create(this.planet.x, this.planet.y, 'star').refreshBody();
+            if ( this.hitIndex%2 == 0)
+                var star = this.stars.create(this.planet1.x, this.planet1.y, 'star').refreshBody();
+            else
+                var star = this.stars.create(this.planet2.x, this.planet2.y, 'star').refreshBody();
+            
             star.setDisplaySize(32, 32);
             star.setOffset(16, 16);
             star.setCircle(8, 0, 0);
-            console.log(this.levelIndex+this.hitIndex);
+            // console.log(this.levelIndex+this.hitIndex);
             star.isCircle = true;
             star.setInteractive();
+            if(this.numberOfStarsInScene == 0){
+                this.planet1Path.beginPath();
+                this.planet2Path.beginPath();
+            }
             this.numberOfStarsInScene++;
+            //this.drawPath();
         }
 
 
@@ -261,13 +292,30 @@ class GameScene extends Phaser.Scene {
         }
         else{
             this.numberOfStarsLeft = this.numberOfStarsInScene;
-            console.log("create star:"+this.numberOfStarsLeft.toString());
+            //console.log("create star:"+this.numberOfStarsLeft.toString());
             this.starsHaveBeenCreated = true;
+            this.planet1Path.closePath();
+            this.planet1Path.strokePath();
+            this.planet2Path.closePath();
+            this.planet2Path.strokePath();
         } 
             
 
         this.hitIndex++;
             
+    }
+
+    drawPath()
+    {
+        if (this.starsHaveBeenCreated == false)
+        {
+            this.planet1Path.lineTo(this.planet1.x, this.planet1.y);
+            this.planet2Path.lineTo(this.planet2.x, this.planet2.y);
+        }
+        //else{
+        //    this.planet1Path.closePath();
+        //    this.planet1Path.strokePath();
+        //}
     }
 
     startCountdown()
@@ -302,7 +350,7 @@ var config = {
     physics: {
         default: 'arcade',
         arcade: {
-            // debug: true
+            debug: true
         }
     },
     scene: GameScene
