@@ -34,11 +34,12 @@
 
 var xPos = new Float32Array(16);
 var yPos = new Float32Array(16);
-
+var dropStar = 0;
 var firstTime = true;
 var csoundLoaded = false;
-var collisionDetected = false;
 var hitsTable = new Int32Array(1024);
+var stopCreatingStars = 0;
+var shouldCreateStar = false;
 function moduleDidLoad() {
     //csound.CopyUrlToLocal("audio/explosion01.wav", "explosion01.wav", function(){console.log("Loading...");});
     csound.PlayCsd("SporbitalSounds.csd");
@@ -52,14 +53,10 @@ function moduleDidLoad() {
             hitsTable = csound.Csound.getTable(1);
         }); 
 
-        csound.Csound.requestControlChannel('freq', function() {
-            freq = csound.Csound.getControlChannel('freq');         
-        });
-
         var game = new Phaser.Game(config);
         // var element = document.getElementById('startCsound');
         // element.parentNode.removeChild(element);
-   }, 1000);
+   }, 100);
 //  };
 }
 
@@ -105,34 +102,22 @@ class GameScene extends Phaser.Scene
         
         this.physics.add.overlap(this.ship, this.stars, this.reachedStar, null, this);
         this.physics.add.overlap(this.planets, this.ship, this.death, null, this);
-        this.physics.add.overlap(this.planets, this.stars, this.triggerSound, null, this);
+        this.physics.add.collider(this.planets, this.stars, this.triggerSound, null, this);
 
         this.input.on('gameobjectdown',function (pointer, gameObject){
-           // this.moveShip(gameObject);
+            this.moveShip(gameObject);
         }, this);
-        
-        this.input.on('pointerdown', function (pointer) {
-                this.planets.children.iterate(function (planet) {
-                    this.stars.children.iterate(function (star) {
-                        if ( planet.x >= star.x-10 && planet.x <= star.x+10 
-                            &&  planet.y >= star.y-10 && planet.y <= star.y+10 )
-                            {
-                                console.log('Planet', planet.x, planet.y);
-                                console.log('Star', star.x, star.y);
-                                csound.ReadScore("i3 0 2 200");
-                            }
-                            
-
-                    }, this);
-                }, this);
-        }, this);  
-
+  
+       
+       
     }
 
     triggerSound()
     {
+        //console.log("here I am");
         //csound.ReadScore("i3 0 5");   
-        // console.log("hello");   
+        // console.log("hello");
+        
     }
     
     death(planet, ship)
@@ -149,18 +134,7 @@ class GameScene extends Phaser.Scene
         this.starsHaveBeenCreated = false;
         this.countdownValue = 7;
         csound.SetChannel("reset", 1);
-        // if(death==true){
-        //     csound.ReadScore("i2 0 z 1");
-        //     csound.ReadScore("i4 0 z");
-        // }
-        // else{
-        //     csound.ReadScore("i4 0 z");
-        //     csound.ReadScore("i2 0 z "+(1+this.levelIndex).toString());
-        // }
-            
-
-
-
+        
         for ( var i = 0 ; i < 16 ; i++){
           xPos[i] = 0;  
           yPos[i] = 0;  
@@ -197,9 +171,9 @@ class GameScene extends Phaser.Scene
     update (time, delta)
     {        
         csound.Csound.requestControlChannel('x1', function() {
-            xPos[0] = csound.Csound.getControlChannel('x1') ;           
+            xPos[0] = csound.Csound.getControlChannel('x1') ; 
         });
-        
+
         csound.Csound.requestControlChannel('y1', function() {
             yPos[0] = csound.Csound.getControlChannel('y1');             
         });
@@ -212,10 +186,41 @@ class GameScene extends Phaser.Scene
             yPos[1] = csound.Csound.getControlChannel('y2');             
         });
 
+        
+
+        csound.Csound.requestControlChannel('createStar', function() {
+            var value = csound.Csound.getControlChannel('createStar');
+            if(value!=dropStar){
+                shouldCreateStar = true;
+            }
+            else{
+                shouldCreateStar = false;
+            }
+            dropStar = value;
+        });
+
+        csound.Csound.requestControlChannel('stopCreatingStars', function() {
+            stopCreatingStars = csound.Csound.getControlChannel('stopCreatingStars');
+        });
+
+
+        if (shouldCreateStar == 1 && stopCreatingStars<16)
+            this.createStars();
+
 
         var planetIndex = 0;
-        
+    
         this.planets.children.iterate(function (child) {
+            const touching = child.body.touching;
+            const wasTouching = child.body.wasTouching;
+  
+            if (touching.none && !wasTouching.none) {
+                //child.body.debugBodyColor = 0xffff00;
+            }
+            else if (!touching.none && wasTouching.none) {
+                //console.log("Hello");
+            }
+
             child.x = 400 + xPos[planetIndex] * 300;
             child.y = 200 + yPos[planetIndex] * 200;
             planetIndex++;
@@ -233,36 +238,20 @@ class GameScene extends Phaser.Scene
 
     createStars()
     {
-        if(hitsTable[this.levelIndex*16+this.hitIndex] == 1)
-        {
             //if ( this.hitIndex%2 == 0)
-                var star = this.stars.create(this.planets.getChildren()[0].x, this.planets.getChildren()[0].y, 'star').refreshBody();
+            var star = this.stars.create(this.planets.getChildren()[0].x, this.planets.getChildren()[0].y, 'star').refreshBody();
             //else
             //    var star = this.stars.create(this.planets.getChildren()[1].x, this.planets.getChildren()[1].y, 'star').refreshBody();
-            
+            console.log(this.hitIndex);
             star.setDisplaySize(32, 32);
             star.setOffset(16, 16);
             star.setCircle(8, 0, 0);
             star.isCircle = true;
             star.setInteractive();
             this.numberOfStarsInScene++;
-        }
-
-
-        csound.Csound.requestControlChannel('freq', function() {
-             freq = csound.Csound.getControlChannel('freq');         
-        });
-
-
-        if ( this.hitIndex < 16){
-            this.time.addEvent({ delay: 10000*(1/16), callback: this.createStars, callbackScope: this});      
-        }
-        else{
             this.numberOfStarsLeft = this.numberOfStarsInScene;
-            this.starsHaveBeenCreated = true;
-        }           
-
-        this.hitIndex++;            
+            this.starsHaveBeenCreated = true;           
+            
     }
 };
 
