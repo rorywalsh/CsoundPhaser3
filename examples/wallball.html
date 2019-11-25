@@ -1,0 +1,121 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Csound and Phaser 3</title>
+    <script src="../js/phaser.js"></script>
+    <!-- <script src="../js/csdFile.js"></script> -->
+    <style type="text/css">
+        body {  
+            margin: 0;
+            }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+    let startingVelocity = 250;
+    let ball1, ball2, mouseDown, mouseDownX, mouseDownY, sprite, bmd, graphics;
+    function preload ()
+    {
+        this.load.image('ball', 'assets/cannonBall.png'); 
+        this.load.image('bomb', 'assets/hbomb.png'); 
+    }
+
+    function create ()
+    {       
+        myLine = this.add.graphics();
+
+        myLine.lineStyle(2, 0x00ff00, 1);
+
+        ball1 = this.physics.add.image(200+Math.random()*500, Math.random()*400, 'ball');
+        
+        ball1.setCircle(16, 0, 0);
+
+        ball2 = this.physics.add.image(200+Math.random()*500, Math.random()*400, 'bomb');
+        ball2.setCircle(16, 0, 0);
+        // ball1.setSize(8, 8);
+        ball1.setDrag(200, 200);
+        ball2.setDrag(20, 20);
+        // ball1.setCircle(46);
+        // ball2.setCircle(46);
+
+        ball1.setCollideWorldBounds(true);
+        ball2.setCollideWorldBounds(true);
+        ball1.body.onWorldBounds = true;
+        ball2.body.onWorldBounds = true;
+
+        ball1.setBounce(1);
+
+        this.input.on('pointermove', function(pointer, localX, localY, event){ 
+           if(mouseDown === true)
+           {
+            myLine.clear();
+            myLine.lineBetween(ball1.x, ball1.y, pointer.x, pointer.y);
+           } 
+        }, this);
+
+
+        // this.input.on('dragstart', function(pointer, gameObject){ console.log("drag");});
+
+        this.input.on('pointerdown', function(pointer){
+            mouseDown = true;
+            var touchX = pointer.x;
+            var touchY = pointer.y;
+            mouseDownX = touchX;
+            mouseDownY = touchY;
+            
+
+        }, this);
+
+        ball2.setBounce(1);
+
+        this.input.on('pointerup', function(pointer){
+            ball1.setVelocity((ball1.x-pointer.x)*10, (ball1.y-pointer.y)*10);
+            mouseDown = false;
+            // ...
+        });
+        // ball2.setVelocity(-startingVelocity, Math.random()*100);
+
+        this.physics.add.collider(ball1, ball2);
+        this.physics.world.on('worldbounds', worldCollision);
+    }
+
+    function worldCollision()
+    {
+        ball1.setVelocity(0,0);
+        // ball2.setDrag(10);
+    }
+
+    function update ()
+    {
+        this.graphics.strokeLineShape(line);
+    }
+
+
+
+var config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    physics: {
+        default: 'arcade',
+        arcade: {
+            debug: true,
+            gravity: { y: 0, x:0 }
+        }
+    },
+    scene: {
+        preload: preload,
+        create: create
+    }
+
+};
+
+var game = new Phaser.Game(config);
+
+</script>
+
+</body>
+</html>
