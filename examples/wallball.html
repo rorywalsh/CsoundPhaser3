@@ -16,8 +16,9 @@
 <script type="text/javascript">
 
 let startingVelocity = 250;
-let player, ball, mouseDown, mouseDownX, mouseDownY, scoreText, score, moving;
+let player, ball, mouseDown, practiceAttempt, attempt, mouseDownX, mouseDownY, scoreText, score, moving, dummyMoving, trajectory;
 let borders = [];
+let prevDummyBall;
 let wallCheck = [1,1,1,1];
 function preload() {
   this.load.image("ball", "assets/cannonBall.png");
@@ -26,13 +27,10 @@ function preload() {
 }
 
 function create() {
-    // var sum = 0;
-    // for(val of wallCheck){
-    //     sum+=val;
-    // }
-    // console.log(sum);
-
     score = 4;
+    attempt = 1;
+    practiceAttempt = true;
+    prevDummyBall = new Phaser.Math.Vector2(0, 0);
     player = this.add.circle(200, 200, 20, 0x0066ff);
     this.physics.add.existing(player);
     player.body.setCircle(20, 0, 0);
@@ -40,13 +38,32 @@ function create() {
     player.body.setDrag(.98);
     player.body.setBounce(1);    
     ball = this.add.circle(200+Math.random()*300, 200+Math.random()*200, 20, 0xdd66ff);
+    prevDummyBall.x = ball.x;
+    prevDummyBall.y = ball.y;
     this.physics.add.existing(ball);
     ball.body.setCircle(20, 0, 0);
     ball.body.useDamping = true;
     ball.body.setDrag(.99);
     ball.body.setBounce(1);
 
-    scoreText = this.add.text(16, 16, 'Borders: 4', { fontWeight: 'bold', fontSize: '32px', fill: '#fff' });
+    dummyPlayer = this.add.circle(200, 200, 20, );
+    dummyPlayer.setFillStyle(0x006633, 255);
+    this.physics.add.existing(dummyPlayer);
+    dummyPlayer.body.setCircle(20, 0, 0);
+    dummyPlayer.body.useDamping = true;//.setDamping(true).setDrag(0.98);
+    dummyPlayer.body.setDrag(.98);
+    dummyPlayer.body.setBounce(1);    
+    dummyBall = this.add.circle(ball.x, ball.y, 20, 0xdd6633);
+    this.physics.add.existing(dummyBall);
+    dummyBall.body.setCircle(20, 0, 0);
+    dummyBall.setFillStyle(0x006633, 255);
+    dummyBall.body.useDamping = true;
+ 
+    dummyBall.body.setDrag(.99);
+    dummyBall.body.setBounce(1);
+
+
+    scoreText = this.add.text(16, 16, 'Borders: '+attempt*4, { fontWeight: 'bold', fontSize: '32px', fill: '#000' });
 
     borders[0] = this.add.rectangle(400, 150, 600, 20, 0x6666ff);
     borders[1] = this.add.rectangle(400, 450, 600, 20, 0x6666ff);
@@ -59,18 +76,32 @@ function create() {
     }
 
     myLine = this.add.graphics();
+    trajectory = this.add.graphics();
     myLine.lineStyle(2, 0x00ff00, 1);
-
+    trajectory.lineStyle(2, 0x000000, 1);
+    trajectory.fillStyle(0x000000, 1.0);
     this.input.on("pointerup", function(pointer) {
-        player.body.setVelocity((player.x-pointer.x)*20, (player.y-pointer.y)*20);
+        if (practiceAttempt == true){
+            trajectory.clear();
+            dummyPlayer.setPosition(player.x, player.y);
+            dummyBall.setPosition(ball.x, ball.y);
+            dummyPlayer.body.setVelocity((player.x-pointer.x)*20, (player.y-pointer.y)*20);
+            dummyPlayer.body.setVelocity((player.x-pointer.x)*20, (player.y-pointer.y)*20);
+            dummyPlayer.body.enable = true;   
+            practiceAttempt = !practiceAttempt;
+        }
+        else{
+            player.body.setVelocity((player.x-pointer.x)*20, (player.y-pointer.y)*20);
+            practiceAttempt = !practiceAttempt;
+        }
         mouseDown = false;
         myLine.clear();
-        wallCheck = [1, 1, 1, 1];
+        
         moving = true;
     });
 
     this.input.on('pointerdown', function(pointer){
-        
+        // this.scene.restart();
         mouseDown = true;
         mouseDownX = pointer.x;
         mouseDownY = pointer.y;
@@ -78,20 +109,25 @@ function create() {
 
     this.input.on('pointermove', function(pointer, localX, localY, event){ 
         if(mouseDown === true){
-            myLine.clear();
+            myLine.clear();          
             myLine.lineBetween(player.x, player.y, player.x+(player.x-pointer.x)*2, player.y+(player.y-pointer.y)*2);
-            // myLine.beginPath();
-            // myLine.moveTo(100, 100);
-            // myLine.lineTo(200, 200);
-            // myLine.closePath();
-            // myLine.strokePath();
         } 
     }, this);
 
     this.physics.add.collider(player, borders);
-    this.physics.add.collider(player, ball, playerBallCollision);
-    this.physics.add.collider(ball, borders, ballBorderCollision);
+    this.physics.add.collider(dummyPlayer, borders);
+    this.physics.add.collider(dummyPlayer, dummyBall, dummyPlayerBallCollision);
+    this.physics.add.collider(dummyBall, borders);
+    this.physics.add.collider(player, ball, playerBallCollision, null, this);
+    // this.physics.add.collider(dummyPlayer, dummyBall, dummyPlayerBallCollision, null, this);
+    // this.physics.add.collider(ball, borders, ballBorderCollision);
     this.physics.add.collider(ball, borders, ballBorderCollision, null, this);
+    // this.scene.restart();
+}
+
+function dummyPlayerBallCollision()
+{
+    dummyPlayer.body.enable = false;
 }
 
 function playerBallCollision() 
@@ -102,7 +138,7 @@ function playerBallCollision()
     } 
     else{
         console.log("should restart");
-        restart();
+        this.scene.restart();
     }
         
 }
@@ -113,39 +149,56 @@ function ballBorderCollision(ball, border)
     var sum = 0;
     console.log(border.name);
     if(border.name == 'Border0')
-        wallCheck[0] = 0;
+        wallCheck[0] -= 1;
     if(border.name == 'Border1')
-        wallCheck[1] = 0;
+        wallCheck[1] -= 1;
     if(border.name == 'Border2')
-        wallCheck[2] = 0;
+        wallCheck[2] -= 1;
     if(border.name  == 'Border3')
-        wallCheck[3] = 0;
+        wallCheck[3] -= 1;
 
     for(var i = 0 ; i < wallCheck.length ; i++){
         sum = sum+wallCheck[i];       
     }
     // console.log(sum);
     scoreText.setText('Borders: ' + sum);
+    if(sum==0)
+    {
+        //this.scene.restart();
+        attempt++;
+        wallCheck = [attempt, attempt, attempt, attempt];
+        
+    }    
 }
 
 function update() {
   // this.physics.world.collide(ball1, [border]);
+  point = new Phaser.Math.Vector2(0, 300)
+  trajectory.beginPath();
+  trajectory.moveTo(prevDummyBall.x, prevDummyBall.y); // point: {x, y}
+  trajectory.lineTo(dummyBall.x, dummyBall.y, 2);
+  trajectory.closePath();
+  trajectory.strokePath();
+  prevDummyBall.x = dummyBall.x;
+  prevDummyBall.y = dummyBall.y;
 }
 
 var config = {
   type: Phaser.AUTO,
   width: 1000,
   height: 800,
+  backgroundColor: 'rgb(255, 255, 255)',
   physics: {
     default: "arcade",
     arcade: {
-      debug: true,
+      debug: false,
       gravity: { y: 0, x: 0 }
     }
   },
   scene: {
     preload: preload,
-    create: create
+    create: create,
+    update: update
   }
 };
 
