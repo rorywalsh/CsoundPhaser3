@@ -16,8 +16,9 @@
 <script type="text/javascript">
 
 let startingVelocity = 250;
-let ball1, ball2, player, ball, mouseDown, mouseDownX, mouseDownY, sprite, bmd, graphics, platforms, rect1;
-let borders = []
+let player, ball, mouseDown, mouseDownX, mouseDownY, scoreText, score, moving;
+let borders = [];
+let wallCheck = [1,1,1,1];
 function preload() {
   this.load.image("ball", "assets/cannonBall.png");
   this.load.image("bomb", "assets/hbomb.png");
@@ -25,20 +26,27 @@ function preload() {
 }
 
 function create() {
-    
+    // var sum = 0;
+    // for(val of wallCheck){
+    //     sum+=val;
+    // }
+    // console.log(sum);
+
+    score = 4;
     player = this.add.circle(200, 200, 20, 0x0066ff);
     this.physics.add.existing(player);
     player.body.setCircle(20, 0, 0);
     player.body.useDamping = true;//.setDamping(true).setDrag(0.98);
     player.body.setDrag(.98);
     player.body.setBounce(1);    
-    ball = this.add.circle(200+Math.random()*100, 200+Math.random()*100, 20, 0xdd66ff);
+    ball = this.add.circle(200+Math.random()*300, 200+Math.random()*200, 20, 0xdd66ff);
     this.physics.add.existing(ball);
     ball.body.setCircle(20, 0, 0);
     ball.body.useDamping = true;
-    ball.body.setDrag(.98);
+    ball.body.setDrag(.99);
     ball.body.setBounce(1);
 
+    scoreText = this.add.text(16, 16, 'Borders: 4', { fontWeight: 'bold', fontSize: '32px', fill: '#fff' });
 
     borders[0] = this.add.rectangle(400, 150, 600, 20, 0x6666ff);
     borders[1] = this.add.rectangle(400, 450, 600, 20, 0x6666ff);
@@ -46,29 +54,32 @@ function create() {
     borders[3] = this.add.rectangle(700, 300, 20, 300, 0x6666ff);
     for (element of borders) {
       this.physics.add.existing(element);
-      element.body.setImmovable(true);    
+      element.body.setImmovable(true);  
+      element.name = "Border"+borders.indexOf(element);  
     }
 
     myLine = this.add.graphics();
     myLine.lineStyle(2, 0x00ff00, 1);
 
     this.input.on("pointerup", function(pointer) {
-        player.body.setVelocity((player.x-pointer.x)*10, (player.y-pointer.y)*10);
+        player.body.setVelocity((player.x-pointer.x)*20, (player.y-pointer.y)*20);
         mouseDown = false;
         myLine.clear();
+        wallCheck = [1, 1, 1, 1];
+        moving = true;
     });
 
     this.input.on('pointerdown', function(pointer){
-     
-          mouseDown = true;
-          mouseDownX = pointer.x;
-          mouseDownY = pointer.y;
+        
+        mouseDown = true;
+        mouseDownX = pointer.x;
+        mouseDownY = pointer.y;
     }, this);
 
     this.input.on('pointermove', function(pointer, localX, localY, event){ 
         if(mouseDown === true){
             myLine.clear();
-            myLine.lineBetween(player.x, player.y, player.x+(player.x-pointer.x), player.y+(player.y-pointer.y));
+            myLine.lineBetween(player.x, player.y, player.x+(player.x-pointer.x)*2, player.y+(player.y-pointer.y)*2);
             // myLine.beginPath();
             // myLine.moveTo(100, 100);
             // myLine.lineTo(200, 200);
@@ -79,14 +90,43 @@ function create() {
 
     this.physics.add.collider(player, borders);
     this.physics.add.collider(player, ball, playerBallCollision);
-    this.physics.add.collider(ball, borders);
+    this.physics.add.collider(ball, borders, ballBorderCollision);
+    this.physics.add.collider(ball, borders, ballBorderCollision, null, this);
 }
 
-function playerBallCollision() {
-  player.body.setVelocity(0,0);
+function playerBallCollision() 
+{
+    if(moving===true){
+        player.body.setVelocity(0,0);
+        moving = false;
+    } 
+    else{
+        console.log("should restart");
+        restart();
+    }
+        
 }
 
-function worldCollision() {}
+function ballBorderCollision(ball, border) 
+{
+
+    var sum = 0;
+    console.log(border.name);
+    if(border.name == 'Border0')
+        wallCheck[0] = 0;
+    if(border.name == 'Border1')
+        wallCheck[1] = 0;
+    if(border.name == 'Border2')
+        wallCheck[2] = 0;
+    if(border.name  == 'Border3')
+        wallCheck[3] = 0;
+
+    for(var i = 0 ; i < wallCheck.length ; i++){
+        sum = sum+wallCheck[i];       
+    }
+    // console.log(sum);
+    scoreText.setText('Borders: ' + sum);
+}
 
 function update() {
   // this.physics.world.collide(ball1, [border]);
