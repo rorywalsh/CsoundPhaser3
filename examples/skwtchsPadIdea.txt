@@ -1,0 +1,8 @@
+  // var graphics = this.add.graphics({ fillStyle: { color: 0xff0000 } });
+    // var circle = new Phaser.Geom.Circle(50, 50, 25);
+    // graphics.fillCircleShape(circle);
+    // this.physics.add.existing(graphics); 
+    // var border = this.add.graphics({ fillStyle: { color: 0x0000ff } });
+    // var rect = new Phaser.Geom.Rectangle(0, 20, 800, 20);
+    // rect.setSize(800, 20);
+    // border.fillRectShape(rect);

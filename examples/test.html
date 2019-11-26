@@ -1,0 +1,59 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Csound and Phaser 3</title>
+    <script src="../js/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+class GameScene extends Phaser.Scene {
+
+    constructor (config)
+    {
+        super(config);
+    }
+
+    preload ()
+    {
+    }
+
+    create ()
+    {
+    }
+
+    update ()
+    {
+    }
+};
+
+
+var config = {
+    type: Phaser.CANVAS,
+    width: 960,
+    height: 600,
+    backgroundColor: 'rgb(255, 255, 255)',
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 300 },
+            debug: false
+        }
+    },
+    scene: GameScene
+};
+
+
+var game = new Phaser.Game(config);
+
+</script>
+
+</body>
+</html>

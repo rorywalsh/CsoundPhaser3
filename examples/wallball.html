@@ -7,7 +7,7 @@
 
     <style type="text/css">
         body {  
-            margin: 0;
+            left: 2000;
             }
     </style>
 </head>
@@ -16,83 +16,86 @@
 <script type="text/javascript">
 
 let startingVelocity = 250;
-let ball1, ball2, mouseDown, mouseDownX, mouseDownY, sprite, bmd, graphics;
-
+let ball1, ball2, player, ball, mouseDown, mouseDownX, mouseDownY, sprite, bmd, graphics, platforms, rect1;
+let borders = []
 function preload() {
   this.load.image("ball", "assets/cannonBall.png");
   this.load.image("bomb", "assets/hbomb.png");
+  this.load.image('platform', 'assets/platform.png');
 }
 
 function create() {
+    
+    player = this.add.circle(200, 200, 20, 0x0066ff);
+    this.physics.add.existing(player);
+    player.body.setCircle(20, 0, 0);
+    player.body.useDamping = true;//.setDamping(true).setDrag(0.98);
+    player.body.setDrag(.98);
+    player.body.setBounce(1);    
+    ball = this.add.circle(200+Math.random()*100, 200+Math.random()*100, 20, 0xdd66ff);
+    this.physics.add.existing(ball);
+    ball.body.setCircle(20, 0, 0);
+    ball.body.useDamping = true;
+    ball.body.setDrag(.98);
+    ball.body.setBounce(1);
+
+
+    borders[0] = this.add.rectangle(400, 150, 600, 20, 0x6666ff);
+    borders[1] = this.add.rectangle(400, 450, 600, 20, 0x6666ff);
+    borders[2] = this.add.rectangle(100, 300, 20, 300, 0x6666ff);
+    borders[3] = this.add.rectangle(700, 300, 20, 300, 0x6666ff);
+    for (element of borders) {
+      this.physics.add.existing(element);
+      element.body.setImmovable(true);    
+    }
+
     myLine = this.add.graphics();
     myLine.lineStyle(2, 0x00ff00, 1);
 
-    ball1 = this.physics.add.image(
-        200 + Math.random() * 100,
-        Math.random() * 400,
-        "ball"
-    );
-    ball1.setSize(20);
-    ball1.setCircle(20, 0, 0);
-    ball2 = this.physics.add.image(
-        100 + Math.random() * 100,
-        Math.random() * 400,
-        "bomb"
-    );
-    ball2.setCircle(16, 0, 0);
-
-    ball1.setDamping(true).setDrag(0.98);
-    ball2.setDamping(true).setDrag(0.98);
-
-    ball1.setCollideWorldBounds(true);
-    ball2.setCollideWorldBounds(true);
-
-    ball1.body.onWorldBounds = true;
-    ball2.body.onWorldBounds = true;
-
-    ball1.setBounce(1);
-    ball2.setBounce(1);
-
     this.input.on("pointerup", function(pointer) {
-        // ball1.setVelocity(Math.random() * 1500, Math.random() * 1500);
-        ball1.setVelocity((ball1.x-pointer.x)*10, (ball1.y-pointer.y)*10);
+        player.body.setVelocity((player.x-pointer.x)*10, (player.y-pointer.y)*10);
         mouseDown = false;
         myLine.clear();
     });
 
     this.input.on('pointerdown', function(pointer){
-            mouseDown = true;
-            mouseDownX = pointer.x;
-            mouseDownY = pointer.y;
-            console.log(mouseDownX, mouseDownY);
+     
+          mouseDown = true;
+          mouseDownX = pointer.x;
+          mouseDownY = pointer.y;
     }, this);
 
     this.input.on('pointermove', function(pointer, localX, localY, event){ 
         if(mouseDown === true){
             myLine.clear();
-            myLine.lineBetween(ball1.x, ball1.y, ball1.x+(ball1.x-pointer.x), ball1.y+(ball1.y-pointer.y));
-            console.log(pointer.x, pointer.y);
+            myLine.lineBetween(player.x, player.y, player.x+(player.x-pointer.x), player.y+(player.y-pointer.y));
+            // myLine.beginPath();
+            // myLine.moveTo(100, 100);
+            // myLine.lineTo(200, 200);
+            // myLine.closePath();
+            // myLine.strokePath();
         } 
     }, this);
 
-  this.physics.add.collider(ball1, ball2, ballCollision);
-  this.physics.world.on("worldbounds", worldCollision);
+    this.physics.add.collider(player, borders);
+    this.physics.add.collider(player, ball, playerBallCollision);
+    this.physics.add.collider(ball, borders);
 }
 
-function ballCollision() {
-
+function playerBallCollision() {
+  player.body.setVelocity(0,0);
 }
 
 function worldCollision() {}
 
 function update() {
-  this.graphics.strokeLineShape(line);
+  // this.physics.world.collide(ball1, [border]);
 }
 
 var config = {
   type: Phaser.AUTO,
-  width: 400,
-  height: 200,
+  width: 1000,
+  height: 800,
   physics: {
     default: "arcade",
     arcade: {
