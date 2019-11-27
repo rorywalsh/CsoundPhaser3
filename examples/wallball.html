@@ -18,7 +18,7 @@
 let startingVelocity = 250;
 let player, ball, mouseDown, dashLine, practiceAttempt, attempt, mouseDownX, mouseDownY, scoreText, level, moving, dummyMoving, trajectory;
 let borders = [];
-let prevDummyBall, lineAlpha, linePointer;
+let prevDummyBall, lineAlpha, linePointer, forceVector;
 let wallCheck = [1,1,1,1];
 function preload() {
   this.load.image("ball", "assets/cannonBall.png");
@@ -89,7 +89,6 @@ function create() {
             dummyPlayer.setPosition(player.x, player.y);
             dummyBall.setPosition(ball.x, ball.y);
             dummyPlayer.body.setVelocity((player.x-pointer.x)*20, (player.y-pointer.y)*20);
-            dummyPlayer.body.setVelocity((player.x-pointer.x)*20, (player.y-pointer.y)*20);
             dummyPlayer.body.enable = true;   
             practiceAttempt = !practiceAttempt;
         }
@@ -116,7 +115,8 @@ function create() {
             myLine.clear();  
             myLine.beginPath();   
             myLine.lineStyle(2, 0x00ff00, 1);
-            myLine.lineBetween(player.x, player.y, player.x+(player.x-pointer.x)*2, player.y+(player.y-pointer.y)*2);
+            myLine.lineBetween(player.x, player.y, player.x+(mouseDownX-pointer.x)*2, player.y+(mouseDownY-pointer.y)*2);
+            
             // linePointer.setPosition(player.x+(player.x-pointer.x)*2, player.y+(player.y-pointer.y)*2);
             // vec = new Phaser.Math.Vector2(player.x+(player.x-pointer.x)*2, player.y+(player.y-pointer.y)*2);
             // vec.normalize();
