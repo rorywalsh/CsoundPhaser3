@@ -16,9 +16,9 @@
 <script type="text/javascript">
 
 let startingVelocity = 250;
-let player, ball, mouseDown, practiceAttempt, attempt, mouseDownX, mouseDownY, scoreText, score, moving, dummyMoving, trajectory;
+let player, ball, mouseDown, dashLine, practiceAttempt, attempt, mouseDownX, mouseDownY, scoreText, level, moving, dummyMoving, trajectory;
 let borders = [];
-let prevDummyBall;
+let prevDummyBall, lineAlpha, linePointer;
 let wallCheck = [1,1,1,1];
 function preload() {
   this.load.image("ball", "assets/cannonBall.png");
@@ -27,7 +27,8 @@ function preload() {
 }
 
 function create() {
-    score = 4;
+    // linePointer = this.add.triangle(100, 100, 0, 20, 20, 20, 10, 0, 0xff0000);
+    level = 1;
     attempt = 1;
     practiceAttempt = true;
     prevDummyBall = new Phaser.Math.Vector2(0, 0);
@@ -63,7 +64,7 @@ function create() {
     dummyBall.body.setBounce(1);
 
 
-    scoreText = this.add.text(16, 16, 'Borders: '+attempt*4, { fontWeight: 'bold', fontSize: '32px', fill: '#000' });
+    // scoreText = this.add.text(16, 16, 'Borders: '+attempt*4, { fontWeight: 'bold', fontSize: '32px', fill: '#000' });
 
     borders[0] = this.add.rectangle(400, 150, 600, 20, 0x6666ff);
     borders[1] = this.add.rectangle(400, 450, 600, 20, 0x6666ff);
@@ -73,16 +74,18 @@ function create() {
       this.physics.add.existing(element);
       element.body.setImmovable(true);  
       element.name = "Border"+borders.indexOf(element);  
+      dummyBall.setFillStyle(0x6666ff, 0);
     }
 
     myLine = this.add.graphics();
     trajectory = this.add.graphics();
     myLine.lineStyle(2, 0x00ff00, 1);
-    trajectory.lineStyle(2, 0x000000, 1);
-    trajectory.fillStyle(0x000000, 1.0);
+    trajectory.lineStyle(2, 0xdddddd, 1);
+
     this.input.on("pointerup", function(pointer) {
         if (practiceAttempt == true){
             trajectory.clear();
+            lineAlpha = 1;
             dummyPlayer.setPosition(player.x, player.y);
             dummyBall.setPosition(ball.x, ball.y);
             dummyPlayer.body.setVelocity((player.x-pointer.x)*20, (player.y-pointer.y)*20);
@@ -93,6 +96,7 @@ function create() {
         else{
             player.body.setVelocity((player.x-pointer.x)*20, (player.y-pointer.y)*20);
             practiceAttempt = !practiceAttempt;
+            lineAlpha = 1;
         }
         mouseDown = false;
         myLine.clear();
@@ -109,8 +113,16 @@ function create() {
 
     this.input.on('pointermove', function(pointer, localX, localY, event){ 
         if(mouseDown === true){
-            myLine.clear();          
+            myLine.clear();  
+            myLine.beginPath();   
+            myLine.lineStyle(2, 0x00ff00, 1);
             myLine.lineBetween(player.x, player.y, player.x+(player.x-pointer.x)*2, player.y+(player.y-pointer.y)*2);
+            // linePointer.setPosition(player.x+(player.x-pointer.x)*2, player.y+(player.y-pointer.y)*2);
+            // vec = new Phaser.Math.Vector2(player.x+(player.x-pointer.x)*2, player.y+(player.y-pointer.y)*2);
+            // vec.normalize();
+            // const angle = Math.atan2(vec.x, vec.y) * (180/Math.PI);
+            myLine.closePath();
+            console.log(angle);
         } 
     }, this);
 
@@ -146,8 +158,8 @@ function playerBallCollision()
 function ballBorderCollision(ball, border) 
 {
 
-    var sum = 0;
-    console.log(border.name);
+    // var sum = 0;
+    
     if(border.name == 'Border0')
         wallCheck[0] -= 1;
     if(border.name == 'Border1')
@@ -157,30 +169,33 @@ function ballBorderCollision(ball, border)
     if(border.name  == 'Border3')
         wallCheck[3] -= 1;
 
-    for(var i = 0 ; i < wallCheck.length ; i++){
-        sum = sum+wallCheck[i];       
-    }
-    // console.log(sum);
-    scoreText.setText('Borders: ' + sum);
-    if(sum==0)
-    {
-        //this.scene.restart();
-        attempt++;
-        wallCheck = [attempt, attempt, attempt, attempt];
-        
-    }    
+    border.fillAlpha += (255/level);
+    border.setFillStyle(0x000000, border.fillAlpha);
+    console.log(border.fillAlpha);
+
 }
 
 function update() {
-  // this.physics.world.collide(ball1, [border]);
-  point = new Phaser.Math.Vector2(0, 300)
-  trajectory.beginPath();
-  trajectory.moveTo(prevDummyBall.x, prevDummyBall.y); // point: {x, y}
-  trajectory.lineTo(dummyBall.x, dummyBall.y, 2);
-  trajectory.closePath();
-  trajectory.strokePath();
-  prevDummyBall.x = dummyBall.x;
-  prevDummyBall.y = dummyBall.y;
+    // this.physics.world.collide(ball1, [border]);
+    point = new Phaser.Math.Vector2(0, 300)
+    trajectory.beginPath();
+    trajectory.lineStyle(2, 0xdddddd, 1);
+    trajectory.moveTo(prevDummyBall.x, prevDummyBall.y); // point: {x, y}
+    trajectory.lineTo(dummyBall.x, dummyBall.y, 2);
+    trajectory.closePath();
+    trajectory.strokePath();
+    prevDummyBall.x = dummyBall.x;
+    prevDummyBall.y = dummyBall.y;
+
+    if(ball.body.speed < 30){
+        for(element of borders){
+            element.setFillStyle(0x6666ff, 1);
+        }
+        // trajectory.clear();
+    }
+
+    
+        
 }
 
 var config = {
