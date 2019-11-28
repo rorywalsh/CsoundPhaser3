@@ -1,0 +1,266 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.19.0/phaser.js"></script>
+
+    <style type="text/css">
+        body {  
+            left: 2000;
+            }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+let startingVelocity = 250;
+let player, ball, mouseDown, dashLine, practiceAttempt, attempt, mouseDownX, mouseDownY, scoreText, level, moving, dummyMoving, trajectory;
+let borders = [];
+let prevDummyBall, lineAlpha, linePointer, forceVector, playerPosVector, reflectionPoint;
+let wallCheck = [1,1,1,1];
+function preload() {
+  this.load.image("ball", "assets/cannonBall.png");
+  this.load.image("bomb", "assets/hbomb.png");
+  this.load.image('platform', 'assets/platform.png');
+}
+
+function create() {
+    // linePointer = this.add.triangle(100, 100, 0, 20, 20, 20, 10, 0, 0xff0000);
+    level = 1;
+    attempt = 1;
+    practiceAttempt = true;
+    prevDummyBall = new Phaser.Math.Vector2(0, 0);
+    player = this.add.circle(200, 200, 20, 0x0066ff);
+    this.physics.add.existing(player);
+    player.body.setCircle(20, 0, 0);
+    player.body.useDamping = true;//.setDamping(true).setDrag(0.98);
+    player.body.setDrag(.98);
+    player.body.setBounce(1);    
+    ball = this.add.circle(200+Math.random()*300, 200+Math.random()*200, 20, 0xdd66ff);
+    prevDummyBall.x = ball.x;
+    prevDummyBall.y = ball.y;
+    this.physics.add.existing(ball);
+    ball.body.setCircle(20, 0, 0);
+    ball.body.useDamping = true;
+    ball.body.setDrag(.99);
+    ball.body.setBounce(1);
+
+    reflectionPoint = new Phaser.Math.Vector2( ball.x, ball.y);
+    reflectionVelocity = new Phaser.Math.Vector2( 1, 1);
+
+    dummyPlayer = this.add.circle(200, 200, 20);
+    dummyPlayer.setFillStyle(0x006633, 255);
+    this.physics.add.existing(dummyPlayer);
+    dummyPlayer.body.setCircle(20, 0, 0);
+    dummyPlayer.body.useDamping = true;//.setDamping(true).setDrag(0.98);
+    dummyPlayer.body.setDrag(.98);
+    dummyPlayer.body.setBounce(1);    
+    dummyBall = this.add.circle(ball.x, ball.y, 20, 0xdd6633);
+    this.physics.add.existing(dummyBall);
+    dummyBall.body.setCircle(20, 0, 0);
+    dummyBall.setFillStyle(0x006633, 255);
+    dummyBall.body.useDamping = true;
+ 
+    dummyBall.body.setDrag(.99);
+    dummyBall.body.setBounce(1);
+
+
+    // scoreText = this.add.text(16, 16, 'Borders: '+attempt*4, { fontWeight: 'bold', fontSize: '32px', fill: '#000' });
+
+    borders[0] = this.add.rectangle(400, 150, 600, 20, 0x6666ff);//top
+    borders[1] = this.add.rectangle(400, 450, 600, 20, 0x6666ff);//top
+    borders[2] = this.add.rectangle(100, 300, 20, 300, 0x6666ff);//left
+    borders[3] = this.add.rectangle(700, 300, 20, 300, 0x6666ff);//right
+    for (element of borders) {
+      this.physics.add.existing(element);
+      element.body.setImmovable(true);  
+      element.name = "Border"+borders.indexOf(element);  
+      dummyBall.setFillStyle(0x6666ff, 0);
+    }
+
+    forceLine = this.add.graphics();
+
+    trajectory = this.add.graphics();
+
+    this.input.on("pointerup", function(pointer) {
+            playerPosVector = new Phaser.Math.Vector2(player.x-pointer.x, player.y-pointer.y);
+            playerPosVector.scale(10);
+            if (practiceAttempt == true){
+                lineAlpha = 1;
+                dummyPlayer.setPosition(player.x, player.y);
+                dummyBall.setPosition(ball.x, ball.y);
+                dummyPlayer.body.setVelocity(playerPosVector.x, playerPosVector.y);
+                dummyPlayer.body.enable = true;   
+            }
+            else{
+                forceLine.clear();
+                trajectory.clear();
+                player.body.setVelocity(playerPosVector.x, playerPosVector.y);
+                lineAlpha = 1;
+            }
+
+            mouseDown = false;
+            
+            practiceAttempt = !practiceAttempt;
+            moving = true;
+   });
+
+    this.input.on('pointerdown', function(pointer){
+        mouseDown = true;
+        mouseDownX = pointer.x;
+        mouseDownY = pointer.y;
+    }, this);
+
+    this.input.on('pointermove', function(pointer, localX, localY, event){ 
+        if(mouseDown === true){
+            forceLine.clear();  
+            forceLine.beginPath();   
+            forceLine.lineStyle(6, 0x00ff00);
+            forceLine.lineBetween(player.x, player.y, player.x+(mouseDownX-pointer.x), player.y+(mouseDownY-pointer.y));
+            reflectionPoint.set(player.x, player.y);
+            reflectionVelocity.x = (player.x-pointer.x);
+            reflectionVelocity.y = (player.y-pointer.y);
+            reflectionVelocity.normalize();
+            forceLine.closePath();
+            trajectory.clear();
+        } 
+    }, this);
+
+    this.physics.add.collider(reflectionPoint, borders, testCollision);
+    this.physics.add.collider(player, borders);
+    this.physics.add.collider(dummyPlayer, borders);
+    this.physics.add.collider(dummyPlayer, dummyBall, dummyPlayerBallCollision);
+    this.physics.add.collider(dummyBall, borders);
+    this.physics.add.collider(player, ball, playerBallCollision, null, this);
+    // this.physics.add.collider(dummyPlayer, dummyBall, dummyPlayerBallCollision, null, this);
+    // this.physics.add.collider(ball, borders, ballBorderCollision);
+    this.physics.add.collider(ball, borders, ballBorderCollision, null, this);
+    // this.scene.restart();
+}
+
+function testCollision()
+{
+    sadfd
+}
+function dummyPlayerBallCollision()
+{
+    dummyPlayer.body.enable = false;
+}
+
+function playerBallCollision() 
+{
+    if(moving===true){
+        player.body.setVelocity(0,0);
+        moving = false;
+    } 
+    else{
+        console.log("should restart");
+        // this.scene.restart();
+    }
+        
+}
+
+function ballBorderCollision(ball, border) 
+{
+    if(border.name == 'Border0'){
+        wallCheck[0] = wallCheck[0]>0 ? wallCheck[0] - 1 : 0;
+        changeBorderColour(border);
+    }
+    if(border.name == 'Border1'){
+        wallCheck[1] = wallCheck[1]>0 ? wallCheck[1] - 1 : 0;
+        changeBorderColour(border);
+    }
+    if(border.name == 'Border2'){
+        wallCheck[2] = wallCheck[2]>0 ? wallCheck[2] - 1 : 0;
+        changeBorderColour(border);
+    }
+    if(border.name  == 'Border3'){
+        wallCheck[3] = wallCheck[3]>0 ? wallCheck[3] - 1 : 0;
+        changeBorderColour(border);
+    }
+    var sum = 0;
+    for(item of wallCheck){
+        sum+=item;
+    }
+
+    if(sum == 0)
+    {
+        for(element of borders){
+            element.setFillStyle(0x6666ff, 1);
+            border.fillAlpha = 1;
+        }
+        level++;
+        wallCheck = [level, level, level, level];
+    }
+
+    console.log("Sum:"+sum, "level:"+level);
+}
+
+function changeBorderColour(border)
+{
+    console.log("Before:", border.fillAlpha);
+    border.fillAlpha = border.fillAlpha > 0 ? border.fillAlpha-1-(1/level) : 0;
+    border.setFillStyle(0x6666ff, border.fillAlpha+.1);
+    console.log("After", border.fillAlpha);
+}
+
+function update() {
+    // this.physics.world.collide(ball1, [border]);
+    point = new Phaser.Math.Vector2(0, 300)
+    // trajectory.beginPath();
+    // trajectory.lineStyle(2, 0x222222);
+    // trajectory.moveTo(prevDummyBall.x, prevDummyBall.y); // point: {x, y}
+    // trajectory.lineTo(dummyBall.x, dummyBall.y, 2);
+    // trajectory.closePath();
+    // trajectory.strokePath();
+    // prevDummyBall.x = dummyBall.x;
+    // prevDummyBall.y = dummyBall.y;
+
+    // trajectory.clear();
+    if(mouseDown == true)
+    {
+        trajectory.beginPath();
+        trajectory.fillStyle(2, 0x222222);
+        if(reflectionPoint.y>borders[1].y || reflectionPoint.y<borders[0].y)
+            reflectionVelocity.y*=-1;
+        if(reflectionPoint.x<borders[2].x || reflectionPoint.x>borders[3].x)
+            reflectionVelocity.x*=-1;
+
+        trajectory.fillCircle(reflectionPoint.x, reflectionPoint.y, 2);
+        trajectory.closePath();
+        trajectory.strokePath(); 
+        reflectionPoint.x+=reflectionVelocity.x*10;
+        reflectionPoint.y+=reflectionVelocity.y*10;
+    }
+
+
+        
+}
+
+var config = {
+  type: Phaser.AUTO,
+  width: 1000,
+  height: 800,
+  backgroundColor: 'rgb(255, 255, 255)',
+  physics: {
+    default: "arcade",
+    arcade: {
+      debug: false,
+      gravity: { y: 0, x: 0 }
+    }
+  },
+  scene: {
+    preload: preload,
+    create: create,
+    update: update
+  }
+};
+
+var game = new Phaser.Game(config);
+
+</script>
+
+</body>
+</html>
