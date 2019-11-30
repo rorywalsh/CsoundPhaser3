@@ -18,7 +18,7 @@
 let startingVelocity = 250;
 let player, ball, mouseDown, dashLine, practiceAttempt, attempt, mouseDownX, mouseDownY, scoreText, level, moving, dummyMoving, trajectory;
 let borders = [];
-let prevDummyBall, lineAlpha, linePointer, forceVector, playerPosVector;
+let prevDummyBall, lineAlpha, linePointer, forceVector;
 let wallCheck = [1,1,1,1];
 function preload() {
   this.load.image("ball", "assets/cannonBall.png");
@@ -47,7 +47,7 @@ function create() {
     ball.body.setDrag(.99);
     ball.body.setBounce(1);
 
-    dummyPlayer = this.add.circle(200, 200, 20);
+    dummyPlayer = this.add.circle(200, 200, 20, );
     dummyPlayer.setFillStyle(0x006633, 255);
     this.physics.add.existing(dummyPlayer);
     dummyPlayer.body.setCircle(20, 0, 0);
@@ -77,34 +77,34 @@ function create() {
       dummyBall.setFillStyle(0x6666ff, 0);
     }
 
-    forceLine = this.add.graphics();
+    myLine = this.add.graphics();
     trajectory = this.add.graphics();
+    myLine.lineStyle(2, 0x00ff00, 1);
+    trajectory.lineStyle(2, 0xdddddd, 1);
 
     this.input.on("pointerup", function(pointer) {
-            playerPosVector = new Phaser.Math.Vector2(player.x-pointer.x, player.y-pointer.y);
-            playerPosVector.scale(10);
-            if (practiceAttempt == true){
-                lineAlpha = 1;
-                
-                dummyPlayer.setPosition(player.x, player.y);
-                dummyBall.setPosition(ball.x, ball.y);
-                dummyPlayer.body.setVelocity(playerPosVector.x, playerPosVector.y);
-                dummyPlayer.body.enable = true;   
-            }
-            else{
-                forceLine.clear();
-                trajectory.clear();
-                player.body.setVelocity(playerPosVector.x, playerPosVector.y);
-                lineAlpha = 1;
-            }
-
-            mouseDown = false;
-            
+        if (practiceAttempt == true){
+            trajectory.clear();
+            lineAlpha = 1;
+            dummyPlayer.setPosition(player.x, player.y);
+            dummyBall.setPosition(ball.x, ball.y);
+            dummyPlayer.body.setVelocity((player.x-pointer.x)*20, (player.y-pointer.y)*20);
+            dummyPlayer.body.enable = true;   
             practiceAttempt = !practiceAttempt;
-            moving = true;
-   });
+        }
+        else{
+            player.body.setVelocity((player.x-pointer.x)*20, (player.y-pointer.y)*20);
+            practiceAttempt = !practiceAttempt;
+            lineAlpha = 1;
+        }
+        mouseDown = false;
+        myLine.clear();
+        
+        moving = true;
+    });
 
     this.input.on('pointerdown', function(pointer){
+        // this.scene.restart();
         mouseDown = true;
         mouseDownX = pointer.x;
         mouseDownY = pointer.y;
@@ -112,11 +112,17 @@ function create() {
 
     this.input.on('pointermove', function(pointer, localX, localY, event){ 
         if(mouseDown === true){
-            forceLine.clear();  
-            forceLine.beginPath();   
-            forceLine.lineStyle(6, 0x00ff00);
-            forceLine.lineBetween(player.x, player.y, player.x+(mouseDownX-pointer.x)*2, player.y+(mouseDownY-pointer.y)*2);
-            forceLine.closePath();
+            myLine.clear();  
+            myLine.beginPath();   
+            myLine.lineStyle(2, 0x00ff00, 1);
+            myLine.lineBetween(player.x, player.y, player.x+(mouseDownX-pointer.x)*2, player.y+(mouseDownY-pointer.y)*2);
+            
+            // linePointer.setPosition(player.x+(player.x-pointer.x)*2, player.y+(player.y-pointer.y)*2);
+            // vec = new Phaser.Math.Vector2(player.x+(player.x-pointer.x)*2, player.y+(player.y-pointer.y)*2);
+            // vec.normalize();
+            // const angle = Math.atan2(vec.x, vec.y) * (180/Math.PI);
+            myLine.closePath();
+            console.log(angle);
         } 
     }, this);
 
@@ -151,53 +157,29 @@ function playerBallCollision()
 
 function ballBorderCollision(ball, border) 
 {
-    if(border.name == 'Border0'){
-        wallCheck[0] = wallCheck[0]>0 ? wallCheck[0] - 1 : 0;
-        changeBorderColour(border);
-    }
-    if(border.name == 'Border1'){
-        wallCheck[1] = wallCheck[1]>0 ? wallCheck[1] - 1 : 0;
-        changeBorderColour(border);
-    }
-    if(border.name == 'Border2'){
-        wallCheck[2] = wallCheck[2]>0 ? wallCheck[2] - 1 : 0;
-        changeBorderColour(border);
-    }
-    if(border.name  == 'Border3'){
-        wallCheck[3] = wallCheck[3]>0 ? wallCheck[3] - 1 : 0;
-        changeBorderColour(border);
-    }
-    var sum = 0;
-    for(item of wallCheck){
-        sum+=item;
-    }
 
-    if(sum == 0)
-    {
-        for(element of borders){
-            element.setFillStyle(0x6666ff, 1);
-            border.fillAlpha = 1;
-        }
-        level++;
-        wallCheck = [level, level, level, level];
-    }
+    // var sum = 0;
+    
+    if(border.name == 'Border0')
+        wallCheck[0] -= 1;
+    if(border.name == 'Border1')
+        wallCheck[1] -= 1;
+    if(border.name == 'Border2')
+        wallCheck[2] -= 1;
+    if(border.name  == 'Border3')
+        wallCheck[3] -= 1;
 
-    console.log("Sum:"+sum, "level:"+level);
-}
+    border.fillAlpha += (255/level);
+    border.setFillStyle(0x000000, border.fillAlpha);
+    console.log(border.fillAlpha);
 
-function changeBorderColour(border)
-{
-    console.log("Before:", border.fillAlpha);
-    border.fillAlpha = border.fillAlpha > 0 ? border.fillAlpha-1-(1/level) : 0;
-    border.setFillStyle(0x6666ff, border.fillAlpha+.1);
-    console.log("After", border.fillAlpha);
 }
 
 function update() {
     // this.physics.world.collide(ball1, [border]);
     point = new Phaser.Math.Vector2(0, 300)
     trajectory.beginPath();
-    trajectory.lineStyle(2, 0x222222);
+    trajectory.lineStyle(2, 0xdddddd, 1);
     trajectory.moveTo(prevDummyBall.x, prevDummyBall.y); // point: {x, y}
     trajectory.lineTo(dummyBall.x, dummyBall.y, 2);
     trajectory.closePath();
@@ -205,6 +187,14 @@ function update() {
     prevDummyBall.x = dummyBall.x;
     prevDummyBall.y = dummyBall.y;
 
+    if(ball.body.speed < 30){
+        for(element of borders){
+            element.setFillStyle(0x6666ff, 1);
+        }
+        // trajectory.clear();
+    }
+
+    
         
 }
 
