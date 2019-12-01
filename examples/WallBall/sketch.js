@@ -34,7 +34,7 @@ function setup() {
 
 
     Matter.Resolver._restingThresh = 0.1;
-    createCanvas(800, 600);
+    createCanvas(windowWidth, windowWidth);
     engine = Engine.create();
     engine.world.gravity.y = 0;
     world = engine.world;
@@ -72,13 +72,13 @@ function setup() {
         
         // check bodies, do whatever...
 
-    walls.push(new Wall(400, 0, width, 100));       //top
+    walls.push(new Wall(windowWidth/2, 0, windowWidth, 100));       //top
     walls[0].body.label = "Wall0";
-    walls.push(new Wall(400, height, width, 100));  //bottom
+    walls.push(new Wall(windowWidth/2, windowHeight, windowWidth, 100));  //bottom
     walls[1].body.label = "Wall1"
-    walls.push(new Wall(0, 300, 100, height));      //left
+    walls.push(new Wall(0, windowHeight/2, 100, windowHeight));      //left
     walls[2].body.label = "Wall2"
-    walls.push(new Wall(width, 300, 100, height));  //right
+    walls.push(new Wall(windowWidth, windowHeight/2, 100, windowHeight));  //right
     walls[3].body.label = "Wall3";
 
     ball = new Ball(random(100, 400), random(100, 400), 20);
@@ -105,29 +105,69 @@ function showEnemies()
           elem.show();
 }
 
+// mouse/touch moved events
 function mouseMoved()
 {
-    //if(shouldDrawPath!=1){
-        background(51);  
-        showWalls(); 
-        ball.show(); 
-        showEnemies();
-        trajectoryPointPos = Vector.create(ball.body.position.x,ball.body.position.y);
-        var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
-        trajectoryPointVel = Vector.create(force.x, force.y);
-        pathFadeOutValue = 255; 
-        shouldDrawPath = 1; 
-   // }
-   
+   pointerMoved();
 }
 
+function touchMoved()
+{
+   pointerMoved();
+}
+
+//device agnostic method
+function pointerMoved()
+{
+    background(51);  
+    showWalls(); 
+    ball.show(); 
+    showEnemies();
+    trajectoryPointPos = Vector.create(ball.body.position.x,ball.body.position.y);
+    var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
+    trajectoryPointVel = Vector.create(force.x, force.y);
+    pathFadeOutValue = 255; 
+    shouldDrawPath = 1; 
+}
+
+//mouse/touch pressed events
 function mousePressed() {
-    
+    pointerPressed();
+}
+
+function touchPressed()
+{
+    pointerPressed()
+}
+
+//device agnostic method
+function pointerPressed()
+{
     showPowerLevel = true;
     trajectoryPointPos = Vector.create(ball.body.position.x,ball.body.position.y);
     shouldDrawPath = 0;//shouldDrawPath == 1 ? 0 : shouldDrawPath+1;
     angle = 0;
     shotEnded = false;
+}
+
+// mouse/touch events
+function mouseReleased()
+{
+    pointerReleased();
+}
+
+function touchReleased()
+{
+    pointerReleased();
+}
+//device agnostic method
+function pointerReleased()
+{
+    var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
+    body.applyForce(ball.body, ball.body.position, {x:force.x*.5*ballVelocity, y:force.y*.5*ballVelocity});
+    shouldDrawPath = 0;
+    shotTaken = true;
+    showPowerLevel = false;
 }
 
 function restartLevel()
@@ -137,15 +177,6 @@ function restartLevel()
     setup();
 }
 
-function mouseReleased()
-{
-    var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
-    //trajectoryPointVel = Vector.create(force.x, force.y);
-    body.applyForce(ball.body, ball.body.position, {x:force.x*.1*ballVelocity, y:force.y*.1*ballVelocity});
-    shouldDrawPath = 0;
-    shotTaken = true;
-    showPowerLevel = false;
-}
 
 function draw() {
     Engine.update(engine);
