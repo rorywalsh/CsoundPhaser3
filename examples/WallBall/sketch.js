@@ -33,16 +33,16 @@ var Engine = Matter.Engine,
     canvas,
     firstTouch = 0;
 
-    function touchStarted () {
-        var fs = fullscreen();
-        if (!fs) {
-          fullscreen(true);
-        }
-      }
-    /* full screening will change the size of the canvas */
-    function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
-    }
+    // function touchStarted () {
+    //     var fs = fullscreen();
+    //     if (!fs) {
+    //       fullscreen(true);
+    //     }
+    //   }
+    // /* full screening will change the size of the canvas */
+    // function windowResized() {
+    // resizeCanvas(windowWidth, windowHeight);
+    // }
   
   /* prevents the mobile browser from processing some default
    * touch events, like swiping left for "back" or scrolling
@@ -53,9 +53,9 @@ var Engine = Matter.Engine,
     };
 
 function setup() {
-    canvas = createCanvas(windowWidth, windowWidth);
+    canvas = createCanvas(displayWidth, displayHeight);
     Matter.Resolver._restingThresh = 0.1;
-    ballSpeed = 0.2;
+    ballSpeed = 0.15;
     canvas.style("overscroll-behavior-y", "contain");
     engine = Engine.create();
     engine.world.gravity.y = 0;
