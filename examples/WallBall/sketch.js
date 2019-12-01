@@ -30,15 +30,31 @@ var Engine = Matter.Engine,
     trajectoryPointPos, 
     trajectoryPointVe,
     ballSpeed = 0.2,
-    canvas;
+    canvas,
+    firstTouch = 0;
 
-
+    function touchStarted () {
+        var fs = fullscreen();
+        if (!fs) {
+          fullscreen(true);
+        }
+      }
+    /* full screening will change the size of the canvas */
+    function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+    }
+  
+  /* prevents the mobile browser from processing some default
+   * touch events, like swiping left for "back" or scrolling
+   * the page.
+   */
+    document.ontouchmove = function(event) {
+      event.preventDefault();
+    };
 
 function setup() {
     canvas = createCanvas(windowWidth, windowWidth);
     Matter.Resolver._restingThresh = 0.1;
-    let fs = fullscreen();
-    fullscreen(!fs);
     ballSpeed = 0.2;
     canvas.style("overscroll-behavior-y", "contain");
     engine = Engine.create();
@@ -143,7 +159,11 @@ function mousePressed() {
 
 function touchPressed()
 {
-    pointerPressed()
+    if(firstTouch==1) 
+        pointerPressed();
+    
+    firstTouch = 1;
+
 }
 
 //device agnostic method
