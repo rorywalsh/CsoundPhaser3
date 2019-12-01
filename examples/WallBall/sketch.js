@@ -28,13 +28,18 @@ var Engine = Matter.Engine,
     engine,
     world,
     trajectoryPointPos, 
-    trajectoryPointVel;
+    trajectoryPointVe,
+    ballSpeed = 0.2,
+    canvas;
+
+
 
 function setup() {
-
-
+    
     Matter.Resolver._restingThresh = 0.1;
-    createCanvas(windowWidth, windowWidth);
+    canvas = createCanvas(windowWidth, windowWidth);
+    ballSpeed = 0.2;
+    canvas.style("overscroll-behavior-y", "contain");
     engine = Engine.create();
     engine.world.gravity.y = 0;
     world = engine.world;
@@ -164,7 +169,7 @@ function touchReleased()
 function pointerReleased()
 {
     var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
-    body.applyForce(ball.body, ball.body.position, {x:force.x*.5*ballVelocity, y:force.y*.5*ballVelocity});
+    body.applyForce(ball.body, ball.body.position, {x:force.x*ballSpeed*ballVelocity, y:force.y*ballSpeed*ballVelocity});
     shouldDrawPath = 0;
     shotTaken = true;
     showPowerLevel = false;
