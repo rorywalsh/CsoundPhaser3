@@ -35,9 +35,10 @@ var Engine = Matter.Engine,
 
 
 function setup() {
-    
-    Matter.Resolver._restingThresh = 0.1;
     canvas = createCanvas(windowWidth, windowWidth);
+    Matter.Resolver._restingThresh = 0.1;
+    let fs = fullscreen();
+    fullscreen(!fs);
     ballSpeed = 0.2;
     canvas.style("overscroll-behavior-y", "contain");
     engine = Engine.create();
