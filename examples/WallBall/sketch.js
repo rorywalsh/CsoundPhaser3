@@ -44,6 +44,9 @@ var Engine = Matter.Engine,
     // resizeCanvas(playAreaWidth, playAreaHeight);
     // }
   
+    function windowResized() {
+        resizeCanvas(playAreaWidth, playAreaHeight);
+    }
   /* prevents the mobile browser from processing some default
    * touch events, like swiping left for "back" or scrolling
    * the page.
@@ -123,13 +126,13 @@ function showWalls()
           elem.show();
 }
 
-function touchStarted () {
-    var fs = fullscreen();
-    if (!fs) {
-      fullscreen(true);
-    }
-  }
-  
+// function touchStarted () {
+//     var fs = fullscreen();
+//     if (!fs) {
+//       fullscreen(true);
+//     }
+//   }
+
 function showEnemies()
 {
     for(elem of enemies)
