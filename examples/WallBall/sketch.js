@@ -41,7 +41,7 @@ var Engine = Matter.Engine,
     //   }
     // /* full screening will change the size of the canvas */
     // function windowResized() {
-    // resizeCanvas(windowWidth, windowHeight);
+    // resizeCanvas(playAreaWidth, playAreaHeight);
     // }
   
   /* prevents the mobile browser from processing some default
@@ -54,6 +54,8 @@ var Engine = Matter.Engine,
 
 function setup() {
     canvas = createCanvas(displayWidth, displayHeight);
+    playAreaHeight = displayHeight;
+    playAreaWidth = displayWidth;
     Matter.Resolver._restingThresh = 0.1;
     ballSpeed = 0.15;
     canvas.style("overscroll-behavior-y", "contain");
@@ -94,19 +96,19 @@ function setup() {
         
         // check bodies, do whatever...
 
-    walls.push(new Wall(windowWidth/2, 0, windowWidth, 100));       //top
+    walls.push(new Wall(playAreaWidth/2, 0, playAreaWidth, playAreaHeight*.1));       //top
     walls[0].body.label = "Wall0";
-    walls.push(new Wall(windowWidth/2, windowHeight, windowWidth, 100));  //bottom
+    walls.push(new Wall(playAreaWidth/2, playAreaHeight, playAreaWidth, playAreaHeight*.1));  //bottom
     walls[1].body.label = "Wall1"
-    walls.push(new Wall(0, windowHeight/2, 100, windowHeight));      //left
+    walls.push(new Wall(0, playAreaHeight/2, playAreaWidth*.1, playAreaHeight));      //left
     walls[2].body.label = "Wall2"
-    walls.push(new Wall(windowWidth, windowHeight/2, 100, windowHeight));  //right
+    walls.push(new Wall(playAreaWidth, playAreaHeight/2, playAreaWidth*.1, playAreaHeight));  //right
     walls[3].body.label = "Wall3";
 
-    ball = new Ball(random(100, 400), random(100, 400), 20);
+    ball = new Ball(random(playAreaWidth*.2, playAreaWidth*.8), random(playAreaHeight*.2, playAreaHeight*.8), 20);
 
     for ( var i = 0 ; i < level ; i++){
-        enemies.push(new Enemy(random(100, 700), random(100, 500), 20));
+        enemies.push(new Enemy(random(playAreaWidth*.3, playAreaWidth*.7), random(playAreaHeight*.3, playAreaHeight*.7), 20));
         enemies[i].body.label = "Enemy"+i;
     }
 
@@ -121,6 +123,13 @@ function showWalls()
           elem.show();
 }
 
+function touchStarted () {
+    var fs = fullscreen();
+    if (!fs) {
+      fullscreen(true);
+    }
+  }
+  
 function showEnemies()
 {
     for(elem of enemies)
@@ -232,7 +241,7 @@ function draw() {
             if(trajectoryPointPos.x < walls[2].body.position.x+80 || trajectoryPointPos.x > walls[3].body.position.x-80)
                 trajectoryPointVel.x*=-1;  
         }
-        pathFadeOutValue-=5;
+        pathFadeOutValue-=playAreaWidth*0.001;;
         // if(pathFadeOutValue<0)
         // shouldDrawPath = 0;
     }
