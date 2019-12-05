@@ -61,10 +61,11 @@ function setup() {
     canvas = createCanvas(windowWidth, windowHeight);
     mouseDownPos = createVector(0, 0);
     ballRadius = windowWidth*.01;
+    ballVelocity = .001;
     playAreaHeight = windowHeight;
     playAreaWidth = windowWidth;
     Matter.Resolver._restingThresh = 0.1;
-    ballSpeed = 0.15;
+    ballSpeed = windowWidth*.00005;
     canvas.style("overscroll-behavior-y", "contain");
     engine = Engine.create();
     engine.world.gravity.y = 0;
@@ -192,18 +193,21 @@ function pointerPressed()
 // mouse/touch events
 function mouseReleased()
 {
+    var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
+    body.applyForce(ball.body, ball.body.position, {x:force.x*ballSpeed*ballVelocity, y:force.y*ballSpeed*ballVelocity});
     pointerReleased();
 }
 
 function touchReleased()
 {
+    var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
+    if(touches.length==2)
+        body.applyForce(ball.body, ball.body.position, {x:force.x*ballSpeed*ballVelocity, y:force.y*ballSpeed*ballVelocity});
     pointerReleased();
 }
 //device agnostic method
 function pointerReleased()
 {
-    // var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
-    // body.applyForce(ball.body, ball.body.position, {x:force.x*ballSpeed*ballVelocity, y:force.y*ballSpeed*ballVelocity});
     shouldDrawPath = 0;
     shotTaken = true;
     showPowerLevel = false;
