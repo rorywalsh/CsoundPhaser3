@@ -14,15 +14,19 @@
 <!-- <button id="startCsound"  style="font-size : 20px; position:relative; left:80px; top:80px;">Press to start</button> -->
 
 <script src="csound/csound.js"></script>
+<script src="lettuce.js"></script>
 <script type="text/javascript">
 
-function moduleDidLoad() {
-    //csound.CopyUrlToLocal("audio/explosion01.wav", "explosion01.wav", function(){console.log("Loading...");});
-    csound.PlayCsd("breakout.csd");
-    csoundLoaded = true;
-    var game = new Phaser.Game(config);
+var lettuce;
+function moduleDidLoad() {          
+    lettuce = new Lettuce();
+    lettuce.setAudioDirectory("/audio");
+    lettuce.addFiles(new Array('pianoMood.wav'));
+    lettuce.start();
+    setTimeout(function(){
+        var game = new Phaser.Game(config);
+    }, 1000);
 }
-
 
 var Breakout = new Phaser.Class({
 
@@ -62,6 +66,18 @@ var Breakout = new Phaser.Class({
 
         this.paddle = this.physics.add.image(400, 550, 'assets', 'paddle1').setImmovable();
 
+        //create audiosource
+        lettuce.createAudioSource(this.paddle, this.ball, 'pianoMood.wav');
+
+        const paddleSound =`
+        instr PADDLE
+            kNum active "PADDLE"
+            aEnv expon .5, p3, .001
+            a1 oscili aEnv, cpsmidinn(p4)
+            outs a1/kNum, a1/kNum
+        endin`;
+        lettuce.compileInstr(paddleSound);
+
         //  Our colliders
         this.physics.add.collider(this.ball, this.bricks, this.hitBrick, null, this);
         this.physics.add.collider(this.ball, this.paddle, this.hitPaddle, null, this);
@@ -71,19 +87,32 @@ var Breakout = new Phaser.Class({
     hitBrick: function (ball, brick)
     {
         brick.disableBody(true, true);
-        if(brick.frame.name === 'purple1')
-            csound.ReadScore('i1 0 2 60');
-        else if(brick.frame.name === 'silver1')
-            csound.ReadScore('i1 0 2 62');
-        else if(brick.frame.name === 'yellow1')
-            csound.ReadScore('i1 0 2 64');
-        else if(brick.frame.name === 'green1')
-            csound.ReadScore('i1 0 2 65');
-        else if(brick.frame.name === 'red1')
-            csound.ReadScore('i1 0 2 67');
-        else if(brick.frame.name === 'blue1')
-            csound.ReadScore('i1 0 2 69');
-                
+
+        if(brick.frame.name === 'purple1'){
+            lettuce.sendEvent('i"PADDLE" 0 2 70'); 
+            lettuce.sendEvent('i"PADDLE" 0.5 2 70'); 
+        }
+        else if(brick.frame.name === 'silver1'){
+            lettuce.sendEvent('i"PADDLE" 0 2 75');
+            lettuce.sendEvent('i"PADDLE" 0.5 2 75'); 
+        }   
+        else if(brick.frame.name === 'yellow1'){
+            lettuce.sendEvent('i"PADDLE" 0 2 78');
+            lettuce.sendEvent('i"PADDLE" 0.5 2 78'); 
+        }
+        else if(brick.frame.name === 'green1'){
+            lettuce.sendEvent('i"PADDLE" 0 2 82');
+            lettuce.sendEvent('i"PADDLE" 0.5 2 82'); 
+        }
+        else if(brick.frame.name === 'red1'){
+            lettuce.sendEvent('i"PADDLE" 0 2 75');
+            lettuce.sendEvent('i"PADDLE" 0.5 2 75'); 
+        }
+        else if(brick.frame.name === 'blue1'){
+            lettuce.sendEvent('i"PADDLE" 0 2 82');
+            lettuce.sendEvent('i"PADDLE" 0.5 2 82');
+        }
+
         if (this.bricks.countActive() === 0)
         {
             this.resetLevel();
@@ -112,7 +141,7 @@ var Breakout = new Phaser.Class({
     {
         var diff = 0;
         var numberOfBricksLeft = (60-this.bricks.countActive())*60;
-
+        
         if (ball.x < paddle.x)
         {
             //  Ball is on the left-hand side of the paddle
@@ -135,8 +164,9 @@ var Breakout = new Phaser.Class({
 
     update: function ()
     {
-//  Keep the paddle within the game
-        // this.paddle.x = 
+
+        lettuce.setSourceAmplitude(this.paddle, this.ball, .05);
+        
         if (this.keys.A.isDown)
         {   
             this.paddle.x = Phaser.Math.Clamp(this.paddle.x-=25, 52, 748);
@@ -150,7 +180,7 @@ var Breakout = new Phaser.Class({
         {
             if (this.ball.getData('onPaddle'))
             {
-                this.ball.setVelocity(-75, -300);
+                this.ball.setVelocity(0, -300);
                 this.ball.setData('onPaddle', false);
             }
         }
@@ -174,8 +204,6 @@ var config = {
         default: 'arcade'
     }
 };
-
-var game = new Phaser.Game(config);
 
 
     
