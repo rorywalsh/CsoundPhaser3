@@ -302,5 +302,5 @@ function draw() {
     }
     fill(255);
     textSize(20);
-    text(touches.length, 10, 10);
+    text("Touches:"+touches.length.toString(), 100, 100);
 }
