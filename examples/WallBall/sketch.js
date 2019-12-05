@@ -31,7 +31,8 @@ var Engine = Matter.Engine,
     trajectoryPointVe,
     ballSpeed = 0.2,
     canvas,
-    firstTouch = 0;
+    firstTouch = 0,
+    ballRadius;
 
     // function touchStarted () {
     //     var fs = fullscreen();
@@ -56,9 +57,10 @@ var Engine = Matter.Engine,
     };
 
 function setup() {
-    canvas = createCanvas(displayWidth, displayHeight);
-    playAreaHeight = displayHeight;
-    playAreaWidth = displayWidth;
+    canvas = createCanvas(windowWidth, windowHeight);
+    ballRadius = windowWidth*.01;
+    playAreaHeight = windowHeight;
+    playAreaWidth = windowWidth;
     Matter.Resolver._restingThresh = 0.1;
     ballSpeed = 0.15;
     canvas.style("overscroll-behavior-y", "contain");
@@ -108,10 +110,10 @@ function setup() {
     walls.push(new Wall(playAreaWidth, playAreaHeight/2, playAreaWidth*.1, playAreaHeight));  //right
     walls[3].body.label = "Wall3";
 
-    ball = new Ball(random(playAreaWidth*.2, playAreaWidth*.8), random(playAreaHeight*.2, playAreaHeight*.8), 20);
+    ball = new Ball(random(playAreaWidth*.2, playAreaWidth*.8), random(playAreaHeight*.2, playAreaHeight*.8), ballRadius);
 
     for ( var i = 0 ; i < level ; i++){
-        enemies.push(new Enemy(random(playAreaWidth*.3, playAreaWidth*.7), random(playAreaHeight*.3, playAreaHeight*.7), 20));
+        enemies.push(new Enemy(random(playAreaWidth*.3, playAreaWidth*.7), random(playAreaHeight*.3, playAreaHeight*.7), ballRadius));
         enemies[i].body.label = "Enemy"+i;
     }
 
@@ -289,8 +291,8 @@ function draw() {
         // rect(770, 50, 10, 500, 10);
         // fill(0, 0, 0);
         // rect(770, 50, 10, (sin(angle/100)*250+250), 10);
-        ballVelocity = (sin(angle/100)+1)/2;
-        fill(0);
+        ballVelocity = (sin(angle/100)+1)*.7;
+        fill(0, 0, 0, 50);
         ellipse(mouseX, mouseY, ballVelocity*50);
         angle+=2;
     }
