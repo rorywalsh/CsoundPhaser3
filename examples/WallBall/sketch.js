@@ -33,7 +33,8 @@ var Engine = Matter.Engine,
     canvas,
     firstTouch = 0,
     ballRadius,
-    mouseDownPos;
+    mouseDownPos,
+    debugInfo;
 
     // function touchStarted () {
     //     var fs = fullscreen();
@@ -299,4 +300,7 @@ function draw() {
         ellipse(mouseX, mouseY, ballVelocity*50);
         angle+=2;
     }
+    fill(255);
+    textSize(20);
+    text(touches.length, 10, 10);
 }
