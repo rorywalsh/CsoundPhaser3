@@ -59,6 +59,7 @@ var Engine = Matter.Engine,
 
 function setup() {
     canvas = createCanvas(windowWidth, windowHeight);
+    mouseDownPos = createVector(0, 0);
     ballRadius = windowWidth*.01;
     playAreaHeight = windowHeight;
     playAreaWidth = windowWidth;
@@ -173,8 +174,7 @@ function mousePressed() {
     pointerPressed();
 }
 
-function touchPressed()
-{
+function touchPressed(){
     pointerPressed();
 }
 
