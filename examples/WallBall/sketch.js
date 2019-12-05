@@ -32,7 +32,8 @@ var Engine = Matter.Engine,
     ballSpeed = 0.2,
     canvas,
     firstTouch = 0,
-    ballRadius;
+    ballRadius,
+    mouseDownPos;
 
     // function touchStarted () {
     //     var fs = fullscreen();
@@ -160,7 +161,8 @@ function pointerMoved()
     ball.show(); 
     showEnemies();
     trajectoryPointPos = Vector.create(ball.body.position.x,ball.body.position.y);
-    var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
+    // var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
+    var force = Vector.normalise(Vector.create(mouseX-mouseDownPos.x, mouseY-mouseDownPos.y));
     trajectoryPointVel = Vector.create(force.x, force.y);
     pathFadeOutValue = 255; 
     shouldDrawPath = 1; 
@@ -184,6 +186,7 @@ function touchPressed()
 function pointerPressed()
 {
     showPowerLevel = true;
+    mouseDownPos = createVector(mouseX, mouseY);
     trajectoryPointPos = Vector.create(ball.body.position.x,ball.body.position.y);
     shouldDrawPath = 0;//shouldDrawPath == 1 ? 0 : shouldDrawPath+1;
     angle = 0;
@@ -203,8 +206,8 @@ function touchReleased()
 //device agnostic method
 function pointerReleased()
 {
-    var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
-    body.applyForce(ball.body, ball.body.position, {x:force.x*ballSpeed*ballVelocity, y:force.y*ballSpeed*ballVelocity});
+    // var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
+    // body.applyForce(ball.body, ball.body.position, {x:force.x*ballSpeed*ballVelocity, y:force.y*ballSpeed*ballVelocity});
     shouldDrawPath = 0;
     shotTaken = true;
     showPowerLevel = false;
