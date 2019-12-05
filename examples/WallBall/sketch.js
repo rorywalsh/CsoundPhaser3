@@ -175,11 +175,7 @@ function mousePressed() {
 
 function touchPressed()
 {
-    if(firstTouch==1) 
-        pointerPressed();
-    
-    firstTouch = 1;
-
+    pointerPressed();
 }
 
 //device agnostic method
