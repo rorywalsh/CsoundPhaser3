@@ -295,7 +295,7 @@ function draw() {
     text(debugInfo+" "+touches.length, 100, 100);
 
     if(isMobile == true)
-        text("Mobile4", 100, 200);
+        text("Mobil5", 100, 200);
     else
         text("not Mobile", 100, 200);
 }
