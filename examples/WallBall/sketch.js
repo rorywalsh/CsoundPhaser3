@@ -146,7 +146,8 @@ function mouseMoved()
 
 function touchMoved()
 {
-    pointerMoved();
+    if(touches.length!=2)
+        pointerMoved();
 }
 
 //device agnostic method
@@ -274,7 +275,7 @@ function draw() {
     text(debugInfo+" "+touches.length, 100, 100);
 
     if(isMobile == true)
-        text("Mobile14", 100, 200);
+        text("Mobile15", 100, 200);
     else
         text("not Mobile", 100, 200);
 
