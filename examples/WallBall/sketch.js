@@ -148,7 +148,7 @@ function touchMoved(event)
 {
     if(touches.length!=2)
     {
-        if (event.absDeltaX > 5 && event.absDeltaY > 5) {
+        if (event.absDeltaX < 5 && event.absDeltaY < 5) {
             pointerMoved();
         }
     }
@@ -280,7 +280,7 @@ function draw() {
     text(debugInfo+" "+touches.length, 100, 100);
 
     if(isMobile == true)
-        text("Mobile16", 100, 200);
+        text("Mobile17", 100, 200);
     else
         text("not Mobile", 100, 200);
 
