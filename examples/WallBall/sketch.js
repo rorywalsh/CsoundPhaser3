@@ -211,7 +211,8 @@ function touchEnded()
 {
     debugInfo =  "mouseReleased: touches:";
     var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
-    body.applyForce(ball.body, ball.body.position, {x:force.x*ballSpeed*ballVelocity, y:force.y*ballSpeed*ballVelocity});
+    if(touches.length == 1)
+        body.applyForce(ball.body, ball.body.position, {x:force.x*ballSpeed*ballVelocity, y:force.y*ballSpeed*ballVelocity});
     pointerReleased();
 }
 //device agnostic method
