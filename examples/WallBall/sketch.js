@@ -196,7 +196,7 @@ function pointerPressed()
     trajectoryPointPos = Vector.create(ball.body.position.x,ball.body.position.y);
     // shouldDrawPath = 0;//shouldDrawPath == 1 ? 0 : shouldDrawPath+1;
     angle = 0;
-    //shotEnded = false;
+    shotEnded = false;
 }
 
 // mouse/touch events
@@ -205,6 +205,7 @@ function mouseReleased()
     var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
     body.applyForce(ball.body, ball.body.position, {x:force.x*ballSpeed*ballVelocity, y:force.y*ballSpeed*ballVelocity});
     pointerReleased();
+    showPowerLevel = false;
 }
 
 function touchEnded()
@@ -273,7 +274,7 @@ function draw() {
     text(debugInfo+" "+touches.length, 100, 100);
 
     if(isMobile == true)
-        text("Mobile12", 100, 200);
+        text("Mobile13", 100, 200);
     else
         text("not Mobile", 100, 200);
 
@@ -298,12 +299,12 @@ function draw() {
     if(showPowerLevel){
         stroke(255);
         strokeWeight(1);
-        ballVelocity = (sin(angle/100)+1)*(isMobile ? .3 : .7);
+        ballVelocity = (sin(angle/100)+1)*(isMobile ? .3 : .5);
         fill(0, 0, 0, 50);
         if(touches.length == 2)
-            ellipse(mouseX, mouseY, ballVelocity*(isMobile ? 100 : 50));
+            ellipse(touches[1].x, touches[1].y, ballVelocity*(isMobile ? 100 : 50));   
         else
-            ellipse(touches[1].x, touches[1].y, ballVelocity*(isMobile ? 100 : 50));
+            ellipse(mouseX, mouseY, ballVelocity*(isMobile ? 100 : 50));
         angle+=2;
     }
 
