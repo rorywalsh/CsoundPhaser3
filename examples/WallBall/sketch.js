@@ -315,4 +315,7 @@ function draw() {
     fill(255);
     textSize(20);
     text(debugInfo, 100, 100);
+
+    if(window.mobilecheck === true)
+        text("Mobile", 100, 200);
 }
