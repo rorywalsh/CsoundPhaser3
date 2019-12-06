@@ -148,7 +148,7 @@ function touchMoved(event)
 {
     if(touches.length!=2)
     {
-        if (event.absDeltaX < 5 && event.absDeltaY < 5) {
+        if (abs(touches[0].x - mouseDownPos.x)>5 || abs(touches[0].y - mouseDownPos.y)>5) {
             pointerMoved();
         }
     }
