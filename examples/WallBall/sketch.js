@@ -194,9 +194,7 @@ function pointerPressed()
     showPowerLevel = true;
     mouseDownPos = createVector(mouseX, mouseY);
     trajectoryPointPos = Vector.create(ball.body.position.x,ball.body.position.y);
-    shouldDrawPath = 0;//shouldDrawPath == 1 ? 0 : shouldDrawPath+1;
-    if(isMobile == true)
-        shouldDrawPath = 1; 
+    // shouldDrawPath = 0;//shouldDrawPath == 1 ? 0 : shouldDrawPath+1;
     angle = 0;
     shotEnded = false;
 }
