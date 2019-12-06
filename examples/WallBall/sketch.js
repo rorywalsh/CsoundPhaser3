@@ -217,7 +217,7 @@ function touchEnded()
 //device agnostic method
 function pointerReleased()
 {
-    shouldDrawPath = 0;
+    //shouldDrawPath = 0;
     shotTaken = true;
     showPowerLevel = false;
 }
