@@ -182,7 +182,7 @@ function mousePressed() {
     pointerPressed();
 }
 
-function touchPressed(){
+function touchStart(){
     debugInfo = "touchPressed: touches:" +touches.length;
     pointerPressed();
 }
