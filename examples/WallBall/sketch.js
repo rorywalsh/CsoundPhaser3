@@ -212,7 +212,7 @@ function touchEnded()
     debugInfo =  "mouseReleased: touches:";
     var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
     if(touches.length == 1){
-        trajectoryPointVel.normalise();
+        //trajectoryPointVel.normalise();
         body.applyForce(ball.body, ball.body.position, {x:trajectoryPointVel.x*ballSpeed*ballVelocity, y:trajectoryPointVel.y*ballSpeed*ballVelocity});
     }
 
@@ -266,6 +266,15 @@ function draw() {
         showEnemies();
     }
 
+    fill(255);
+    textSize(20);
+    text(debugInfo+" "+touches.length, 100, 100);
+
+    if(isMobile == true)
+        text("Mobile7", 100, 200);
+    else
+        text("not Mobile", 100, 200);
+        
     if(ball.body.speed<.05 && shotTaken == true)
     {
         shotEnded = true;
@@ -293,12 +302,5 @@ function draw() {
         angle+=2;
     }
 
-    fill(255);
-    textSize(20);
-    text(debugInfo+" "+touches.length, 100, 100);
 
-    if(isMobile == true)
-        text("Mobil6", 100, 200);
-    else
-        text("not Mobile", 100, 200);
 }
