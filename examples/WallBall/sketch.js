@@ -315,4 +315,6 @@ function draw() {
 
     if(isMobile == true)
         text("Mobile", 100, 200);
+    else
+        text("not Mobile", 100, 200);
 }
