@@ -211,8 +211,11 @@ function touchEnded()
 {
     debugInfo =  "mouseReleased: touches:";
     var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
-    if(touches.length == 1)
-        body.applyForce(ball.body, ball.body.position, {x:force.x*ballSpeed*ballVelocity, y:force.y*ballSpeed*ballVelocity});
+    if(touches.length == 1){
+        trajectoryPointVel.normalise();
+        body.applyForce(ball.body, ball.body.position, {x:trajectoryPointVel.x*ballSpeed*ballVelocity, y:trajectoryPointVel.y*ballSpeed*ballVelocity});
+    }
+
     pointerReleased();
 }
 //device agnostic method
@@ -295,7 +298,7 @@ function draw() {
     text(debugInfo+" "+touches.length, 100, 100);
 
     if(isMobile == true)
-        text("Mobil5", 100, 200);
+        text("Mobil6", 100, 200);
     else
         text("not Mobile", 100, 200);
 }
