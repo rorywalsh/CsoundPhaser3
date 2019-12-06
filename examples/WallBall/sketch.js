@@ -211,7 +211,7 @@ function touchReleased()
 {
     debugInfo =  "mouseReleased: touches:" +touches.length;
     var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
-    if(touches.length>1)
+    if(touches.length==2)
         body.applyForce(ball.body, ball.body.position, {x:force.x*ballSpeed*ballVelocity, y:force.y*ballSpeed*ballVelocity});
     pointerReleased();
 }
