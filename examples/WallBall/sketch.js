@@ -271,7 +271,7 @@ function draw() {
     text(debugInfo+" "+touches.length, 100, 100);
 
     if(isMobile == true)
-        text("Mobile7", 100, 200);
+        text("Mobile8", 100, 200);
     else
         text("not Mobile", 100, 200);
 
@@ -298,7 +298,7 @@ function draw() {
     if(showPowerLevel){
         ballVelocity = (sin(angle/100)+1)* (isMobile ? .1 : .7);
         fill(0, 0, 0, 50);
-        ellipse(mouseX, mouseY, ballVelocity*50);
+        ellipse(mouseX, mouseY, ballVelocity*(isMobile ? 300 : 50));
         angle+=2;
     }
 
