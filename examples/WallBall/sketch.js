@@ -13,7 +13,7 @@ var Engine = Matter.Engine,
     trajectoryPoints = new Array(100),
     wallHits = [1, 1, 1, 1],
     enemyHits = [0],
-    shotTaken = false,
+    shotTaken = true,
     shotEnded = true,
     ballVelocity = 1,
     showPowerLevel = false,
@@ -22,7 +22,7 @@ var Engine = Matter.Engine,
     level = 1,
     angle = 0,
     enemies = [],
-    ball, dummyBall;
+    ball, dummyBall,
     walls = [],
     engine,
     world,
@@ -132,13 +132,6 @@ function showWalls()
           elem.show();
 }
 
-// function touchStarted () {
-//     var fs = fullscreen();
-//     if (!fs) {
-//       fullscreen(true);
-//     }
-//   }
-
 function showEnemies()
 {
     for(elem of enemies)
@@ -191,7 +184,11 @@ function touchStarted(){
 function pointerPressed()
 {
     debugInfo = "mousePressed: touches:";
-    showPowerLevel = true;
+    if(touches.length==2)
+        showPowerLevel = true;
+    
+    if(isMobile === false)
+        showPowerLevel = true;
     mouseDownPos = createVector(mouseX, mouseY);
     trajectoryPointPos = Vector.create(ball.body.position.x,ball.body.position.y);
     // shouldDrawPath = 0;//shouldDrawPath == 1 ? 0 : shouldDrawPath+1;
