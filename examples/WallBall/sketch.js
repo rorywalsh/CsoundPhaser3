@@ -223,7 +223,7 @@ function pointerReleased()
 {
     shouldDrawPath = 0;
     shotTaken = true;
-    showPowerLevel = false;
+    // showPowerLevel = false;
 }
 
 function restartLevel()
@@ -274,7 +274,7 @@ function draw() {
         text("Mobile7", 100, 200);
     else
         text("not Mobile", 100, 200);
-        
+
     if(ball.body.speed<.05 && shotTaken == true)
     {
         shotEnded = true;
