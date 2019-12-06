@@ -296,7 +296,7 @@ function draw() {
     }
 
     if(showPowerLevel){
-        ballVelocity = (sin(angle/100)+1)* (isMobile ? .1 : .7);
+        ballVelocity = (sin(angle/100)+1);
         fill(0, 0, 0, 50);
         ellipse(mouseX, mouseY, ballVelocity*(isMobile ? 300 : 50));
         angle+=2;
