@@ -148,7 +148,7 @@ function touchMoved(event)
 {
     if(touches.length!=2)
     {
-        if (abs(touches[0].x - mouseDownPos.x)>5 || abs(touches[0].y - mouseDownPos.y)>5) {
+        if (abs(touches[0].x - mouseDownPos.x)>10 || abs(touches[0].y - mouseDownPos.y)>10) {
             pointerMoved();
         }
     }
@@ -280,7 +280,7 @@ function draw() {
     text(debugInfo+" "+touches.length, 100, 100);
 
     if(isMobile == true)
-        text("Mobile17", 100, 200);
+        text("Mobile18", 100, 200);
     else
         text("not Mobile", 100, 200);
 
