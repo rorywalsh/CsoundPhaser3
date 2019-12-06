@@ -215,6 +215,8 @@ function touchEnded()
         //trajectoryPointVel.normalise();
         body.applyForce(ball.body, ball.body.position, {x:trajectoryPointVel.x*ballSpeed*ballVelocity, y:trajectoryPointVel.y*ballSpeed*ballVelocity});
     }
+    else if(touches.length == 0)
+        showPowerLevel = false;
 
     pointerReleased();
 }
@@ -271,7 +273,7 @@ function draw() {
     text(debugInfo+" "+touches.length, 100, 100);
 
     if(isMobile == true)
-        text("Mobile8", 100, 200);
+        text("Mobile9", 100, 200);
     else
         text("not Mobile", 100, 200);
 
@@ -298,7 +300,7 @@ function draw() {
     if(showPowerLevel){
         ballVelocity = (sin(angle/100)+1);
         fill(0, 0, 0, 50);
-        ellipse(mouseX, mouseY, ballVelocity*(isMobile ? 300 : 50));
+        ellipse(mouseX, mouseY, ballVelocity*(isMobile ? 100 : 50));
         angle+=2;
     }
 
