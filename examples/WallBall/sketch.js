@@ -273,7 +273,7 @@ function draw() {
     text(debugInfo+" "+touches.length, 100, 100);
 
     if(isMobile == true)
-        text("Mobile9", 100, 200);
+        text("Mobile11", 100, 200);
     else
         text("not Mobile", 100, 200);
 
@@ -287,8 +287,6 @@ function draw() {
             // showLevelOverMessage = true;
             wallHits = [1,1,1,1];
             enemiesHit = 0;
-
-
         }
         else if(sum < 0){
             level++;
@@ -298,7 +296,7 @@ function draw() {
     }
 
     if(showPowerLevel){
-        ballVelocity = (sin(angle/100)+1);
+        ballVelocity = (sin(angle/100)+1)*(isMobile ? .3 : .7);
         fill(0, 0, 0, 50);
         ellipse(mouseX, mouseY, ballVelocity*(isMobile ? 100 : 50));
         angle+=2;
