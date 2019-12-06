@@ -159,7 +159,7 @@ function touchMoved()
 //device agnostic method
 function pointerMoved()
 {
-    debugInfo = "mouseMoved: touches:" +touches.length;
+    debugInfo = "mouseMoved: touches:";
     var force;
     background(51);  
     showWalls(); 
@@ -183,14 +183,14 @@ function mousePressed() {
 }
 
 function touchStarted(){
-    debugInfo = "touchPressed: touches:" +touches.length;
+    debugInfo = "touchPressed: touches:";
     pointerPressed();
 }
 
 //device agnostic method
 function pointerPressed()
 {
-    debugInfo = "mousePressed: touches:" +touches.length;
+    debugInfo = "mousePressed: touches:";
     showPowerLevel = true;
     mouseDownPos = createVector(mouseX, mouseY);
     trajectoryPointPos = Vector.create(ball.body.position.x,ball.body.position.y);
@@ -209,7 +209,7 @@ function mouseReleased()
 
 function touchReleased()
 {
-    debugInfo =  "mouseReleased: touches:" +touches.length;
+    debugInfo =  "mouseReleased: touches:";
     var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
     if(touches.length==2)
         body.applyForce(ball.body, ball.body.position, {x:force.x*ballSpeed*ballVelocity, y:force.y*ballSpeed*ballVelocity});
@@ -311,7 +311,7 @@ function draw() {
     }
     fill(255);
     textSize(20);
-    text(debugInfo, 100, 100);
+    text(debugInfo+" "+touches.length, 100, 100);
 
     if(isMobile == true)
         text("Mobile", 100, 200);
