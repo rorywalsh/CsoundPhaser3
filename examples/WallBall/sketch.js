@@ -282,28 +282,19 @@ function draw() {
         shotTaken = false;
     }
 
-    // if(showLevelOverMessage){
-    //     textSize(width / 10);
-    //     textAlign(CENTER, CENTER);
-    //     fill(0, 255, 0);
-    //     text("Whoops...", width/2, height/2);
-    // }
     if(showPowerLevel){
-        // fill(255, 0, 0);
-        // rect(770, 50, 10, 500, 10);
-        // fill(0, 0, 0);
-        // rect(770, 50, 10, (sin(angle/100)*250+250), 10);
-        ballVelocity = (sin(angle/100)+1)*.7;
+        ballVelocity = (sin(angle/100)+1)* (isMobile ? .1 : .7);
         fill(0, 0, 0, 50);
         ellipse(mouseX, mouseY, ballVelocity*50);
         angle+=2;
     }
+
     fill(255);
     textSize(20);
     text(debugInfo+" "+touches.length, 100, 100);
 
     if(isMobile == true)
-        text("Mobile1", 100, 200);
+        text("Mobile4", 100, 200);
     else
         text("not Mobile", 100, 200);
 }
