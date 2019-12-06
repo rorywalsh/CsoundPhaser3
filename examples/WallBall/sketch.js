@@ -196,7 +196,7 @@ function pointerPressed()
     trajectoryPointPos = Vector.create(ball.body.position.x,ball.body.position.y);
     // shouldDrawPath = 0;//shouldDrawPath == 1 ? 0 : shouldDrawPath+1;
     angle = 0;
-    shotEnded = false;
+    //shotEnded = false;
 }
 
 // mouse/touch events
@@ -217,7 +217,7 @@ function touchEnded()
 //device agnostic method
 function pointerReleased()
 {
-    //shouldDrawPath = 0;
+    shouldDrawPath = 0;
     shotTaken = true;
     showPowerLevel = false;
 }
