@@ -296,6 +296,8 @@ function draw() {
     }
 
     if(showPowerLevel){
+        stroke(255);
+        strokeWeight(1);
         ballVelocity = (sin(angle/100)+1)*(isMobile ? .3 : .7);
         fill(0, 0, 0, 50);
         ellipse(mouseX, mouseY, ballVelocity*(isMobile ? 100 : 50));
