@@ -144,10 +144,15 @@ function mouseMoved()
    pointerMoved();
 }
 
-function touchMoved()
+function touchMoved(event)
 {
     if(touches.length!=2)
-        pointerMoved();
+    {
+        if (event.absDeltaX > 5 && event.absDeltaY > 5) {
+            pointerMoved();
+        }
+    }
+        
 }
 
 //device agnostic method
@@ -275,7 +280,7 @@ function draw() {
     text(debugInfo+" "+touches.length, 100, 100);
 
     if(isMobile == true)
-        text("Mobile15", 100, 200);
+        text("Mobile16", 100, 200);
     else
         text("not Mobile", 100, 200);
 
