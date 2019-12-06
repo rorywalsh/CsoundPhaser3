@@ -189,7 +189,10 @@ function pointerPressed()
     
     if(isMobile === false)
         showPowerLevel = true;
-    mouseDownPos = createVector(mouseX, mouseY);
+    
+    if(touches.length==1)
+        mouseDownPos = createVector(mouseX, mouseY);
+    
     trajectoryPointPos = Vector.create(ball.body.position.x,ball.body.position.y);
     // shouldDrawPath = 0;//shouldDrawPath == 1 ? 0 : shouldDrawPath+1;
     angle = 0;
@@ -207,9 +210,9 @@ function mouseReleased()
 function touchEnded()
 {
     debugInfo =  "mouseReleased: touches:";
-    // var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
-    // body.applyForce(ball.body, ball.body.position, {x:force.x*ballSpeed*ballVelocity, y:force.y*ballSpeed*ballVelocity});
-    // pointerReleased();
+    var force = Vector.normalise(Vector.create(mouseX-ball.body.position.x, mouseY-ball.body.position.y));
+    body.applyForce(ball.body, ball.body.position, {x:force.x*ballSpeed*ballVelocity, y:force.y*ballSpeed*ballVelocity});
+    pointerReleased();
 }
 //device agnostic method
 function pointerReleased()
@@ -300,7 +303,7 @@ function draw() {
     text(debugInfo+" "+touches.length, 100, 100);
 
     if(isMobile == true)
-        text("Mobile2", 100, 200);
+        text("Mobile3", 100, 200);
     else
         text("not Mobile", 100, 200);
 }
