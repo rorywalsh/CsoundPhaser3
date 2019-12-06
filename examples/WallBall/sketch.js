@@ -195,6 +195,8 @@ function pointerPressed()
     mouseDownPos = createVector(mouseX, mouseY);
     trajectoryPointPos = Vector.create(ball.body.position.x,ball.body.position.y);
     shouldDrawPath = 0;//shouldDrawPath == 1 ? 0 : shouldDrawPath+1;
+    if(isMobile == true){
+        shouldDrawPath = 1;
     angle = 0;
     shotEnded = false;
 }
@@ -232,14 +234,6 @@ function restartLevel()
 
 function draw() {
     Engine.update(engine);
-    // for(elem of walls)
-    // {
-    //     var collide = Matter.Detector(ball.body, elem.body);
-
-    //     if (collide){
-    //         console.log(ball.body.position);
-    //     }
-    // }
 
     if(shouldDrawPath==1 && shotEnded){
         noStroke();
@@ -259,8 +253,6 @@ function draw() {
                 trajectoryPointVel.x*=-1;  
         }
         pathFadeOutValue-=playAreaWidth*0.001;;
-        // if(pathFadeOutValue<0)
-        // shouldDrawPath = 0;
     }
     else
     {
