@@ -257,10 +257,10 @@ function draw() {
             trajectoryPointPos.x+=trajectoryPointVel.x*20;
             trajectoryPointPos.y+=trajectoryPointVel.y*20;
 
-            if(trajectoryPointPos.y < walls[0].body.position.y+80 || trajectoryPointPos.y > walls[1].body.position.y-80){
+            if(trajectoryPointPos.y < walls[0].body.position.y+playAreaHeight*.1 || trajectoryPointPos.y > walls[1].body.position.y-playAreaHeight*.1){
                 trajectoryPointVel.y*=-1;
             }
-            if(trajectoryPointPos.x < walls[2].body.position.x+80 || trajectoryPointPos.x > walls[3].body.position.x-80)
+            if(trajectoryPointPos.x < walls[2].body.position.x+playAreaWidth*.1 || trajectoryPointPos.x > walls[3].body.position.x-+playAreaWidth*.1)
                 trajectoryPointVel.x*=-1;  
         }
         pathFadeOutValue-=playAreaWidth*0.001;;
@@ -280,7 +280,7 @@ function draw() {
     text(debugInfo+" "+touches.length, 100, 100);
 
     if(isMobile == true)
-        text("Mobile20", 100, 200);
+        text("Mobile21", 100, 200);
     else
         text("not Mobile", 100, 200);
 
