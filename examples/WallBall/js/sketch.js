@@ -22,7 +22,7 @@ var Engine = Matter.Engine,
     level = 1,
     angle = 0,
     enemies = [],
-    ball, dummyBall,
+    ball,
     walls = [],
     engine,
     world,
@@ -61,7 +61,7 @@ function setup() {
     canvas = createCanvas(windowWidth, windowHeight);
     canvas.style('display', 'block');
     mouseDownPos = createVector(0, 0);
-    ballRadius = windowWidth*.01;
+    ballRadius = windowWidth*.015;
     ballVelocity = .001;
     debugInfo = "";
     playAreaHeight = windowHeight;
@@ -281,9 +281,9 @@ function draw() {
     text(debugInfo+" "+touches.length, 100, 100);
 
     if(isMobile == true)
-        text("Mobile24", 100, 200);
+        text("Mobile25", 100, 200);
     else
-        text("not Mobile24", 100, 200);
+        text("not Mobile25", 100, 200);
 
     if(ball.body.speed<.05 && shotTaken == true)
     {
