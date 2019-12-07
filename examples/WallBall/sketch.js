@@ -282,7 +282,7 @@ function draw() {
     if(isMobile == true)
         text("Mobile21", 100, 200);
     else
-        text("not Mobile", 100, 200);
+        text("not Mobile21", 100, 200);
 
     if(ball.body.speed<.05 && shotTaken == true)
     {
