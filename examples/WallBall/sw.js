@@ -3,21 +3,21 @@
 
 var cacheName = 'WallBall';
 var filesToCache = [
-    'WallBall/', 
-    'WallBall/csound/CsoundObj.js',
-    'WallBall/csound/CsoundProcessor.js',
-    'WallBall/csound/libcsound.js',
-    'WallBall/csound/libcsound.wasm',
-    'WallBall/csound/libcsound-worklet.base64.js',
-    'WallBall/csound/libcsound-worklet.js',
-    'WallBall/scripts/backgroundStar.js',
-    'WallBall/scripts/Ball.js',
-    'WallBall/scripts/Enemy.js',
-    'WallBall/scripts/sketch.js',
-    'WallBall/scripts/p5.dom.min.js',
-    'WallBall/scripts/p5.min.js',
-    'WallBall/index.html',
-    'WallBall/scripts/sw.js'
+    '', 
+    'index.html',
+    'csound/CsoundObj.js',
+    'csound/CsoundProcessor.js',
+    'csound/libcsound.js',
+    'csound/libcsound.wasm',
+    'csound/CsoundScriptProcessorNode.js',
+    'csound/libcsound-worklet.js',
+    'csound/libcsound-worklet.wasm.js',
+    'Ball.js',
+    'Enemy.js',
+    'sketch.js',
+    'p5.dom.js',
+    'p5.min.js',
+    'WallBall/sw.js'
 ];
 
 self.addEventListener('install', function(e) {
