@@ -281,9 +281,9 @@ function draw() {
     text(debugInfo+" "+touches.length, 100, 100);
 
     if(isMobile == true)
-        text("Mobile25", 100, 200);
+        text("Mobile26", 100, 200);
     else
-        text("not Mobile25", 100, 200);
+        text("not Mobile26", 100, 200);
 
     if(ball.body.speed<.05 && shotTaken == true)
     {
