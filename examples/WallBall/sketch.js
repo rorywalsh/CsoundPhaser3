@@ -59,6 +59,7 @@ var Engine = Matter.Engine,
 
 function setup() {
     canvas = createCanvas(windowWidth, windowHeight);
+    canvas.style('display', 'block');
     mouseDownPos = createVector(0, 0);
     ballRadius = windowWidth*.01;
     ballVelocity = .001;
@@ -305,12 +306,12 @@ function draw() {
     if(showPowerLevel){
         stroke(255);
         strokeWeight(1);
-        ballVelocity = (sin(angle/100)+1)*(isMobile ? .3 : .5);
+        ballVelocity = (sin(angle/100)+1)*(isMobile ? .1 : .5);
         fill(0, 0, 0, 150);
         if(touches.length == 2)
-            ellipse(touches[1].x, touches[1].y, ballVelocity*(isMobile ? 100 : 50));   
+            ellipse(ball.body.position.x, ball.body.position.y, ballVelocity*(isMobile ? 100 : 50));   
         else
-            ellipse(mouseX, mouseY, ballVelocity*(isMobile ? 200 : 50));
+            ellipse(ball.body.position.x, ball.body.position.y, ballVelocity*(isMobile ? 200 : 50));
         angle+=2;
     }
 
